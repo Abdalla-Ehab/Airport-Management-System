@@ -71,11 +71,15 @@ async function authenticate(username, password) {
 
 // PASSENGER REGISTRATION
 document.getElementById('register-btn').addEventListener('click', async () => {
+    const fn = document.getElementById('reg-firstname').value.trim();
+    const ln = document.getElementById('reg-lastname').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value.trim();
     const errEl = document.getElementById('auth-error');
 
-    if (!username || !password) {
+    if (!fn || !ln || !email || !phone || !username || !password) {
         errEl.textContent = 'Please fill out all fields.';
         errEl.classList.remove('hidden');
         return;
@@ -85,13 +89,27 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         const res = await fetch(`${API}/auth/register/passenger`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ 
+                firstName: fn, 
+                lastName: ln, 
+                email: email, 
+                phone: phone, 
+                username: username, 
+                password: password 
+            })
         });
         if (res.ok) {
             showToast('Account created! You can now log in.', 'success');
             document.getElementById('tab-login').click(); // Switch back to login
+            // Clear fields
+            document.getElementById('reg-firstname').value = '';
+            document.getElementById('reg-lastname').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-phone').value = '';
+            document.getElementById('reg-username').value = '';
+            document.getElementById('reg-password').value = '';
         } else {
-            errEl.textContent = 'Username might already exist.';
+            errEl.textContent = 'Registration failed. Username or Email might already exist.';
             errEl.classList.remove('hidden');
         }
     } catch (err) {
@@ -102,20 +120,41 @@ document.getElementById('register-btn').addEventListener('click', async () => {
 
 // ADMIN: ADD STAFF
 document.getElementById('add-staff-btn')?.addEventListener('click', async () => {
+    const fn = document.getElementById('staff-fn').value.trim();
+    const ln = document.getElementById('staff-ln').value.trim();
+    const email = document.getElementById('staff-email').value.trim();
+    const phone = document.getElementById('staff-phone').value.trim();
+    const role = document.getElementById('staff-role').value;
     const username = document.getElementById('staff-username').value.trim();
     const password = document.getElementById('staff-password').value.trim();
     const resultEl = document.getElementById('add-staff-result');
 
-    if (!username || !password) return;
+    if (!fn || !username || !password) {
+        showResult(resultEl, `⚠️ Please fill in all required fields.`, false);
+        return;
+    }
 
     try {
         const res = await fetch(`${API}/auth/register/staff`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ 
+                firstName: fn, 
+                lastName: ln, 
+                email: email, 
+                phone: phone, 
+                role: role,
+                username: username, 
+                password: password 
+            })
         });
         if (res.ok) {
-            showResult(resultEl, `✅ Staff account '${username}' created successfully!`, true);
+            showResult(resultEl, `✅ Staff account '${username}' created successfully as ${role}!`, true);
+            // Clear fields
+            document.getElementById('staff-fn').value = '';
+            document.getElementById('staff-ln').value = '';
+            document.getElementById('staff-email').value = '';
+            document.getElementById('staff-phone').value = '';
             document.getElementById('staff-username').value = '';
             document.getElementById('staff-password').value = '';
         } else {
@@ -125,6 +164,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
         showResult(resultEl, `⚠️ Network error.`, false);
     }
 });
+
 
 /* ═══════════════════════════════════════════
    ROUTER

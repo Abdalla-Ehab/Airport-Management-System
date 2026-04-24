@@ -44,13 +44,35 @@
             </div>
 
             <div id="form-register" class="hidden">
-                <div class="form-group">
-                    <label>Choose Username</label>
-                    <input type="text" id="reg-username" placeholder="Create a username" autocomplete="off" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" id="reg-firstname" placeholder="First" />
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" id="reg-lastname" placeholder="Last" />
+                    </div>
                 </div>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label>Create Password</label>
-                    <input type="password" id="reg-password" placeholder="••••••••" />
+                <div class="form-row" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="reg-email" placeholder="email@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="reg-phone" placeholder="e.g. 010..." />
+                    </div>
+                </div>
+                <div class="form-row" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="reg-username" placeholder="Choose a username" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" placeholder="••••••••" />
+                    </div>
                 </div>
                 <button class="btn-primary" id="register-btn" style="margin-top: 20px;">Create Account</button>
             </div>
@@ -266,13 +288,47 @@
                     <p>Create credentials for new airport employees</p>
                 </div>
                 <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Staff Username</label>
-                        <input type="text" id="staff-username" placeholder="e.g. jsmith_security" />
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" id="staff-fn" placeholder="First Name" />
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" id="staff-ln" placeholder="Last Name" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Temporary Password</label>
-                        <input type="password" id="staff-password" placeholder="••••••••" />
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="staff-email" placeholder="work@airport.com" />
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="staff-phone" placeholder="Phone Number" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Assigned Role</label>
+                            <select id="staff-role">
+                                <option value="Gate Agent">Gate Agent</option>
+                                <option value="Security">Security</option>
+                                <option value="Baggage Handler">Baggage Handler</option>
+                                <option value="Maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 10px 0;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>System Username</label>
+                            <input type="text" id="staff-username" placeholder="e.g. jsmith_sec" />
+                        </div>
+                        <div class="form-group">
+                            <label>Temporary Password</label>
+                            <input type="password" id="staff-password" placeholder="••••••••" />
+                        </div>
                     </div>
                     <button class="btn-primary" id="add-staff-btn">Create Staff Account</button>
                     <div id="add-staff-result" class="result-area hidden"></div>

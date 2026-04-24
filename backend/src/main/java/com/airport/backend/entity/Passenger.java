@@ -19,6 +19,20 @@ public class Passenger {
     // These match the columns we added for the login system
     private String username;
     private String password;
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getPhone_number() {
+        return phone_number;
+    }
+    public void setPhone_number(String phone_number) {
+        this.phone_number = phone_number;
+    }
+    private String email;
+    private String phone_number;
 
     // Getters and Setters
     public Long getPassenger_id() { return passenger_id; }
