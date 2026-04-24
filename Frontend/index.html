@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>twixNexus — Airport Management System</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- ========== LOGIN SCREEN ========== -->
+<section id="login-screen" class="active fullscreen">
+        <div class="login-bg">
+            <div class="login-overlay"></div>
+        </div>
+        <div class="login-card glass">
+            <div class="brand">
+                <div class="brand-icon">✈</div>
+                <h1>twixNexus</h1>
+                <p class="brand-sub">Airport Management Platform</p>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button id="tab-login" class="btn-primary" style="flex: 1; padding: 10px;">Login</button>
+                <button id="tab-register" class="btn-primary" style="flex: 1; padding: 10px; background: transparent; border: 1px solid var(--sky); color: var(--sky);">Register</button>
+            </div>
+
+            <div id="form-login">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" />
+                </div>
+                <button class="btn-primary" id="login-btn" style="margin-top: 20px;">Sign In</button>
+            </div>
+
+            <div id="form-register" class="hidden">
+                <div class="form-group">
+                    <label>Choose Username</label>
+                    <input type="text" id="reg-username" placeholder="Create a username" autocomplete="off" />
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Create Password</label>
+                    <input type="password" id="reg-password" placeholder="••••••••" />
+                </div>
+                <button class="btn-primary" id="register-btn" style="margin-top: 20px;">Create Account</button>
+            </div>
+
+            <div id="auth-error" class="msg-error hidden"></div>
+        </div>
+    </section>
+
+
+    <!-- ========== APP SHELL ========== -->
+    <div id="app-shell" class="hidden">
+
+        <!-- SIDEBAR NAV -->
+        <nav id="sidebar">
+            <div class="nav-brand">
+                <div class="brand-icon small">✈</div>
+                <span>Twix</span>
+            </div>
+            <div class="nav-user">
+                <div class="user-avatar" id="nav-avatar">P</div>
+                <div>
+                    <div class="user-name" id="nav-username">Passenger</div>
+                    <div class="user-role" id="nav-role">Passenger Portal</div>
+                </div>
+            </div>
+            <ul class="nav-links" id="nav-links"></ul>
+            <button class="btn-logout" id="logout-btn">⬅ Sign Out</button>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main id="main-content">
+
+            <!-- Toast -->
+            <div id="toast-container"></div>
+
+            <!-- ── PASSENGER VIEWS ── -->
+            <section id="view-home" class="view hidden">
+                <div class="view-header">
+                    <h2>Available Airports</h2>
+                    <p>Live data from our network</p>
+                </div>
+                <div class="card-grid" id="airports-grid">
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                </div>
+            </section>
+
+            <section id="view-book" class="view hidden">
+                <div class="view-header">
+                    <h2>Book a Flight</h2>
+                    <p>Reserve your seat today</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Flight ID</label>
+                        <input type="number" id="book-flight-id" placeholder="e.g. 101" />
+                    </div>
+                    <div class="form-group">
+                        <label>Travel Class</label>
+                        <div class="class-selector">
+                            <label class="class-option">
+                                <input type="radio" name="travel-class" value="Economy" checked />
+                                <span>🪑 Economy</span>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="travel-class" value="Business" />
+                                <span>💼 Business</span>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="travel-class" value="First" />
+                                <span>⭐ First Class</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="book-btn">Confirm Booking</button>
+                    <div id="book-result" class="result-area hidden"></div>
+                </div>
+            </section>
+
+            <section id="view-checkin" class="view hidden">
+                <div class="view-header">
+                    <h2>Check-In Kiosk</h2>
+                    <p>Fast-track your boarding experience</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Ticket Number</label>
+                        <input type="text" id="checkin-ticket" placeholder="e.g. TKT-20241" />
+                    </div>
+                    <button class="btn-primary" id="checkin-btn">Check In Now</button>
+                    <div id="boarding-pass" class="hidden"></div>
+                </div>
+            </section>
+
+            <section id="view-status" class="view hidden">
+                <div class="view-header">
+                    <h2>Flight Status</h2>
+                    <p>Real-time departure information</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Flight ID</label>
+                        <input type="number" id="status-flight-id" placeholder="e.g. 101" />
+                    </div>
+                    <button class="btn-primary" id="status-btn">Track Flight</button>
+                    <div id="flight-status-result" class="hidden"></div>
+                </div>
+            </section>
+
+            <!-- ── STAFF VIEWS ── -->
+            <section id="view-baggage" class="view hidden">
+                <div class="view-header">
+                    <h2>Baggage Drop</h2>
+                    <p>Process passenger baggage check-in</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Ticket Number</label>
+                        <input type="text" id="bag-ticket" placeholder="e.g. TKT-20241" />
+                    </div>
+                    <div class="form-group">
+                        <label>Baggage Weight (kg)</label>
+                        <input type="number" id="bag-weight" placeholder="e.g. 23" step="0.1" />
+                    </div>
+                    <button class="btn-primary" id="bag-btn">Process Baggage</button>
+                    <div id="bag-result" class="result-area hidden"></div>
+                </div>
+            </section>
+
+            <section id="view-security" class="view hidden">
+                <div class="view-header">
+                    <h2>Security Log</h2>
+                    <p>File terminal incident reports</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Terminal</label>
+                        <select id="sec-terminal">
+                            <option value="">Select Terminal</option>
+                            <option value="Terminal A">Terminal A</option>
+                            <option value="Terminal B">Terminal B</option>
+                            <option value="Terminal C">Terminal C</option>
+                            <option value="Terminal D">Terminal D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Incident Report</label>
+                        <textarea id="sec-report" rows="5" placeholder="Describe the incident in detail..."></textarea>
+                    </div>
+                    <button class="btn-primary" id="sec-btn">Submit Report</button>
+                    <div id="sec-result" class="result-area hidden"></div>
+                </div>
+            </section>
+
+            <!-- ── ADMIN VIEWS ── -->
+            <section id="view-schedule" class="view hidden">
+                <div class="view-header">
+                    <h2>Master Flight Scheduler</h2>
+                    <p>Create and manage flight operations</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Flight Number</label>
+                            <input type="text" id="sched-flight-no" placeholder="e.g. AX-201" />
+                        </div>
+                        <div class="form-group">
+                            <label>Aircraft ID</label>
+                            <input type="number" id="sched-aircraft-id" placeholder="e.g. 5" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Origin Airport</label>
+                            <input type="text" id="sched-origin" placeholder="e.g. JFK" />
+                        </div>
+                        <div class="form-group">
+                            <label>Destination Airport</label>
+                            <input type="text" id="sched-dest" placeholder="e.g. LHR" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Departure Time</label>
+                            <input type="datetime-local" id="sched-depart" />
+                        </div>
+                        <div class="form-group">
+                            <label>Arrival Time</label>
+                            <input type="datetime-local" id="sched-arrive" />
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="sched-btn">Schedule Flight</button>
+                    <div id="sched-result" class="result-area hidden"></div>
+                </div>
+            </section>
+
+            <section id="view-fleet" class="view hidden">
+                <div class="view-header">
+                    <h2>Fleet Management</h2>
+                    <p>All registered aircraft in the network</p>
+                </div>
+                <div class="card-grid" id="fleet-grid">
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                    <div class="skeleton-loader"></div>
+                </div>
+            </section>
+
+            <section id="view-add-staff" class="view hidden">
+                <div class="view-header">
+                    <h2>Hire New Staff</h2>
+                    <p>Create credentials for new airport employees</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Staff Username</label>
+                        <input type="text" id="staff-username" placeholder="e.g. jsmith_security" />
+                    </div>
+                    <div class="form-group">
+                        <label>Temporary Password</label>
+                        <input type="password" id="staff-password" placeholder="••••••••" />
+                    </div>
+                    <button class="btn-primary" id="add-staff-btn">Create Staff Account</button>
+                    <div id="add-staff-result" class="result-area hidden"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
