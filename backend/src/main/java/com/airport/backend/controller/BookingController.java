@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
@@ -38,10 +39,12 @@ public class BookingController {
     }
 
     @PostMapping("/create")
+    @Transactional // 1. THIS IS THE FIX: Locks the entire method into a single transaction
     public ResponseEntity<?> createBooking(@RequestBody BookFlightRequest request) {
         
-        // 1. Find the Flight the passenger wants
-        Optional<Flight> flightOpt = flightRepository.findById(request.getFlight_id());
+        // 2. THIS IS THE FIX: Use the locked query to prevent simultaneous double-booking
+        Optional<Flight> flightOpt = flightRepository.findByIdLocked(request.getFlight_id());
+        
         if (flightOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Flight not found.");
         }
@@ -78,7 +81,7 @@ public class BookingController {
         String seatLabel = (seatNumber / 6 + 1) + letters[(int)(seatNumber % 6)];
         newBooking.setSeat_no(seatLabel);
 
-        // 7. THE FIX: Try to save safely
+        // 7. Try to save safely
         try {
             bookingRepository.save(newBooking);
 
