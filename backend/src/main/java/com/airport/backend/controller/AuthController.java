@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -78,22 +79,31 @@ public class AuthController {
 
     @PostMapping("/register/passenger")
     public ResponseEntity<?> registerPassenger(@RequestBody LoginRequest request) {
+        // 1. Check for duplicates
         if (passengerRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
         }
 
         Passenger p = new Passenger();
+        
+        // 2. Account Credentials
         p.setUsername(request.getUsername());
         p.setPassword(request.getPassword());
         
-        // REAL DATA from the frontend
+        // 3. Basic Contact Info
         p.setFirst_name(request.getFirstName());
         p.setLast_name(request.getLastName());
         p.setEmail(request.getEmail());
-        p.setPhone_number(request.getPhone()); // Adjust to your exact entity variable name
-        // p.setPassport_no(request.getPassportNo()); // Uncomment if you have this column!
+        p.setPhone_number(request.getPhone()); 
         
+        // 4. THE FIX: Required Identity Fields
+        // This converts the "YYYY-MM-DD" string from the frontend into a real Java Date
+        p.setDob(LocalDate.parse(request.getDob())); 
+        p.setPassport_no(request.getPassportNo());
+        
+        // 5. Save to Database
         passengerRepository.save(p);
+        
         return ResponseEntity.ok("Passenger registered successfully");
     }
 

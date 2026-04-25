@@ -11,6 +11,8 @@ public class LoginRequest {
     private String phone;
     private String passportNo; // For passengers
     private String role;       // For staff
+    private String dob;
+    // private String passportNo;
 
     // Original Getters and Setters
     public String getUsername() { return username; }
@@ -36,4 +38,10 @@ public class LoginRequest {
     
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getDob() {
+        return dob;
+    }
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
 }
