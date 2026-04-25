@@ -107,7 +107,7 @@ public class AuthController {
         return ResponseEntity.ok("Passenger registered successfully");
     }
 
-    @PostMapping("/register/staff")
+@PostMapping("/register/staff")
     public ResponseEntity<?> registerStaff(@RequestBody LoginRequest request) {
         if (staffRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
@@ -122,8 +122,29 @@ public class AuthController {
         s.setLast_name(request.getLastName());
         s.setEmail(request.getEmail());
         s.setPhone_number(request.getPhone());
-        s.setRole(request.getRole()); // Let the admin decide their role!
+        
+        // ==========================================
+        // THE FIX: Server-Side Role Validation
+        // ==========================================
+        String requestedRole = request.getRole();
+        
+        // 1. If no role is provided, default to a standard staff member
+        if (requestedRole == null || requestedRole.trim().isEmpty()) {
+            s.setRole("staff");
+        } else {
+            String cleanRole = requestedRole.trim().toLowerCase();
+            
+            // 2. BLOCK ADMIN ESCALATION: Never allow a user to assign themselves admin rights
+            if (cleanRole.equals("admin") || cleanRole.equals("system admin")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Security Violation: Cannot assign admin privileges.");
+            }
+            
+            // 3. Save the clean, safe role
+            s.setRole(cleanRole);
+        }
 
         staffRepository.save(s);
         return ResponseEntity.ok("Staff registered successfully");
-    }}
+    }
+}
