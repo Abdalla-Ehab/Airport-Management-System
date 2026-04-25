@@ -333,23 +333,45 @@ function showResult(el, message, isSuccess) {
 async function loadAirports() {
   const grid = document.getElementById('airports-grid');
   grid.innerHTML = '<div class="skeleton-loader"></div><div class="skeleton-loader"></div><div class="skeleton-loader"></div>';
+
   try {
     const res = await fetch(`${API}/airports`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const airports = Array.isArray(data) ? data : (data.content || data.data || []);
+
     if (!airports.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No airports found.</p>';
       return;
     }
-    grid.innerHTML = airports.map(a => `
-      <div class="data-card">
-        <div class="card-icon">🏢</div>
-        <h3>${escHtml(a.name || a.airportName || 'Airport')}</h3>
-        <div class="card-detail">📍 ${escHtml(a.city || a.location || '—')}, ${escHtml(a.country || '—')}</div>
-        <div class="card-badge">IATA: ${escHtml(a.code || a.iataCode || '?')}</div>
-      </div>
-    `).join('');
+
+    grid.innerHTML = airports.map(a => {
+      // 1. Safely grab the country 
+      const country = a.country ? `, ${a.country}` : '';
+
+      // 2. Map all possible names for the Airport name
+      const name = a.airport_name || a.airportName || a.name || 'Airport';
+
+      // 3. Map the city
+      const city = a.city || a.location || 'Unknown City';
+
+      // 4. Create a safe Google Maps search URL
+      const searchQuery = encodeURIComponent(`${name} ${city}`);
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+
+      // Return the HTML card (Now an interactive button!)
+      return `
+        <div class="data-card" onclick="window.open('${mapsUrl}', '_blank')" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 15px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div class="card-icon">🏢</div>
+            <h3>${escHtml(name)}</h3>
+            <div class="card-detail">📍 ${escHtml(city)}${escHtml(country)}</div>
+            <div style="margin-top: 15px; font-size: 0.85em; color: #4da3ff; font-weight: bold;">
+              🌍 View on Map ↗
+          </div>
+        </div>
+      `;
+    }).join('');
+
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load airports: ${err.message}</div>`;
     showToast('Could not fetch airport data.', 'error');
@@ -425,21 +447,21 @@ async function initBookingView() {
 
 // Listen for when a user selects a specific flight
 document.getElementById('book-flight-select').addEventListener('change', (e) => {
-    const selectElement = e.target;
-    const arrivalInput = document.getElementById('book-arrival-time');
-    
-    // Find the option the user just clicked
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    
-    // Grab the secret arrival time we hid inside it
-    const arrivalTime = selectedOption.getAttribute('data-arrival');
-    
-    if (arrivalTime) {
-        arrivalInput.value = arrivalTime;
-        arrivalInput.style.color = "white"; // Make it pop when filled
-    } else {
-        arrivalInput.value = '';
-    }
+  const selectElement = e.target;
+  const arrivalInput = document.getElementById('book-arrival-time');
+
+  // Find the option the user just clicked
+  const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+  // Grab the secret arrival time we hid inside it
+  const arrivalTime = selectedOption.getAttribute('data-arrival');
+
+  if (arrivalTime) {
+    arrivalInput.value = arrivalTime;
+    arrivalInput.style.color = "white"; // Make it pop when filled
+  } else {
+    arrivalInput.value = '';
+  }
 });
 
 // 3. The actual Book Button Logic
