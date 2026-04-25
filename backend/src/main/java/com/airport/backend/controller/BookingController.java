@@ -12,8 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
+import java.util.Map;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -74,10 +78,24 @@ public class BookingController {
         String seatLabel = (seatNumber / 6 + 1) + letters[(int)(seatNumber % 6)];
         newBooking.setSeat_no(seatLabel);
 
-        // Save to Database
-        bookingRepository.save(newBooking);
+        // 7. THE FIX: Try to save safely
+        try {
+            bookingRepository.save(newBooking);
 
-        return ResponseEntity.ok("Success! Flight Booked. Your seat is: " + seatLabel + 
-                " (Flight capacity: " + (currentBookings + 1) + "/" + maxSeats + " seats filled)");
+            // Return a JSON Map so the frontend can read the ticket number properly!
+            Map<String, Object> successResponse = new HashMap<>();
+            successResponse.put("ticket_no", newBooking.getTicket_no()); 
+            successResponse.put("message", "Success! Flight Booked. Your seat is: " + seatLabel + 
+                    " (Flight capacity: " + (currentBookings + 1) + "/" + maxSeats + " seats filled)");
+            
+            return ResponseEntity.ok(successResponse);
+
+        } catch (DataIntegrityViolationException e) {
+            // Catches the MySQL duplicate constraints without crashing the server
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Booking failed! You are already booked on this flight, or this specific seat is taken.");
+            
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
     }
 }

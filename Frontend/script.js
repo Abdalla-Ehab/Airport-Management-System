@@ -71,6 +71,8 @@ async function authenticate(username, password) {
 
 // PASSENGER REGISTRATION
 document.getElementById('register-btn').addEventListener('click', async () => {
+    const dob = document.getElementById('reg-dob').value;
+    const passport = document.getElementById('reg-passport').value.trim();
     const fn = document.getElementById('reg-firstname').value.trim();
     const ln = document.getElementById('reg-lastname').value.trim();
     const email = document.getElementById('reg-email').value.trim();
@@ -79,7 +81,8 @@ document.getElementById('register-btn').addEventListener('click', async () => {
     const password = document.getElementById('reg-password').value.trim();
     const errEl = document.getElementById('auth-error');
 
-    if (!fn || !ln || !email || !phone || !username || !password) {
+    // 1. ADDED dob and passport to the validation check
+    if (!fn || !ln || !email || !phone || !username || !password || !dob || !passport) {
         errEl.textContent = 'Please fill out all fields.';
         errEl.classList.remove('hidden');
         return;
@@ -94,18 +97,24 @@ document.getElementById('register-btn').addEventListener('click', async () => {
                 lastName: ln, 
                 email: email, 
                 phone: phone, 
+                dob: dob,             // 2. ADDED DOB HERE
+                passportNo: passport, // 2. ADDED PASSPORT HERE
                 username: username, 
                 password: password 
             })
         });
+        
         if (res.ok) {
             showToast('Account created! You can now log in.', 'success');
             document.getElementById('tab-login').click(); // Switch back to login
-            // Clear fields
+            
+            // 3. Clear ALL fields including dob and passport
             document.getElementById('reg-firstname').value = '';
             document.getElementById('reg-lastname').value = '';
             document.getElementById('reg-email').value = '';
             document.getElementById('reg-phone').value = '';
+            document.getElementById('reg-dob').value = '';
+            document.getElementById('reg-passport').value = '';
             document.getElementById('reg-username').value = '';
             document.getElementById('reg-password').value = '';
         } else {
@@ -216,7 +225,7 @@ function buildNav(role) {
 document.getElementById('login-btn').addEventListener('click', async () => {
   const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value.trim();
-  const errEl    = document.getElementById('login-error');
+  const errEl    = document.getElementById('auth-error'); // Updated to use the correct error div
   const btn      = document.getElementById('login-btn');
 
   if (!username || !password) {
@@ -225,38 +234,50 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     return;
   }
 
+  // 1. Set Loading State
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Authenticating…';
   errEl.classList.add('hidden');
 
-  const user = await authenticate(username, password);
+  try {
+      // 2. Await the server response
+      const user = await authenticate(username, password);
 
-  btn.disabled = false;
-  btn.innerHTML = 'Sign In';
+      // 3. Reset Button State immediately after response
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In';
 
-  if (!user) {
-    errEl.textContent = 'Invalid credentials. Please try again.';
-    errEl.classList.remove('hidden');
-    return;
+      if (!user) {
+        errEl.textContent = 'Invalid credentials. Please try again.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      currentUser = user;
+
+      // 4. Safely Update UI (Added checks to prevent crashes if name is missing)
+      const displayUsername = user.username ? user.username : 'User';
+      document.getElementById('nav-username').textContent = displayUsername.charAt(0).toUpperCase() + displayUsername.slice(1);
+      document.getElementById('nav-role').textContent = ({ passenger: 'Passenger Portal', staff: 'Staff Operations', admin: 'Admin Dashboard' })[user.role] || user.role;
+      document.getElementById('nav-avatar').textContent = displayUsername.charAt(0).toUpperCase();
+
+      buildNav(user.role);
+
+      document.getElementById('login-screen').classList.remove('active');
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+      document.getElementById('app-shell').style.display = 'flex';
+
+      showToast('Welcome back, ' + displayUsername + '!', 'success');
+      
+  } catch (error) {
+      // MASTER CATCH: If anything crashes, reset the button!
+      console.error("Login UI Error:", error);
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In';
+      errEl.textContent = 'A system error occurred. Check the console.';
+      errEl.classList.remove('hidden');
   }
-
-  currentUser = user;
-
-  // Update UI
-  document.getElementById('nav-username').textContent =
-    user.username.charAt(0).toUpperCase() + user.username.slice(1);
-  document.getElementById('nav-role').textContent =
-    ({ passenger: 'Passenger Portal', staff: 'Staff Operations', admin: 'Admin Dashboard' })[user.role] || user.role;
-  document.getElementById('nav-avatar').textContent = user.username[0].toUpperCase();
-
-  buildNav(user.role);
-
-  document.getElementById('login-screen').classList.remove('active');
-  document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('app-shell').classList.remove('hidden');
-  document.getElementById('app-shell').style.display = 'flex';
-
-  showToast('Welcome back, ' + user.username + '!', 'success');
 });
 
 // Allow Enter key on login form
