@@ -18,7 +18,7 @@ const NAV_CONFIG = {
     { view: 'home', label: 'Airports', icon: '🌐', onEnter: loadAirports },
     { view: 'book', label: 'Book a Flight', icon: '🎫', onEnter: initBookingView },
     { view: 'checkin', label: 'Check-In Kiosk', icon: '✅' },
-    { view: 'status', label: 'Flight Status', icon: '📡' },
+    { view: 'status', label: 'Flight Status', icon: '📡', onEnter: initStatusView },
   ],
   staff: [
     { view: 'baggage', label: 'Baggage Drop', icon: '🧳' },
@@ -628,58 +628,121 @@ async function renderBoardingPass(el, data, ticketNo) {
 }
 
 /* ═══════════════════════════════════════════
-  PASSENGER: Flight Status
+   PASSENGER: Flight Status
 ═══════════════════════════════════════════ */
-document.getElementById('status-btn').addEventListener('click', async () => {
-  const flightId = document.getElementById('status-flight-id').value.trim();
-  const resultEl = document.getElementById('flight-status-result');
-  const btn = document.getElementById('status-btn');
 
-  if (!flightId) { showToast('Please enter a Flight ID.', 'error'); return; }
+// 1. Load Airports into the Status Dropdowns
+async function initStatusView() {
+    try {
+        const res = await fetch(`${API}/airports`);
+        const data = await res.json();
+        const airports = Array.isArray(data) ? data : (data.content || data.data || []);
+        
+        let options = '<option value="">Select Airport...</option>';
+        airports.forEach(a => {
+            options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city || a.airport_id)}</option>`;
+        });
+        
+        document.getElementById('status-origin').innerHTML = options;
+        document.getElementById('status-dest').innerHTML = options;
+    } catch (e) {
+        console.log("Failed to load airports for status view.");
+    }
+}
+
+// 2. Listen for route changes to find available flights
+['status-origin', 'status-dest'].forEach(id => {
+    document.getElementById(id).addEventListener('change', async () => {
+        const origin = document.getElementById('status-origin').value;
+        const dest = document.getElementById('status-dest').value;
+        const flightSelect = document.getElementById('status-flight-select');
+
+        if (!origin || !dest) {
+            flightSelect.innerHTML = '<option value="">Please select Origin and Destination first</option>';
+            flightSelect.disabled = true;
+            return;
+        }
+
+        flightSelect.innerHTML = '<option value="">Searching flights...</option>';
+        flightSelect.disabled = true;
+
+        try {
+            const res = await fetch(`${API}/flights`);
+            const data = await res.json();
+            const flights = Array.isArray(data) ? data : (data.content || data.data || []);
+
+            // Filter flights for this specific route
+            const availableFlights = flights.filter(f => 
+                String(f.departure_airport_id) === String(origin) && 
+                String(f.arrival_airport_id) === String(dest)
+            );
+
+            if (availableFlights.length === 0) {
+                flightSelect.innerHTML = '<option value="">No flights scheduled for this route</option>';
+            } else {
+                let options = '<option value="">Select a Flight to Track...</option>';
+                availableFlights.forEach(f => {
+                    options += `<option value="${f.flight_id}">Flight ${f.flight_id} - Departs: ${f.departure_time || 'TBA'}</option>`;
+                });
+                flightSelect.innerHTML = options;
+                flightSelect.disabled = false;
+            }
+        } catch (e) {
+            flightSelect.innerHTML = '<option value="">Error loading flights</option>';
+        }
+    });
+});
+
+// 3. Track the selected flight!
+document.getElementById('status-btn').addEventListener('click', async () => {
+  // Grab the ID from the new dropdown instead of a text box!
+  const flightId = document.getElementById('status-flight-select').value;
+  const resultEl = document.getElementById('flight-status-result');
+  const btn      = document.getElementById('status-btn');
+
+  if (!flightId) { showToast('Please select a flight to track.', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Fetching…';
   resultEl.classList.add('hidden');
 
   try {
-    const res = await fetch(`${API}/flights`);
+    const res   = await fetch(`${API}/flights`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const all = await res.json();
-    const list = Array.isArray(all) ? all : (all.content || all.data || []);
-
+    const all   = await res.json();
+    const list  = Array.isArray(all) ? all : (all.content || all.data || []);
+    
     const flight = list.find(f => String(f.id || f.flightId || f.flight_id) === String(flightId));
 
     if (!flight) {
-      resultEl.innerHTML = `<div class="result-area result-error">No flight found with ID ${escHtml(flightId)}.</div>`;
+      resultEl.innerHTML = `<div class="result-area result-error">No flight found.</div>`;
     } else {
-
-      // --- SMART DATA LOOKUP ---
+      
+      // --- SMART DATA LOOKUP (Kept intact!) ---
       let originName = flight.departure_airport_id;
       let destName = flight.arrival_airport_id;
       let airlineName = flight.airline_id;
 
-      // 1. Try to fetch real Airport Names
       try {
-        const airRes = await fetch(`${API}/airports`);
-        const airData = await airRes.json();
-        const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+          const airRes = await fetch(`${API}/airports`);
+          const airData = await airRes.json();
+          const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+          
+          const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
+          if (o) originName = o.name || o.airportName || o.city || originName;
 
-        const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
-        if (o) originName = o.name || o.airportName || o.city || originName;
+          const d = airports.find(a => String(a.id || a.airport_id) === String(flight.arrival_airport_id));
+          if (d) destName = d.name || d.airportName || d.city || destName;
+      } catch(e) { console.log("Could not fetch airport names"); }
 
-        const d = airports.find(a => String(a.id || a.airport_id) === String(flight.arrival_airport_id));
-        if (d) destName = d.name || d.airportName || d.city || destName;
-      } catch (e) { console.log("Could not fetch airport names"); }
-
-      // 2. Try to fetch real Airline Names (Fails gracefully if you don't have an airlines API yet)
       try {
-        const lineRes = await fetch(`${API}/airlines`);
-        const lineData = await lineRes.json();
-        const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
-
-        const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
-        if (al) airlineName = al.name || al.airlineName || airlineName;
-      } catch (e) { console.log("Could not fetch airline names"); }
+          const lineRes = await fetch(`${API}/airlines`);
+          const lineData = await lineRes.json();
+          const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
+          
+          const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
+          if (al) airlineName = al.name || al.airlineName || airlineName;
+      } catch(e) { console.log("Could not fetch airline names"); }
       // -------------------------
 
       resultEl.innerHTML = `

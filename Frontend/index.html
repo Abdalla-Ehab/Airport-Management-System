@@ -214,12 +214,30 @@
                     <p>Real-time departure information</p>
                 </div>
                 <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Flight ID</label>
-                        <input type="number" id="status-flight-id" placeholder="e.g. 101" />
+                    
+                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>From (Origin)</label>
+                            <select id="status-origin" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                                <option value="" style="color: black;">Loading airports...</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>To (Destination)</label>
+                            <select id="status-dest" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
+                                <option value="" style="color: black;">Loading airports...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>Select Flight</label>
+                        <select id="status-flight-select" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);" disabled>
+                            <option value="" style="color: black;">Please select Origin and Destination first</option>
+                        </select>
                     </div>
                     <button class="btn-primary" id="status-btn">Track Flight</button>
-                    <div id="flight-status-result" class="hidden"></div>
+                    <div id="flight-status-result" class="result-area hidden" style="margin-top: 20px;"></div>
                 </div>
             </section>
 
