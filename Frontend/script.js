@@ -442,7 +442,27 @@ document.getElementById('checkin-btn').addEventListener('click', async () => {
   }
 });
 
-function renderBoardingPass(el, data, ticketNo) {
+async function renderBoardingPass(el, data, ticketNo) {
+  // 1. Start with the raw Airport ID (just in case the lookup fails)
+  let airportName = data.departure_airport || data.departureAirport || '—';
+
+  // 2. SMART LOOKUP: Ask the server for the real Airport Name
+  try {
+      const res = await fetch(`${API}/airports`);
+      if (res.ok) {
+          const airData = await res.json();
+          const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+          // Find the airport that matches our ID
+          const found = airports.find(a => String(a.id || a.airport_id) === String(airportName));
+          if (found) {
+              airportName = found.name || found.airportName || found.city || airportName;
+          }
+      }
+  } catch (e) {
+      console.log("Could not fetch airport names for boarding pass");
+  }
+
+  // 3. Render the final Boarding Pass HTML
   el.innerHTML = `
     <div class="bp-header">
       <div>
@@ -459,7 +479,7 @@ function renderBoardingPass(el, data, ticketNo) {
       </div>
       <div class="bp-field">
         <label>Passenger</label>
-        <span>${escHtml(data.passengerName || data.passenger_name || currentUser.username || '—')}</span>
+        <span>${escHtml(data.passengerName || data.passenger_name || currentUser?.username || '—')}</span>
       </div>
     </div>
     <div class="bp-row">
@@ -485,13 +505,13 @@ function renderBoardingPass(el, data, ticketNo) {
     <hr class="bp-divider"/>
     <div class="bp-field">
       <label>Departure</label>
-      <span>${escHtml(String(data.departureTime || data.departure_time || '—'))}</span>
+      <span>${escHtml(airportName)} at ${escHtml(String(data.departure_time || data.departureTime || '—'))}</span>
     </div>
   `;
 }
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Flight Status
+  PASSENGER: Flight Status
 ═══════════════════════════════════════════ */
 document.getElementById('status-btn').addEventListener('click', async () => {
   const flightId = document.getElementById('status-flight-id').value.trim();
@@ -509,52 +529,81 @@ document.getElementById('status-btn').addEventListener('click', async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const all   = await res.json();
     const list  = Array.isArray(all) ? all : (all.content || all.data || []);
-    const flight = list.find(f =>
-      String(f.id || f.flightId || f.flight_id) === String(flightId)
-    );
+    
+    const flight = list.find(f => String(f.id || f.flightId || f.flight_id) === String(flightId));
 
     if (!flight) {
       resultEl.innerHTML = `<div class="result-area result-error">No flight found with ID ${escHtml(flightId)}.</div>`;
     } else {
+      
+      // --- SMART DATA LOOKUP ---
+      let originName = flight.departure_airport_id;
+      let destName = flight.arrival_airport_id;
+      let airlineName = flight.airline_id;
+
+      // 1. Try to fetch real Airport Names
+      try {
+          const airRes = await fetch(`${API}/airports`);
+          const airData = await airRes.json();
+          const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+          
+          const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
+          if (o) originName = o.name || o.airportName || o.city || originName;
+
+          const d = airports.find(a => String(a.id || a.airport_id) === String(flight.arrival_airport_id));
+          if (d) destName = d.name || d.airportName || d.city || destName;
+      } catch(e) { console.log("Could not fetch airport names"); }
+
+      // 2. Try to fetch real Airline Names (Fails gracefully if you don't have an airlines API yet)
+      try {
+          const lineRes = await fetch(`${API}/airlines`);
+          const lineData = await lineRes.json();
+          const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
+          
+          const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
+          if (al) airlineName = al.name || al.airlineName || airlineName;
+      } catch(e) { console.log("Could not fetch airline names"); }
+      // -------------------------
+
       resultEl.innerHTML = `
         <div class="status-row">
           <div class="status-field">
             <label>Flight ID</label>
-            <div class="status-val">${escHtml(String(flight.id || flight.flightId || flightId))}</div>
+            <div class="status-val">${escHtml(String(flight.flight_id || flightId))}</div>
           </div>
           <div class="status-field">
-            <label>Flight No.</label>
-            <div class="status-val">${escHtml(flight.flightNo || flight.flight_no || flight.flightNumber || '—')}</div>
+            <label>Airline</label>
+            <div class="status-val">✈️ ${escHtml(String(airlineName || '—'))}</div>
           </div>
         </div>
         <div class="status-row">
           <div class="status-field">
             <label>Departure Gate</label>
-            <div class="status-val">🚪 ${escHtml(String(flight.departureGate || flight.departure_gate || flight.gate || '—'))}</div>
+            <div class="status-val">🚪 ${escHtml(String(flight.departure_gate_id || '—'))}</div>
           </div>
           <div class="status-field">
             <label>Aircraft ID</label>
-            <div class="status-val">✈️ ${escHtml(String(flight.aircraftId || flight.aircraft_id || '—'))}</div>
+            <div class="status-val">🛫 ${escHtml(String(flight.aircraft_id || '—'))}</div>
           </div>
         </div>
         <div class="status-row">
           <div class="status-field">
-            <label>Origin</label>
-            <div class="status-val">${escHtml(flight.origin || flight.departureAirport || '—')}</div>
+            <label>Origin Airport</label>
+            <div class="status-val">${escHtml(String(originName || '—'))}</div>
           </div>
           <div class="status-field">
             <label>Destination</label>
-            <div class="status-val">${escHtml(flight.destination || flight.arrivalAirport || '—')}</div>
+            <div class="status-val">${escHtml(String(destName || '—'))}</div>
           </div>
         </div>
         <div class="status-row">
           <div class="status-field">
-            <label>Departure</label>
-            <div class="status-val">${escHtml(String(flight.departureTime || flight.departure_time || '—'))}</div>
+            <label>Departure Time</label>
+            <div class="status-val">${escHtml(String(flight.departure_time || '—'))}</div>
           </div>
           <div class="status-field">
-            <label>Status</label>
-            <div class="status-val">${escHtml(flight.status || 'On Time')}</div>
+            <label>Arrival Time</label>
+            <div class="status-val">${escHtml(String(flight.arrival_time || '—'))}</div>
           </div>
         </div>
       `;
