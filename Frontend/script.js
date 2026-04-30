@@ -951,19 +951,24 @@ async function loadFleet() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const fleet = Array.isArray(data) ? data : (data.content || data.data || []);
+    
     if (!fleet.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No aircraft found.</p>';
       return;
     }
+    
+    // THE FIX: Updated property names to match the Spring Boot backend perfectly
     grid.innerHTML = fleet.map(a => `
       <div class="data-card">
         <div class="card-icon">✈️</div>
-        <h3>${escHtml(a.model || a.aircraftModel || a.name || 'Aircraft')}</h3>
-        <div class="card-detail">ID: ${escHtml(String(a.id || a.aircraftId || '—'))}</div>
-        <div class="card-detail">Capacity: ${escHtml(String(a.capacity || a.seatCapacity || '—'))} seats</div>
-        <div class="card-badge">${escHtml(a.status || a.aircraftStatus || 'Active')}</div>
+        <h3>${escHtml(a.type || 'Aircraft')}</h3>
+        <div class="card-detail">Tail No: ${escHtml(a.registration_no || '—')}</div>
+        <div class="card-detail">ID: ${escHtml(String(a.aircraft_id || '—'))}</div>
+        <div class="card-detail">Capacity: ${escHtml(String(a.number_of_seats || '—'))} seats</div>
+        <div class="card-badge">Active</div>
       </div>
     `).join('');
+    
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load fleet: ${err.message}</div>`;
     showToast('Could not fetch fleet data.', 'error');

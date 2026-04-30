@@ -11,13 +11,28 @@ public class Airport {
     private Long airport_id;
 
     private String name;
-    private String location;
+    
+    // THE FIX: We replaced 'location' with these three new columns!
+    private String city;
+    private String country;
+    private String iata_code;
 
-    // VS Code Tip: Right-click inside the class -> Source Action... -> Generate Getters and Setters
+    // ==========================================
+    // GETTERS AND SETTERS
+    // ==========================================
+    
     public Long getAirport_id() { return airport_id; }
     public void setAirport_id(Long airport_id) { this.airport_id = airport_id; }
+    
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+    
+    public String getIata_code() { return iata_code; }
+    public void setIata_code(String iata_code) { this.iata_code = iata_code; }
 }
