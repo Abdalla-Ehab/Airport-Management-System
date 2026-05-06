@@ -830,3 +830,60 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(43, 127, 255, 0.4);
 }
+/* =============================================
+   UTILITY CLASSES (Replaces inline HTML styles)
+============================================= */
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.flex-row-15 { display: flex; gap: 15px; margin-bottom: 15px; }
+.flex-1 { flex: 1; }
+.text-silver { color: var(--silver); }
+.divider { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0; }
+
+/* Clean Input Selectors */
+.input-glass {
+    width: 100%; 
+    padding: 10px; 
+    border-radius: 6px; 
+    background: rgba(255,255,255,0.1); 
+    color: white; 
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.input-glass option { color: black; }
+.input-glass:disabled { cursor: not-allowed; opacity: 0.6; }
+
+/* Custom Buttons */
+.auth-tabs { display: flex; gap: 10px; margin-bottom: 10px; }
+.btn-pad { padding: 10px; }
+.btn-outline { background: transparent; border: 1px solid var(--sky); color: var(--sky); }
+
+/* Interactive Cards */
+.hover-lift { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.hover-lift:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.3); }
+.card-action-link { margin-top: 15px; font-size: 0.85em; color: #4da3ff; font-weight: bold; }
+
+/* =============================================
+   ACCORDION DROPDOWN NAVIGATION
+============================================= */
+.nav-category { margin-bottom: 8px; }
+.nav-category-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 10px 16px; color: var(--silver); cursor: pointer; 
+    border-radius: var(--radius); font-weight: 600; transition: background 0.2s; 
+}
+.nav-category-header:hover { background: rgba(43, 127, 255, 0.1); color: var(--white); }
+.nav-category-title { display: flex; align-items: center; gap: 12px; }
+.nav-arrow { transition: transform 0.3s ease; font-size: 0.8rem; }
+
+.nav-submenu { 
+    list-style: none; display: none; flex-direction: column; gap: 4px; 
+    padding-left: 36px; margin-top: 4px; 
+}
+.nav-submenu.open { display: flex; }
+.nav-submenu a { 
+    display: block; padding: 8px 12px; color: var(--silver-dim); 
+    text-decoration: none; font-size: 0.85rem; border-radius: 6px; 
+    transition: all 0.2s; cursor: pointer; 
+}
+.nav-submenu a:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+.nav-submenu a.active { color: var(--sky-light); font-weight: 700; background: rgba(43, 127, 255, 0.1); }

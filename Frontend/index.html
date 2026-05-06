@@ -7,14 +7,11 @@
     <title>twixNexus — Airport Management System</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 </head>
 
 <body>
 
-    <!-- ========== LOGIN SCREEN ========== -->
     <section id="login-screen" class="active fullscreen">
         <div class="login-bg">
             <div class="login-overlay"></div>
@@ -26,10 +23,9 @@
                 <p class="brand-sub">Airport Management Platform</p>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button id="tab-login" class="btn-primary" style="flex: 1; padding: 10px;">Login</button>
-                <button id="tab-register" class="btn-primary"
-                    style="flex: 1; padding: 10px; background: transparent; border: 1px solid var(--sky); color: var(--sky);">Register</button>
+            <div class="auth-tabs">
+                <button id="tab-login" class="btn-primary flex-1 btn-pad">Login</button>
+                <button id="tab-register" class="btn-primary btn-outline flex-1 btn-pad">Register</button>
             </div>
 
             <div id="form-login">
@@ -37,15 +33,15 @@
                     <label>Username</label>
                     <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
                 </div>
-                <div class="form-group" style="margin-top: 15px;">
+                <div class="form-group mt-15">
                     <label>Password</label>
                     <input type="password" id="login-password" placeholder="••••••••" />
                 </div>
-                <button class="btn-primary" id="login-btn" style="margin-top: 20px;">Sign In</button>
+                <button class="btn-primary mt-20" id="login-btn">Sign In</button>
             </div>
 
             <div id="form-register" class="hidden">
-                <div class="form-row" style="margin-top: 15px;">
+                <div class="form-row mt-15">
                     <div class="form-group">
                         <label>Date of Birth</label>
                         <input type="date" id="reg-dob" />
@@ -65,7 +61,7 @@
                         <input type="text" id="reg-lastname" placeholder="Last" />
                     </div>
                 </div>
-                <div class="form-row" style="margin-top: 15px;">
+                <div class="form-row mt-15">
                     <div class="form-group">
                         <label>Email Address</label>
                         <input type="email" id="reg-email" placeholder="email@example.com" />
@@ -75,7 +71,7 @@
                         <input type="tel" id="reg-phone" placeholder="e.g. 010..." />
                     </div>
                 </div>
-                <div class="form-row" style="margin-top: 15px;">
+                <div class="form-row mt-15">
                     <div class="form-group">
                         <label>Username</label>
                         <input type="text" id="reg-username" placeholder="Choose a username" />
@@ -85,18 +81,15 @@
                         <input type="password" id="reg-password" placeholder="••••••••" />
                     </div>
                 </div>
-                <button class="btn-primary" id="register-btn" style="margin-top: 20px;">Create Account</button>
+                <button class="btn-primary mt-20" id="register-btn">Create Account</button>
             </div>
 
             <div id="auth-error" class="msg-error hidden"></div>
         </div>
     </section>
 
-
-    <!-- ========== APP SHELL ========== -->
     <div id="app-shell" class="hidden">
 
-        <!-- SIDEBAR NAV -->
         <nav id="sidebar">
             <div class="nav-brand">
                 <div class="brand-icon small">✈</div>
@@ -109,27 +102,22 @@
                     <div class="user-role" id="nav-role">Passenger Portal</div>
                 </div>
             </div>
+            
             <ul class="nav-links" id="nav-links"></ul>
+            
             <button class="btn-logout" id="logout-btn">⬅ Sign Out</button>
         </nav>
 
-        <!-- MAIN CONTENT -->
         <main id="main-content">
 
-            <!-- Toast -->
             <div id="toast-container"></div>
 
-            <!-- ── PASSENGER VIEWS ── -->
             <section id="view-home" class="view hidden">
                 <div class="view-header">
                     <h2>Available Airports</h2>
                     <p>Live data from our network</p>
                 </div>
-                <div class="card-grid" id="airports-grid">
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader"></div>
-                </div>
+                <div class="card-grid" id="airports-grid"></div>
             </section>
 
             <section id="view-book" class="view hidden">
@@ -139,37 +127,31 @@
                 </div>
                 <div class="form-card glass-dark">
 
-                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group" style="flex: 1;">
+                    <div class="form-row flex-row-15">
+                        <div class="form-group flex-1">
                             <label>From (Origin)</label>
-                            <select id="book-origin"
-                                style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                                <option value="" style="color: black;">Loading airports...</option>
+                            <select id="book-origin" class="input-glass">
+                                <option value="">Loading airports...</option>
                             </select>
                         </div>
-                        <div class="form-group" style="flex: 1;">
+                        <div class="form-group flex-1">
                             <label>To (Destination)</label>
-                            <select id="book-dest"
-                                style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                                <option value="" style="color: black;">Loading airports...</option>
+                            <select id="book-dest" class="input-glass">
+                                <option value="">Loading airports...</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group mt-20">
                         <label>Available Flights</label>
-                        <select id="book-flight-select"
-                            style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);"
-                            disabled>
-                            <option value="" style="color: black;">Please select Origin and Destination first</option>
+                        <select id="book-flight-select" class="input-glass" disabled>
+                            <option value="">Please select Origin and Destination first</option>
                         </select>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group mt-20">
                         <label>Arrival Time</label>
-                        <input type="text" id="book-arrival-time" placeholder="Select a flight to view arrival time"
-                            readonly
-                            style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(0,0,0,0.2); color: #aaa; border: 1px solid rgba(255,255,255,0.1); cursor: not-allowed;" />
+                        <input type="text" id="book-arrival-time" class="input-glass" placeholder="Select a flight to view arrival time" readonly disabled />
                     </div>
                     <div class="form-group">
                         <label>Travel Class</label>
@@ -214,34 +196,32 @@
                     <p>Real-time departure information</p>
                 </div>
                 <div class="form-card glass-dark">
-                    
-                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group" style="flex: 1;">
+                    <div class="form-row flex-row-15">
+                        <div class="form-group flex-1">
                             <label>From (Origin)</label>
-                            <select id="status-origin" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                                <option value="" style="color: black;">Loading airports...</option>
+                            <select id="status-origin" class="input-glass">
+                                <option value="">Loading airports...</option>
                             </select>
                         </div>
-                        <div class="form-group" style="flex: 1;">
+                        <div class="form-group flex-1">
                             <label>To (Destination)</label>
-                            <select id="status-dest" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">
-                                <option value="" style="color: black;">Loading airports...</option>
+                            <select id="status-dest" class="input-glass">
+                                <option value="">Loading airports...</option>
                             </select>
                         </div>
                     </div>
                     
-                    <div class="form-group" style="margin-bottom: 20px;">
+                    <div class="form-group mt-20">
                         <label>Select Flight</label>
-                        <select id="status-flight-select" style="width: 100%; padding: 10px; border-radius: 6px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);" disabled>
-                            <option value="" style="color: black;">Please select Origin and Destination first</option>
+                        <select id="status-flight-select" class="input-glass" disabled>
+                            <option value="">Please select Origin and Destination first</option>
                         </select>
                     </div>
                     <button class="btn-primary" id="status-btn">Track Flight</button>
-                    <div id="flight-status-result" class="result-area hidden" style="margin-top: 20px;"></div>
+                    <div id="flight-status-result" class="result-area hidden mt-20"></div>
                 </div>
             </section>
 
-            <!-- ── STAFF VIEWS ── -->
             <section id="view-baggage" class="view hidden">
                 <div class="view-header">
                     <h2>Baggage Drop</h2>
@@ -269,24 +249,22 @@
                 <div class="form-card glass-dark">
                     <div class="form-group">
                         <label>Terminal</label>
-                        <select id="sec-terminal">
+                        <select id="sec-terminal" class="input-glass">
                             <option value="">Select Terminal</option>
                             <option value="Terminal A">Terminal A</option>
                             <option value="Terminal B">Terminal B</option>
                             <option value="Terminal C">Terminal C</option>
-                            <option value="Terminal D">Terminal D</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Incident Report</label>
-                        <textarea id="sec-report" rows="5" placeholder="Describe the incident in detail..."></textarea>
+                        <textarea id="sec-report" class="input-glass" rows="5" placeholder="Describe the incident..."></textarea>
                     </div>
                     <button class="btn-primary" id="sec-btn">Submit Report</button>
                     <div id="sec-result" class="result-area hidden"></div>
                 </div>
             </section>
 
-            <!-- ── ADMIN VIEWS ── -->
             <section id="view-schedule" class="view hidden">
                 <div class="view-header">
                     <h2>Master Flight Scheduler</h2>
@@ -316,11 +294,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Departure Time</label>
-                            <input type="datetime-local" id="sched-depart" />
+                            <input type="datetime-local" id="sched-depart" class="input-glass" />
                         </div>
                         <div class="form-group">
                             <label>Arrival Time</label>
-                            <input type="datetime-local" id="sched-arrive" />
+                            <input type="datetime-local" id="sched-arrive" class="input-glass" />
                         </div>
                     </div>
                     <button class="btn-primary" id="sched-btn">Schedule Flight</button>
@@ -333,11 +311,7 @@
                     <h2>Fleet Management</h2>
                     <p>All registered aircraft in the network</p>
                 </div>
-                <div class="card-grid" id="fleet-grid">
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader"></div>
-                    <div class="skeleton-loader"></div>
-                </div>
+                <div class="card-grid" id="fleet-grid"></div>
             </section>
 
             <section id="view-add-staff" class="view hidden">
@@ -369,7 +343,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Assigned Role</label>
-                            <select id="staff-role">
+                            <select id="staff-role" class="input-glass">
                                 <option value="Gate Agent">Gate Agent</option>
                                 <option value="Security">Security</option>
                                 <option value="Baggage Handler">Baggage Handler</option>
@@ -377,7 +351,7 @@
                             </select>
                         </div>
                     </div>
-                    <hr style="border-color: rgba(255,255,255,0.1); margin: 10px 0;">
+                    <hr class="divider">
                     <div class="form-row">
                         <div class="form-group">
                             <label>System Username</label>
@@ -398,5 +372,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>

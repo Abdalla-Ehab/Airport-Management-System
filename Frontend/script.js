@@ -11,24 +11,66 @@ const API = 'http://localhost:8080/api';
 let currentUser = null;  // { username, role, id }
 
 /* ═══════════════════════════════════════════
-   ROLE DEFINITIONS & NAV CONFIG
+   ROLE DEFINITIONS & NAV CONFIG (UPDATED)
 ═══════════════════════════════════════════ */
 const NAV_CONFIG = {
   passenger: [
-    { view: 'home', label: 'Airports', icon: '🌐', onEnter: loadAirports },
-    { view: 'book', label: 'Book a Flight', icon: '🎫', onEnter: initBookingView },
-    { view: 'checkin', label: 'Check-In Kiosk', icon: '✅' },
-    { view: 'status', label: 'Flight Status', icon: '📡', onEnter: initStatusView },
+    {
+      category: 'My Travel', icon: '✈️',
+      items: [
+        { view: 'book', label: 'Book a Flight', onEnter: initBookingView },
+        { view: 'status', label: 'Flight Status', onEnter: initStatusView },
+        { view: 'history', label: 'Flight History' } // Placeholder for future
+      ]
+    },
+    {
+      category: 'Airport Services', icon: '🏢',
+      items: [
+        { view: 'home', label: 'Airports Network', onEnter: loadAirports },
+        { view: 'checkin', label: 'Check-In Kiosk' },
+        { view: 'dutyfree', label: 'Duty-Free Shops' } // Placeholder for future
+      ]
+    }
   ],
   staff: [
-    { view: 'baggage', label: 'Baggage Drop', icon: '🧳' },
-    { view: 'security', label: 'Security Log', icon: '🔒' },
+    {
+      category: 'Ground Ops', icon: '🦺',
+      items: [
+        { view: 'baggage', label: 'Baggage Drop' },
+        { view: 'gate', label: 'Gate Management' } // Placeholder for future
+      ]
+    },
+    {
+      category: 'Terminal Security', icon: '🛡️',
+      items: [
+        { view: 'security', label: 'Incident Logs' },
+        { view: 'watchlist', label: 'Passenger Watchlist' } // Placeholder for future
+      ]
+    }
   ],
   admin: [
-    { view: 'schedule', label: 'Flight Scheduler', icon: '🗓️' },
-    { view: 'fleet', label: 'Fleet Management', icon: '✈️', onEnter: loadFleet },
-    { view: 'add-staff', label: 'Add Staff', icon: '👤' }, // NEW LINE
-  ],
+    {
+      category: 'Flight Operations', icon: '🌍',
+      items: [
+        { view: 'schedule', label: 'Master Scheduler' },
+        { view: 'active-flights', label: 'Live Traffic Map' } // Placeholder for future
+      ]
+    },
+    {
+      category: 'Asset Management', icon: '🔧',
+      items: [
+        { view: 'fleet', label: 'Fleet & Aircraft', onEnter: loadFleet },
+        { view: 'maintenance', label: 'Maintenance Logs' } // Placeholder for future
+      ]
+    },
+    {
+      category: 'Human Resources', icon: '👥',
+      items: [
+        { view: 'add-staff', label: 'Hire Employee' },
+        { view: 'roster', label: 'Staff Roster' } // Placeholder for future
+      ]
+    }
+  ]
 };
 
 /* ═══════════════════════════════════════════
@@ -176,46 +218,97 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
 
 
 /* ═══════════════════════════════════════════
-   ROUTER
+   ROUTER (UPDATED FOR DROPDOWNS)
 ═══════════════════════════════════════════ */
 function navigate(viewId) {
-  // FIX: Remove 'active' AND add 'hidden' to all views
   document.querySelectorAll('.view').forEach(v => {
     v.classList.remove('active');
     v.classList.add('hidden');
   });
-  document.querySelectorAll('#nav-links a').forEach(a => a.classList.remove('active'));
+  document.querySelectorAll('.nav-submenu a').forEach(a => a.classList.remove('active'));
 
   const target = document.getElementById(`view-${viewId}`);
   if (target) {
     target.classList.remove('hidden');
     target.classList.add('active');
+  } else {
+    // If we click a placeholder menu item that doesn't have HTML yet, show a dummy view
+    const mainContent = document.getElementById('main-content');
+    let placeholder = document.getElementById('view-placeholder');
+    if (!placeholder) {
+      placeholder = document.createElement('section');
+      placeholder.id = 'view-placeholder';
+      placeholder.className = 'view active';
+      mainContent.appendChild(placeholder);
+    }
+    placeholder.innerHTML = `<div class="view-header"><h2>Coming Soon</h2><p>This module is currently under development.</p></div>`;
+    placeholder.classList.remove('hidden');
+    placeholder.classList.add('active');
   }
 
-  const link = document.querySelector(`#nav-links a[data-view="${viewId}"]`);
+  const link = document.querySelector(`.nav-submenu a[data-view="${viewId}"]`);
   if (link) link.classList.add('active');
 
-  const navItems = NAV_CONFIG[currentUser?.role] || [];
-  const item = navItems.find(n => n.view === viewId);
-  if (item?.onEnter) item.onEnter();
+  // Trigger onEnter logic if it exists
+  let foundItem = null;
+  const categories = NAV_CONFIG[currentUser?.role] || [];
+  categories.forEach(cat => {
+    const match = cat.items.find(i => i.view === viewId);
+    if (match) foundItem = match;
+  });
+  
+  if (foundItem?.onEnter) foundItem.onEnter();
 }
 
 /* ═══════════════════════════════════════════
-   BUILD SIDEBAR NAV
+   BUILD SIDEBAR NAV (UPDATED FOR ACCORDIONS)
 ═══════════════════════════════════════════ */
 function buildNav(role) {
   const ul = document.getElementById('nav-links');
   ul.innerHTML = '';
-  const items = NAV_CONFIG[role] || [];
-  items.forEach((item, i) => {
+  const categories = NAV_CONFIG[role] || [];
+
+  categories.forEach((cat, index) => {
     const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.dataset.view = item.view;
-    a.innerHTML = `<span class="nav-icon">${item.icon}</span>${item.label}`;
-    a.addEventListener('click', () => navigate(item.view));
-    li.appendChild(a);
+    li.className = 'nav-category';
+    
+    // Category Header
+    const header = document.createElement('div');
+    header.className = 'nav-category-header';
+    header.innerHTML = `<div class="nav-category-title"><span class="nav-icon">${cat.icon}</span>${cat.category}</div> <span class="nav-arrow">▾</span>`;
+    
+    // Submenu Items
+    const submenu = document.createElement('ul');
+    submenu.className = 'nav-submenu';
+    
+    // Open the first accordion by default
+    if (index === 0) {
+        submenu.classList.add('open');
+        header.querySelector('.nav-arrow').style.transform = 'rotate(180deg)';
+    }
+
+    // Toggle dropdown logic
+    header.addEventListener('click', () => {
+      submenu.classList.toggle('open');
+      header.querySelector('.nav-arrow').style.transform = submenu.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+    });
+
+    cat.items.forEach((item, i) => {
+      const subLi = document.createElement('li');
+      const a = document.createElement('a');
+      a.dataset.view = item.view;
+      a.textContent = item.label;
+      a.addEventListener('click', () => navigate(item.view));
+      subLi.appendChild(a);
+      submenu.appendChild(subLi);
+
+      // Auto-load first screen on login
+      if (index === 0 && i === 0) setTimeout(() => navigate(item.view), 0);
+    });
+
+    li.appendChild(header);
+    li.appendChild(submenu);
     ul.appendChild(li);
-    if (i === 0) setTimeout(() => navigate(item.view), 0);
   });
 }
 
@@ -361,13 +454,11 @@ async function loadAirports() {
 
       // Return the HTML card (Now an interactive button!)
       return `
-        <div class="data-card" onclick="window.open('${mapsUrl}', '_blank')" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 15px rgba(0,0,0,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+        <div class="data-card hover-lift" onclick="window.open('${mapsUrl}', '_blank')">
           <div class="card-icon">🏢</div>
             <h3>${escHtml(name)}</h3>
             <div class="card-detail">📍 ${escHtml(city)}${escHtml(country)}</div>
-            <div style="margin-top: 15px; font-size: 0.85em; color: #4da3ff; font-weight: bold;">
-              🌍 View on Map ↗
-          </div>
+            <div class="card-action-link">🌍 View on Map ↗</div>
         </div>
       `;
     }).join('');
