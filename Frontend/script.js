@@ -76,7 +76,8 @@ const NAV_CONFIG = {
       category: 'Human Resources', icon: '👥',
       items: [
         { view: 'add-staff', label: 'Hire Employee' },
-        { view: 'roster', label: 'Staff Roster' } // Placeholder for future
+        { view: 'roster', label: 'Staff Roster', icon: '📅' }
+        // { view: 'roster', label: 'Staff Roster' } // Placeholder for future
       ]
     }
   ]
@@ -187,6 +188,11 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
   const role = document.getElementById('staff-role').value;
   const username = document.getElementById('staff-username').value.trim();
   const password = document.getElementById('staff-password').value.trim();
+  
+  // NEW: Safely grab the Department ID from the dropdown we added to HTML
+  const deptElement = document.getElementById('reg-staff-dept');
+  const deptId = deptElement ? parseInt(deptElement.value) : 1; // Fallback to dept 1 if not found
+
   const resultEl = document.getElementById('add-staff-result');
 
   if (!fn || !username || !password) {
@@ -199,15 +205,19 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        firstName: fn,
-        lastName: ln,
+        // THESE MUST MATCH StaffRegisterRequest.java EXACTLY
+        first_name: fn,
+        last_name: ln,
         email: email,
-        phone: phone,
+        phone_number: phone,
         role: role,
         username: username,
-        password: password
+        password: password,
+        dept_id: deptId,
+        hire_date: new Date().toISOString().split("T")[0] // Sets hire date to today automatically
       })
     });
+    
     if (res.ok) {
       showResult(resultEl, `✅ Staff account '${username}' created successfully as ${role}!`, true);
       // Clear fields
@@ -218,7 +228,8 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
       document.getElementById('staff-username').value = '';
       document.getElementById('staff-password').value = '';
     } else {
-      showResult(resultEl, `❌ Failed to create staff account.`, false);
+      const errorText = await res.text();
+      showResult(resultEl, `❌ Failed to create staff account: ${errorText}`, false);
     }
   } catch (err) {
     showResult(resultEl, `⚠️ Network error.`, false);
@@ -1342,6 +1353,66 @@ async function loadFleet() {
     showToast('Could not fetch fleet data.', 'error');
   }
 }
+
+/* ═══════════════════════════════════════════
+   ADMIN: Assign Staff Shift
+═══════════════════════════════════════════ */
+document.getElementById('assign-shift-btn')?.addEventListener('click', async () => {
+    const staffId = document.getElementById('shift-staff-id').value;
+    const role = document.getElementById('shift-role').value.trim();
+    const start = document.getElementById('shift-start').value;
+    const end = document.getElementById('shift-end').value;
+    const resultEl = document.getElementById('shift-result');
+    const btn = document.getElementById('assign-shift-btn');
+
+    if (!staffId || !role || !start || !end) { 
+        showToast('All fields are required.', 'error'); 
+        return; 
+    }
+
+    if (new Date(start) >= new Date(end)) {
+        showToast('End time must be after start time.', 'error'); 
+        return; 
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Assigning…';
+
+    try {
+        const res = await fetch(`${API}/shifts/assign`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                staff_id: parseInt(staffId),
+                role_assigned: role,
+                start_time: start,
+                end_time: end
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            showResult(resultEl, `✅ ${data.message}`, true);
+            showToast('Shift scheduled.', 'success');
+            
+            // Clear the inputs so the admin can assign the next person!
+            document.getElementById('shift-staff-id').value = '';
+            document.getElementById('shift-role').value = '';
+            document.getElementById('shift-start').value = '';
+            document.getElementById('shift-end').value = '';
+        } else {
+            // This will display our Overlap or Fatigue errors!
+            showResult(resultEl, `❌ ${data.error}`, false);
+            showToast('Scheduling failed.', 'error');
+        }
+    } catch (err) {
+        showResult(resultEl, `Network error: ${err.message}`, false);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Assign Shift';
+    }
+});
 
 /* ═══════════════════════════════════════════
    SECURITY: HTML Escape

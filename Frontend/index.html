@@ -413,6 +413,36 @@
                 <div class="card-grid" id="maintenance-grid">
                 </div>
             </section>
+            <section id="view-roster" class="view hidden">
+                <div class="view-header">
+                    <h2>Staff Roster & Scheduling</h2>
+                    <p>Assign shifts and manage employee hours</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Staff Member ID</label>
+                            <input type="number" id="shift-staff-id" placeholder="e.g., 12" class="input-glass" />
+                        </div>
+                        <div class="form-group">
+                            <label>Role for Shift</label>
+                            <input type="text" id="shift-role" placeholder="e.g., Gate Agent Terminal A" class="input-glass" />
+                        </div>
+                    </div>
+                    <div class="form-row mt-15">
+                        <div class="form-group">
+                            <label>Shift Start</label>
+                            <input type="datetime-local" id="shift-start" class="input-glass" />
+                        </div>
+                        <div class="form-group">
+                            <label>Shift End</label>
+                            <input type="datetime-local" id="shift-end" class="input-glass" />
+                        </div>
+                    </div>
+                    <button class="btn-primary mt-20" id="assign-shift-btn">Assign Shift</button>
+                    <div id="shift-result" class="result-area hidden mt-20"></div>
+                </div>
+            </section>
         </main>
     </div>
 

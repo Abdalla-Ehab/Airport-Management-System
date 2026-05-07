@@ -1,6 +1,7 @@
 package com.airport.backend.controller;
 
 import com.airport.backend.dto.LoginRequest;
+import com.airport.backend.dto.StaffRegisterRequest;
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
 import com.airport.backend.repository.PassengerRepository;
@@ -107,8 +108,8 @@ public class AuthController {
         return ResponseEntity.ok("Passenger registered successfully");
     }
 
-@PostMapping("/register/staff")
-    public ResponseEntity<?> registerStaff(@RequestBody LoginRequest request) {
+    @PostMapping("/register/staff")
+    public ResponseEntity<?> registerStaff(@RequestBody StaffRegisterRequest request) { // FIX: Uses the new DTO!
         if (staffRepository.findByUsername(request.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
         }
@@ -117,14 +118,24 @@ public class AuthController {
         s.setUsername(request.getUsername());
         s.setPassword(request.getPassword());
         
-        // REAL DATA from the frontend
-        s.setFirst_name(request.getFirstName());
-        s.setLast_name(request.getLastName());
+        // REAL DATA from the frontend mapping exactly to the new DTO names
+        s.setFirst_name(request.getFirst_name());
+        s.setLast_name(request.getLast_name());
         s.setEmail(request.getEmail());
-        s.setPhone_number(request.getPhone());
+        s.setPhone_number(request.getPhone_number());
+        
+        // FIX: Add the Missing Required Fields for the Database
+        s.setDept_id(request.getDept_id()); 
+        
+        // Safely set the hire date (defaults to today if not provided)
+        if (request.getHire_date() != null) {
+            s.setHire_date(request.getHire_date());
+        } else {
+            s.setHire_date(LocalDate.now());
+        }
         
         // ==========================================
-        // THE FIX: Server-Side Role Validation
+        // Server-Side Role Validation
         // ==========================================
         String requestedRole = request.getRole();
         
@@ -144,7 +155,12 @@ public class AuthController {
             s.setRole(cleanRole);
         }
 
-        staffRepository.save(s);
-        return ResponseEntity.ok("Staff registered successfully");
+        try {
+            staffRepository.save(s);
+            return ResponseEntity.ok("Staff registered successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Database error: " + e.getMessage());
+        }
     }
 }
