@@ -39,14 +39,21 @@ const NAV_CONFIG = {
       category: 'Ground Ops', icon: '🦺',
       items: [
         { view: 'baggage', label: 'Baggage Drop' },
-        { view: 'gate', label: 'Gate Management' } // Placeholder for future
+        { view: 'scanner', label: 'Barcode Scanner', icon: '📇' },
+        { view: 'gate', label: 'Gate Management' } 
       ]
     },
     {
       category: 'Terminal Security', icon: '🛡️',
       items: [
         { view: 'security', label: 'Incident Logs' },
-        { view: 'watchlist', label: 'Passenger Watchlist' } // Placeholder for future
+        { view: 'watchlist', label: 'Passenger Watchlist' } 
+      ]
+    },
+    {
+      category: 'Engineering & Maintenance', icon: '🔧',
+      items: [
+        { view: 'maintenance', label: 'Fleet Grounding', onEnter: initMaintenanceView }
       ]
     }
   ],
@@ -1081,6 +1088,65 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
     btn.disabled = false;
     btn.innerHTML = 'Submit Report';
   }
+});
+
+/* ═══════════════════════════════════════════
+   STAFF: Barcode Scanner
+═══════════════════════════════════════════ */
+document.getElementById('scan-btn')?.addEventListener('click', async () => {
+    const barcode = document.getElementById('scan-barcode').value.trim();
+    const location = document.getElementById('scan-location').value.trim();
+    const override = document.getElementById('scan-override').value;
+    const resultEl = document.getElementById('scan-result');
+    const btn = document.getElementById('scan-btn');
+
+    if (!barcode || !location) { showToast('Barcode and Location are required.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Scanning…';
+
+    try {
+        const res = await fetch(`${API}/baggage/scan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                barcode: barcode,
+                staff_id: currentUser.id,
+                location: location,
+                override_status: override
+            }),
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            showResult(resultEl, `
+                <div style="display:flex; justify-content: space-between; align-items:center;">
+                    <div>
+                        <strong>✅ Scan Recorded</strong><br>
+                        Barcode: <span style="font-family:monospace; color:var(--sky-light);">${data.barcode}</span><br>
+                        Location: ${data.location}
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-size: 0.8rem; color: var(--silver-dim);">Status Updated:</span><br>
+                        <span style="text-decoration: line-through; color: var(--error);">${data.previous_status}</span> ➔ 
+                        <span style="color: var(--success); font-weight:bold;">${data.new_status}</span>
+                    </div>
+                </div>
+            `, true);
+            
+            // Clear the barcode input for the next quick scan
+            document.getElementById('scan-barcode').value = '';
+            document.getElementById('scan-barcode').focus();
+        } else {
+            showResult(resultEl, `❌ Scan Failed: ${data.error || 'Unknown error'}`, false);
+        }
+    } catch (err) {
+        showResult(resultEl, `Network error: ${err.message}`, false);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Record Scan';
+    }
 });
 
 /* ═══════════════════════════════════════════

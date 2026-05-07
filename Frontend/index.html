@@ -247,6 +247,34 @@
                 </div>
             </section>
 
+            <section id="view-scanner" class="view hidden">
+                <div class="view-header">
+                    <h2>Logistics Scanner</h2>
+                    <p>Track baggage movement across the network</p>
+                </div>
+                <div class="form-card glass-dark">
+                    <div class="form-group">
+                        <label>Scan Barcode</label>
+                        <input type="text" id="scan-barcode" class="input-glass" placeholder="e.g. BG-A1B2C3D4" style="font-family: monospace; font-size: 1.2rem; letter-spacing: 2px;" autocomplete="off" />
+                    </div>
+                    <div class="form-row mt-15">
+                        <div class="form-group">
+                            <label>Scan Location</label>
+                            <input type="text" id="scan-location" class="input-glass" placeholder="e.g. Cairo T3 Sorting, Gate F4..." />
+                        </div>
+                        <div class="form-group">
+                            <label>Status Override (Optional)</label>
+                            <select id="scan-override" class="input-glass">
+                                <option value="">Auto-Advance Status</option>
+                                <option value="LOST">Flag as LOST</option>
+                                <option value="TRANSIT">Mark as in TRANSIT</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-primary mt-20" id="scan-btn">Record Scan</button>
+                    <div id="scan-result" class="result-area hidden mt-20"></div>
+                </div>
+            </section>
             <section id="view-security" class="view hidden">
                 <div class="view-header">
                     <h2>Security Log</h2>
