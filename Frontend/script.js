@@ -40,14 +40,14 @@ const NAV_CONFIG = {
       items: [
         { view: 'baggage', label: 'Baggage Drop' },
         { view: 'scanner', label: 'Barcode Scanner', icon: '📇' },
-        { view: 'gate', label: 'Gate Management' } 
+        { view: 'gate', label: 'Gate Management' }
       ]
     },
     {
       category: 'Terminal Security', icon: '🛡️',
       items: [
         { view: 'security', label: 'Incident Logs' },
-        { view: 'watchlist', label: 'Passenger Watchlist' } 
+        { view: 'watchlist', label: 'Passenger Watchlist' }
       ]
     },
     {
@@ -61,7 +61,7 @@ const NAV_CONFIG = {
     {
       category: 'Flight Operations', icon: '🌍',
       items: [
-        { view: 'schedule', label: 'Master Scheduler', onEnter:initScheduleView },
+        { view: 'schedule', label: 'Master Scheduler', onEnter: initScheduleView },
         { view: 'active-flights', label: 'Live Traffic Map' } // Placeholder for future
       ]
     },
@@ -188,7 +188,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
   const role = document.getElementById('staff-role').value;
   const username = document.getElementById('staff-username').value.trim();
   const password = document.getElementById('staff-password').value.trim();
-  
+
   // NEW: Safely grab the Department ID from the dropdown we added to HTML
   const deptElement = document.getElementById('reg-staff-dept');
   const deptId = deptElement ? parseInt(deptElement.value) : 1; // Fallback to dept 1 if not found
@@ -217,7 +217,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
         hire_date: new Date().toISOString().split("T")[0] // Sets hire date to today automatically
       })
     });
-    
+
     if (res.ok) {
       showResult(resultEl, `✅ Staff account '${username}' created successfully as ${role}!`, true);
       // Clear fields
@@ -276,7 +276,7 @@ function navigate(viewId) {
     const match = cat.items.find(i => i.view === viewId);
     if (match) foundItem = match;
   });
-  
+
   if (foundItem?.onEnter) foundItem.onEnter();
 }
 
@@ -291,20 +291,20 @@ function buildNav(role) {
   categories.forEach((cat, index) => {
     const li = document.createElement('li');
     li.className = 'nav-category';
-    
+
     // Category Header
     const header = document.createElement('div');
     header.className = 'nav-category-header';
     header.innerHTML = `<div class="nav-category-title"><span class="nav-icon">${cat.icon}</span>${cat.category}</div> <span class="nav-arrow">▾</span>`;
-    
+
     // Submenu Items
     const submenu = document.createElement('ul');
     submenu.className = 'nav-submenu';
-    
+
     // Open the first accordion by default
     if (index === 0) {
-        submenu.classList.add('open');
-        header.querySelector('.nav-arrow').style.transform = 'rotate(180deg)';
+      submenu.classList.add('open');
+      header.querySelector('.nav-arrow').style.transform = 'rotate(180deg)';
     }
 
     // Toggle dropdown logic
@@ -492,13 +492,13 @@ async function loadAirports() {
 /* ═══════════════════════════════════════════
    PASSENGER: Book a Flight (WIZARD & SEAT MAP)
 ═══════════════════════════════════════════ */
-let currentFlightData = null; 
+let currentFlightData = null;
 
 // 1. Initialize Dropdowns and Date Picker
 async function initBookingView() {
   // Prevent selecting past dates
   document.getElementById('book-date').min = new Date().toISOString().split("T")[0];
-  
+
   try {
     const res = await fetch(`${API}/airports`);
     const airports = await res.json();
@@ -511,51 +511,51 @@ async function initBookingView() {
 
 // 2. Search Flights Button Logic
 document.getElementById('search-flights-btn').addEventListener('click', async () => {
-    const origin = document.getElementById('book-origin').value;
-    const dest = document.getElementById('book-dest').value;
-    const date = document.getElementById('book-date').value;
-    
-    const resultsContainer = document.getElementById('flight-results-container');
-    const listEl = document.getElementById('flight-list');
-    const btn = document.getElementById('search-flights-btn');
+  const origin = document.getElementById('book-origin').value;
+  const dest = document.getElementById('book-dest').value;
+  const date = document.getElementById('book-date').value;
 
-    document.getElementById('seat-selection-container').classList.add('hidden'); // Hide seats on new search
+  const resultsContainer = document.getElementById('flight-results-container');
+  const listEl = document.getElementById('flight-list');
+  const btn = document.getElementById('search-flights-btn');
 
-    if (!origin || !dest || !date) { showToast('Please select origin, destination, and date.', 'error'); return; }
+  document.getElementById('seat-selection-container').classList.add('hidden'); // Hide seats on new search
 
-    btn.disabled = true;
-    btn.innerHTML = 'Searching...';
-    listEl.innerHTML = '<div class="skeleton-loader"></div>';
-    resultsContainer.classList.remove('hidden');
+  if (!origin || !dest || !date) { showToast('Please select origin, destination, and date.', 'error'); return; }
 
-    try {
-        const res = await fetch(`${API}/flights`);
-        const allFlights = await res.json();
+  btn.disabled = true;
+  btn.innerHTML = 'Searching...';
+  listEl.innerHTML = '<div class="skeleton-loader"></div>';
+  resultsContainer.classList.remove('hidden');
 
-        // Filter by Route AND Exact Date (Comparing YYYY-MM-DD)
-        const available = allFlights.filter(f => {
-            const flightDate = f.departure_time.split('T')[0].split(' ')[0]; // Handles different DB date formats
-            return String(f.departure_airport_id) === origin && 
-                   String(f.arrival_airport_id) === dest && 
-                   flightDate === date;
-        });
+  try {
+    const res = await fetch(`${API}/flights`);
+    const allFlights = await res.json();
 
-        if (available.length === 0) {
-            listEl.innerHTML = '<p style="color: var(--silver); padding: 20px;">No flights found for this date. Try another day.</p>';
-            return;
-        }
+    // Filter by Route AND Exact Date (Comparing YYYY-MM-DD)
+    const available = allFlights.filter(f => {
+      const flightDate = f.departure_time.split('T')[0].split(' ')[0]; // Handles different DB date formats
+      return String(f.departure_airport_id) === origin &&
+        String(f.arrival_airport_id) === dest &&
+        flightDate === date;
+    });
 
-        listEl.innerHTML = '';
-        available.forEach(f => {
-            // Extract times for UI
-            const depTime = new Date(f.departure_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const arrTime = new Date(f.arrival_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const fn = f.flight_number || `FL-${f.flight_id}`;
-            const pseudoPrice = 150 + (f.flight_id % 300); // Generate a fake realistic price for the UI
+    if (available.length === 0) {
+      listEl.innerHTML = '<p style="color: var(--silver); padding: 20px;">No flights found for this date. Try another day.</p>';
+      return;
+    }
 
-            const card = document.createElement('div');
-            card.className = 'flight-result-card';
-            card.innerHTML = `
+    listEl.innerHTML = '';
+    available.forEach(f => {
+      // Extract times for UI
+      const depTime = new Date(f.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const arrTime = new Date(f.arrival_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const fn = f.flight_number || `FL-${f.flight_id}`;
+      const pseudoPrice = 150 + (f.flight_id % 300); // Generate a fake realistic price for the UI
+
+      const card = document.createElement('div');
+      card.className = 'flight-result-card';
+      card.innerHTML = `
                 <div style="flex: 1; color: var(--sky-light); font-weight: bold;">${fn}</div>
                 <div class="flight-times">
                     <div class="time-block"><h3>${depTime}</h3><p>Departure</p></div>
@@ -565,136 +565,139 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
                 <div class="flight-price">US$${pseudoPrice}</div>
                 <div class="flight-action"><button class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;" onclick="selectFlight(${f.flight_id}, '${fn}')">Select</button></div>
             `;
-            listEl.appendChild(card);
-        });
+      listEl.appendChild(card);
+    });
 
-    } catch (e) {
-        listEl.innerHTML = '<p class="result-error">Error fetching flights.</p>';
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Search';
-    }
+  } catch (e) {
+    listEl.innerHTML = '<p class="result-error">Error fetching flights.</p>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Search';
+  }
 });
 
 // 3. Render the Class-Divided Airplane!
 async function selectFlight(flightId, flightNumber) {
-    currentFlightData = flightId;
-    document.getElementById('selected-seat-no').value = '';
-    
-    const seatContainer = document.getElementById('seat-selection-container');
-    const plane = document.getElementById('plane-seats');
-    
-    plane.innerHTML = '<div class="plane-cockpit">Front of Aircraft (' + flightNumber + ')</div>';
-    seatContainer.classList.remove('hidden');
-    document.getElementById('book-btn').disabled = true; 
-    
-    // Scroll down to the plane
-    seatContainer.scrollIntoView({ behavior: 'smooth' });
+  currentFlightData = flightId;
+  document.getElementById('selected-seat-no').value = '';
 
-    try {
-        const res = await fetch(`${API}/bookings/flights/${flightId}/seats`);
-        let occupiedSeats = [];
-        if(res.ok) occupiedSeats = await res.json();
+  const seatContainer = document.getElementById('seat-selection-container');
+  const plane = document.getElementById('plane-seats');
 
-        const letters = ['A','B','C','D','E','F'];
-        
-        // Helper to build rows
-        const buildRow = (r, className) => {
-            let rowDiv = document.createElement('div');
-            rowDiv.className = 'seat-row';
-            letters.forEach((col, index) => {
-                const seatId = `${r}${col}`;
-                const isOccupied = occupiedSeats.includes(seatId);
-                
-                let seat = document.createElement('div');
-                seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
-                seat.dataset.id = seatId;
-                seat.dataset.class = className; // Tag the seat with its class!
-                seat.textContent = isOccupied ? '' : seatId;
-                
-                if(!isOccupied) {
-                    seat.addEventListener('click', () => {
-                        // Prevent clicking if it's the wrong class
-                        if (seat.classList.contains('wrong-class')) return;
+  plane.innerHTML = '<div class="plane-cockpit">Front of Aircraft (' + flightNumber + ')</div>';
+  seatContainer.classList.remove('hidden');
+  document.getElementById('book-btn').disabled = true;
 
-                        document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
-                        seat.classList.add('selected');
-                        document.getElementById('selected-seat-no').value = seatId;
-                        document.getElementById('book-btn').disabled = false; 
-                    });
-                }
-                
-                rowDiv.appendChild(seat);
-                if(index === 2) {
-                    let aisle = document.createElement('div');
-                    aisle.className = 'aisle'; aisle.textContent = r;
-                    rowDiv.appendChild(aisle);
-                }
-            });
-            plane.appendChild(rowDiv);
-        };
+  // Scroll down to the plane
+  seatContainer.scrollIntoView({ behavior: 'smooth' });
 
-        // Rows 1-2: FIRST CLASS
-        plane.innerHTML += `<div class="row-divider"><span>First Class</span></div>`;
-        for(let r=1; r<=2; r++) buildRow(r, "First");
+  try {
+    const res = await fetch(`${API}/bookings/flights/${flightId}/seats`);
+    let occupiedSeats = [];
+    if (res.ok) occupiedSeats = await res.json();
 
-        // Rows 3-5: BUSINESS CLASS
-        plane.innerHTML += `<div class="row-divider"><span>Business Class</span></div>`;
-        for(let r=3; r<=5; r++) buildRow(r, "Business");
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-        // Rows 6-15: ECONOMY CLASS
-        plane.innerHTML += `<div class="row-divider"><span>Economy Class</span></div>`;
-        for(let r=6; r<=15; r++) buildRow(r, "Economy");
+    // Helper to build rows
+    const buildRow = (r, className) => {
+      let rowDiv = document.createElement('div');
+      rowDiv.className = 'seat-row';
+      letters.forEach((col, index) => {
+        const seatId = `${r}${col}`;
+        const isOccupied = occupiedSeats.includes(seatId);
 
-        applyClassFilter(); // Apply initial class colors based on radio buttons
+        let seat = document.createElement('div');
+        seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
+        seat.dataset.id = seatId;
+        seat.dataset.class = className; // Tag the seat with its class!
+        seat.textContent = isOccupied ? '' : seatId;
 
-    } catch(e) { console.error("Could not load seat map."); }
+        if (!isOccupied) {
+          seat.addEventListener('click', () => {
+            // Prevent clicking if it's the wrong class
+            if (seat.classList.contains('wrong-class')) return;
+
+            document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+            seat.classList.add('selected');
+            document.getElementById('selected-seat-no').value = seatId;
+            document.getElementById('book-btn').disabled = false;
+          });
+        }
+
+        rowDiv.appendChild(seat);
+        if (index === 2) {
+          let aisle = document.createElement('div');
+          aisle.className = 'aisle'; aisle.textContent = r;
+          rowDiv.appendChild(aisle);
+        }
+      });
+      plane.appendChild(rowDiv);
+    };
+
+    // Rows 1-2: FIRST CLASS
+    plane.innerHTML += `<div class="row-divider"><span>First Class</span></div>`;
+    for (let r = 1; r <= 2; r++) buildRow(r, "First");
+
+    // Rows 3-5: BUSINESS CLASS
+    plane.innerHTML += `<div class="row-divider"><span>Business Class</span></div>`;
+    for (let r = 3; r <= 5; r++) buildRow(r, "Business");
+
+    // Rows 6-15: ECONOMY CLASS
+    plane.innerHTML += `<div class="row-divider"><span>Economy Class</span></div>`;
+    for (let r = 6; r <= 15; r++) buildRow(r, "Economy");
+
+    applyClassFilter(); // Apply initial class colors based on radio buttons
+
+  } catch (e) { console.error("Could not load seat map."); }
 }
 
 // 4. Handle Class Switching (Locks seats and calculates live inventory)
 document.querySelectorAll('input[name="travel-class"]').forEach(radio => {
-    radio.addEventListener('change', applyClassFilter);
+  radio.addEventListener('change', applyClassFilter);
 });
 
 function applyClassFilter() {
-    const selectedClass = document.querySelector('input[name="travel-class"]:checked').value;
-    
-    // Reset selection if they change classes
-    document.getElementById('selected-seat-no').value = '';
-    document.getElementById('book-btn').disabled = true;
+  const selectedClass = document.querySelector('input[name="travel-class"]:checked').value;
 
-    let availableInClass = 0; // Track live inventory
+  // Reset selection if they change classes
+  document.getElementById('selected-seat-no').value = '';
+  document.getElementById('book-btn').disabled = true;
 
-    document.querySelectorAll('.seat').forEach(seat => {
-        seat.classList.remove('selected'); // Clear selections
-        
-        if (seat.dataset.class !== selectedClass) {
-            seat.classList.add('wrong-class'); // Gray out wrong class
-        } else {
-            seat.classList.remove('wrong-class'); // Make clickable
-            
-            // If the seat is in the correct class AND is not occupied, add it to inventory!
-            if (!seat.classList.contains('occupied')) {
-                availableInClass++;
-            }
-        }
-    });
+  let availableInClass = 0; // Track live inventory
 
-    // Update the UI with the live inventory count
-    const inventoryDisplay = document.getElementById('class-inventory-count');
-    if (inventoryDisplay) {
-        if (availableInClass === 0) {
-            inventoryDisplay.innerHTML = `<span style="color: var(--error);">Sold Out</span>`;
-        } else {
-            inventoryDisplay.innerHTML = `<span style="color: var(--success);">${availableInClass} seats available in ${selectedClass} Class</span>`;
-        }
+  document.querySelectorAll('.seat').forEach(seat => {
+    seat.classList.remove('selected'); // Clear selections
+
+    if (seat.dataset.class !== selectedClass) {
+      seat.classList.add('wrong-class'); // Gray out wrong class
+    } else {
+      seat.classList.remove('wrong-class'); // Make clickable
+
+      // If the seat is in the correct class AND is not occupied, add it to inventory!
+      if (!seat.classList.contains('occupied')) {
+        availableInClass++;
+      }
     }
+  });
+
+  // Update the UI with the live inventory count
+  const inventoryDisplay = document.getElementById('class-inventory-count');
+  if (inventoryDisplay) {
+    if (availableInClass === 0) {
+      inventoryDisplay.innerHTML = `<span style="color: var(--error);">Sold Out</span>`;
+    } else {
+      inventoryDisplay.innerHTML = `<span style="color: var(--success);">${availableInClass} seats available in ${selectedClass} Class</span>`;
+    }
+  }
 }
 
 // 5. Submit Booking
 document.getElementById('book-btn').addEventListener('click', async () => {
   const className = document.querySelector('input[name="travel-class"]:checked').value;
-  const seatNo = document.getElementById('selected-seat-no').value;
+  
+  // 1. Properly splits the hidden input string into an array
+  const seatNosArray = document.getElementById('selected-seat-no').value.split(',');
+  
   const resultEl = document.getElementById('book-result');
   const btn = document.getElementById('book-btn');
 
@@ -703,29 +706,34 @@ document.getElementById('book-btn').addEventListener('click', async () => {
 
   try {
     const res = await fetch(`${API}/bookings/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            flight_id: currentFlightData,
-            passenger_id: currentUser.id,
-            seat_no: seatNo,
-            class_name: className,
-            is_transit: false
-        })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        flight_id: currentFlightData,
+        passenger_id: currentUser.id,
+        // 2. THE FIX: Send the new array using the new DTO key
+        seat_nos: seatNosArray, 
+        class_name: className,
+        is_transit: false
+      })
     });
-    
+
     const text = await res.text();
     let msg;
     try { msg = JSON.parse(text); } catch { msg = text; }
 
-    if(res.ok) {
-        showResult(resultEl, `🎉 Booking confirmed!<br>Ticket Number: <strong>${msg.ticket_no}</strong><br>Seat: <strong>${seatNo}</strong>`, true);
-        showToast('Flight booked successfully!', 'success');
-        document.getElementById('seat-selection-container').classList.add('hidden');
+    if (res.ok) {
+      // 3. THE FIX: Display the formatted message directly from the backend, 
+      // or join the array back together so it doesn't crash!
+      const seatsString = seatNosArray.join(', ');
+      
+      showResult(resultEl, `🎉 Booking confirmed!<br>Ticket Number(s): <strong>${msg.ticket_nos ? msg.ticket_nos.join(', ') : msg.ticket_no}</strong><br>Seats: <strong>${seatsString}</strong>`, true);
+      showToast('Flight booked successfully!', 'success');
+      document.getElementById('seat-selection-container').classList.add('hidden');
     } else {
-        const errMsg = msg.error || 'Failed to book.';
-        showResult(resultEl, `Error: ${errMsg}`, false);
-        showToast('Booking failed.', 'error');
+      const errMsg = msg.error || 'Failed to book.';
+      showResult(resultEl, `Error: ${errMsg}`, false);
+      showToast('Booking failed.', 'error');
     }
   } catch (err) {
     showResult(resultEl, `Network error: ${err.message}`, false);
@@ -733,6 +741,7 @@ document.getElementById('book-btn').addEventListener('click', async () => {
     btn.innerHTML = 'Confirm Booking';
   }
 });
+
 /* ═══════════════════════════════════════════
    PASSENGER: Check-In
 ═══════════════════════════════════════════ */
@@ -848,64 +857,64 @@ async function renderBoardingPass(el, data, ticketNo) {
 
 // 1. Load Airports into the Status Dropdowns
 async function initStatusView() {
-    try {
-        const res = await fetch(`${API}/airports`);
-        const data = await res.json();
-        const airports = Array.isArray(data) ? data : (data.content || data.data || []);
-        
-        let options = '<option value="">Select Airport...</option>';
-        airports.forEach(a => {
-            options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city || a.airport_id)}</option>`;
-        });
-        
-        document.getElementById('status-origin').innerHTML = options;
-        document.getElementById('status-dest').innerHTML = options;
-    } catch (e) {
-        console.log("Failed to load airports for status view.");
-    }
+  try {
+    const res = await fetch(`${API}/airports`);
+    const data = await res.json();
+    const airports = Array.isArray(data) ? data : (data.content || data.data || []);
+
+    let options = '<option value="">Select Airport...</option>';
+    airports.forEach(a => {
+      options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city || a.airport_id)}</option>`;
+    });
+
+    document.getElementById('status-origin').innerHTML = options;
+    document.getElementById('status-dest').innerHTML = options;
+  } catch (e) {
+    console.log("Failed to load airports for status view.");
+  }
 }
 
 // 2. Listen for route changes to find available flights
 ['status-origin', 'status-dest'].forEach(id => {
-    document.getElementById(id).addEventListener('change', async () => {
-        const origin = document.getElementById('status-origin').value;
-        const dest = document.getElementById('status-dest').value;
-        const flightSelect = document.getElementById('status-flight-select');
+  document.getElementById(id).addEventListener('change', async () => {
+    const origin = document.getElementById('status-origin').value;
+    const dest = document.getElementById('status-dest').value;
+    const flightSelect = document.getElementById('status-flight-select');
 
-        if (!origin || !dest) {
-            flightSelect.innerHTML = '<option value="">Please select Origin and Destination first</option>';
-            flightSelect.disabled = true;
-            return;
-        }
+    if (!origin || !dest) {
+      flightSelect.innerHTML = '<option value="">Please select Origin and Destination first</option>';
+      flightSelect.disabled = true;
+      return;
+    }
 
-        flightSelect.innerHTML = '<option value="">Searching flights...</option>';
-        flightSelect.disabled = true;
+    flightSelect.innerHTML = '<option value="">Searching flights...</option>';
+    flightSelect.disabled = true;
 
-        try {
-            const res = await fetch(`${API}/flights`);
-            const data = await res.json();
-            const flights = Array.isArray(data) ? data : (data.content || data.data || []);
+    try {
+      const res = await fetch(`${API}/flights`);
+      const data = await res.json();
+      const flights = Array.isArray(data) ? data : (data.content || data.data || []);
 
-            // Filter flights for this specific route
-            const availableFlights = flights.filter(f => 
-                String(f.departure_airport_id) === String(origin) && 
-                String(f.arrival_airport_id) === String(dest)
-            );
+      // Filter flights for this specific route
+      const availableFlights = flights.filter(f =>
+        String(f.departure_airport_id) === String(origin) &&
+        String(f.arrival_airport_id) === String(dest)
+      );
 
-            if (availableFlights.length === 0) {
-                flightSelect.innerHTML = '<option value="">No flights scheduled for this route</option>';
-            } else {
-                let options = '<option value="">Select a Flight to Track...</option>';
-                availableFlights.forEach(f => {
-                    options += `<option value="${f.flight_id}">Flight ${f.flight_id} - Departs: ${f.departure_time || 'TBA'}</option>`;
-                });
-                flightSelect.innerHTML = options;
-                flightSelect.disabled = false;
-            }
-        } catch (e) {
-            flightSelect.innerHTML = '<option value="">Error loading flights</option>';
-        }
-    });
+      if (availableFlights.length === 0) {
+        flightSelect.innerHTML = '<option value="">No flights scheduled for this route</option>';
+      } else {
+        let options = '<option value="">Select a Flight to Track...</option>';
+        availableFlights.forEach(f => {
+          options += `<option value="${f.flight_id}">Flight ${f.flight_id} - Departs: ${f.departure_time || 'TBA'}</option>`;
+        });
+        flightSelect.innerHTML = options;
+        flightSelect.disabled = false;
+      }
+    } catch (e) {
+      flightSelect.innerHTML = '<option value="">Error loading flights</option>';
+    }
+  });
 });
 
 // 3. Track the selected flight!
@@ -913,7 +922,7 @@ document.getElementById('status-btn').addEventListener('click', async () => {
   // Grab the ID from the new dropdown instead of a text box!
   const flightId = document.getElementById('status-flight-select').value;
   const resultEl = document.getElementById('flight-status-result');
-  const btn      = document.getElementById('status-btn');
+  const btn = document.getElementById('status-btn');
 
   if (!flightId) { showToast('Please select a flight to track.', 'error'); return; }
 
@@ -922,42 +931,42 @@ document.getElementById('status-btn').addEventListener('click', async () => {
   resultEl.classList.add('hidden');
 
   try {
-    const res   = await fetch(`${API}/flights`);
+    const res = await fetch(`${API}/flights`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const all   = await res.json();
-    const list  = Array.isArray(all) ? all : (all.content || all.data || []);
-    
+    const all = await res.json();
+    const list = Array.isArray(all) ? all : (all.content || all.data || []);
+
     const flight = list.find(f => String(f.id || f.flightId || f.flight_id) === String(flightId));
 
     if (!flight) {
       resultEl.innerHTML = `<div class="result-area result-error">No flight found.</div>`;
     } else {
-      
+
       // --- SMART DATA LOOKUP (Kept intact!) ---
       let originName = flight.departure_airport_id;
       let destName = flight.arrival_airport_id;
       let airlineName = flight.airline_id;
 
       try {
-          const airRes = await fetch(`${API}/airports`);
-          const airData = await airRes.json();
-          const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
-          
-          const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
-          if (o) originName = o.name || o.airportName || o.city || originName;
+        const airRes = await fetch(`${API}/airports`);
+        const airData = await airRes.json();
+        const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
 
-          const d = airports.find(a => String(a.id || a.airport_id) === String(flight.arrival_airport_id));
-          if (d) destName = d.name || d.airportName || d.city || destName;
-      } catch(e) { console.log("Could not fetch airport names"); }
+        const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
+        if (o) originName = o.name || o.airportName || o.city || originName;
+
+        const d = airports.find(a => String(a.id || a.airport_id) === String(flight.arrival_airport_id));
+        if (d) destName = d.name || d.airportName || d.city || destName;
+      } catch (e) { console.log("Could not fetch airport names"); }
 
       try {
-          const lineRes = await fetch(`${API}/airlines`);
-          const lineData = await lineRes.json();
-          const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
-          
-          const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
-          if (al) airlineName = al.name || al.airlineName || airlineName;
-      } catch(e) { console.log("Could not fetch airline names"); }
+        const lineRes = await fetch(`${API}/airlines`);
+        const lineData = await lineRes.json();
+        const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
+
+        const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
+        if (al) airlineName = al.name || al.airlineName || airlineName;
+      } catch (e) { console.log("Could not fetch airline names"); }
       // -------------------------
 
       resultEl.innerHTML = `
@@ -1105,33 +1114,33 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
    STAFF: Barcode Scanner
 ═══════════════════════════════════════════ */
 document.getElementById('scan-btn')?.addEventListener('click', async () => {
-    const barcode = document.getElementById('scan-barcode').value.trim();
-    const location = document.getElementById('scan-location').value.trim();
-    const override = document.getElementById('scan-override').value;
-    const resultEl = document.getElementById('scan-result');
-    const btn = document.getElementById('scan-btn');
+  const barcode = document.getElementById('scan-barcode').value.trim();
+  const location = document.getElementById('scan-location').value.trim();
+  const override = document.getElementById('scan-override').value;
+  const resultEl = document.getElementById('scan-result');
+  const btn = document.getElementById('scan-btn');
 
-    if (!barcode || !location) { showToast('Barcode and Location are required.', 'error'); return; }
+  if (!barcode || !location) { showToast('Barcode and Location are required.', 'error'); return; }
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Scanning…';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Scanning…';
 
-    try {
-        const res = await fetch(`${API}/baggage/scan`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                barcode: barcode,
-                staff_id: currentUser.id,
-                location: location,
-                override_status: override
-            }),
-        });
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-            showResult(resultEl, `
+  try {
+    const res = await fetch(`${API}/baggage/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        barcode: barcode,
+        staff_id: currentUser.id,
+        location: location,
+        override_status: override
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      showResult(resultEl, `
                 <div style="display:flex; justify-content: space-between; align-items:center;">
                     <div>
                         <strong>✅ Scan Recorded</strong><br>
@@ -1145,48 +1154,48 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
                     </div>
                 </div>
             `, true);
-            
-            // Clear the barcode input for the next quick scan
-            document.getElementById('scan-barcode').value = '';
-            document.getElementById('scan-barcode').focus();
-        } else {
-            showResult(resultEl, `❌ Scan Failed: ${data.error || 'Unknown error'}`, false);
-        }
-    } catch (err) {
-        showResult(resultEl, `Network error: ${err.message}`, false);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Record Scan';
+
+      // Clear the barcode input for the next quick scan
+      document.getElementById('scan-barcode').value = '';
+      document.getElementById('scan-barcode').focus();
+    } else {
+      showResult(resultEl, `❌ Scan Failed: ${data.error || 'Unknown error'}`, false);
     }
+  } catch (err) {
+    showResult(resultEl, `Network error: ${err.message}`, false);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Record Scan';
+  }
 });
 
 /* ═══════════════════════════════════════════
    STAFF: Maintenance & Grounding Dashboard
 ═══════════════════════════════════════════ */
 async function initMaintenanceView() {
-    const grid = document.getElementById('maintenance-grid');
-    grid.innerHTML = '<div class="skeleton-loader"></div><div class="skeleton-loader"></div>';
+  const grid = document.getElementById('maintenance-grid');
+  grid.innerHTML = '<div class="skeleton-loader"></div><div class="skeleton-loader"></div>';
 
-    try {
-        const res = await fetch(`${API}/aircraft`);
-        if (!res.ok) throw new Error('Failed to load aircraft');
-        const fleet = await res.json();
+  try {
+    const res = await fetch(`${API}/aircraft`);
+    if (!res.ok) throw new Error('Failed to load aircraft');
+    const fleet = await res.json();
 
-        if (!fleet.length) {
-            grid.innerHTML = '<p style="color:var(--silver)">No aircraft found in the fleet.</p>';
-            return;
-        }
+    if (!fleet.length) {
+      grid.innerHTML = '<p style="color:var(--silver)">No aircraft found in the fleet.</p>';
+      return;
+    }
 
-        grid.innerHTML = fleet.map(a => {
-            const status = a.status || 'ACTIVE';
-            
-            // Dynamic styling based on safety status
-            let badgeColor = 'var(--success)';
-            let icon = '✈️';
-            if (status === 'GROUNDED') { badgeColor = 'var(--error)'; icon = '🛑'; }
-            if (status === 'MAINTENANCE') { badgeColor = 'var(--warn)'; icon = '🔧'; }
+    grid.innerHTML = fleet.map(a => {
+      const status = a.status || 'ACTIVE';
 
-            return `
+      // Dynamic styling based on safety status
+      let badgeColor = 'var(--success)';
+      let icon = '✈️';
+      if (status === 'GROUNDED') { badgeColor = 'var(--error)'; icon = '🛑'; }
+      if (status === 'MAINTENANCE') { badgeColor = 'var(--warn)'; icon = '🔧'; }
+
+      return `
                 <div class="data-card" id="aircraft-card-${a.aircraft_id}">
                     <div class="card-icon">${icon}</div>
                     <h3>${escHtml(a.type)}</h3>
@@ -1206,33 +1215,33 @@ async function initMaintenanceView() {
                     </div>
                 </div>
             `;
-        }).join('');
+    }).join('');
 
-    } catch (err) {
-        grid.innerHTML = `<div class="result-area result-error">Network error loading fleet.</div>`;
-    }
+  } catch (err) {
+    grid.innerHTML = `<div class="result-area result-error">Network error loading fleet.</div>`;
+  }
 }
 
 // Function to handle the Dropdown change
 async function updateAircraftStatus(aircraftId, newStatus) {
-    if (!newStatus) return;
+  if (!newStatus) return;
 
-    try {
-        const res = await fetch(`${API}/aircraft/${aircraftId}/status`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus })
-        });
+  try {
+    const res = await fetch(`${API}/aircraft/${aircraftId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
 
-        if (res.ok) {
-            showToast(`Aircraft status updated to ${newStatus}`, 'success');
-            initMaintenanceView(); // Reload the grid to show the new colors/icons
-        } else {
-            showToast('Failed to update aircraft status', 'error');
-        }
-    } catch (err) {
-        showToast('Network error while updating status', 'error');
+    if (res.ok) {
+      showToast(`Aircraft status updated to ${newStatus}`, 'success');
+      initMaintenanceView(); // Reload the grid to show the new colors/icons
+    } else {
+      showToast('Failed to update aircraft status', 'error');
     }
+  } catch (err) {
+    showToast('Network error while updating status', 'error');
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -1244,7 +1253,7 @@ async function initScheduleView() {
     const res = await fetch(`${API}/airlines`);
     const data = await res.json();
     const airlines = Array.isArray(data) ? data : (data.content || data.data || []);
-    
+
     let options = '<option value="">Select Airline...</option>';
     airlines.forEach(a => {
       // Smart Fallback: If your database doesn't have an official 2-letter iata_code yet, 
@@ -1252,7 +1261,7 @@ async function initScheduleView() {
       const code = a.iata_code || a.iataCode || a.name.substring(0, 2).toUpperCase();
       options += `<option value="${code}">${code} (${a.name})</option>`;
     });
-    
+
     document.getElementById('sched-airline-code').innerHTML = options;
   } catch (err) {
     console.log("Could not load airlines for scheduler");
@@ -1263,10 +1272,10 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
   // Grab the split inputs
   const airlineCode = document.getElementById('sched-airline-code').value;
   const routeNo = document.getElementById('sched-route-no').value.trim();
-  
+
   // THE MAGIC: Stitch them together to make a real-world flight number! (e.g., EK + 201 = EK201)
-  const realFlightNumber = `${airlineCode}${routeNo}`; 
-  
+  const realFlightNumber = `${airlineCode}${routeNo}`;
+
   const aircraftId = document.getElementById('sched-aircraft-id').value.trim();
   const origin = document.getElementById('sched-origin').value.trim();
   const dest = document.getElementById('sched-dest').value.trim();
@@ -1298,11 +1307,11 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
     const text = await res.text();
     let msg;
     try { msg = JSON.parse(text); } catch { msg = text; }
-    
+
     if (res.ok) {
       showResult(resultEl, `🗓️ Flight <strong>${escHtml(realFlightNumber)}</strong> scheduled successfully!`, true);
       showToast('Flight scheduled!', 'success');
-      
+
       // Clear the route number so they can schedule the next one quickly
       document.getElementById('sched-route-no').value = '';
     } else {
@@ -1330,12 +1339,12 @@ async function loadFleet() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const fleet = Array.isArray(data) ? data : (data.content || data.data || []);
-    
+
     if (!fleet.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No aircraft found.</p>';
       return;
     }
-    
+
     // THE FIX: Updated property names to match the Spring Boot backend perfectly
     grid.innerHTML = fleet.map(a => `
       <div class="data-card">
@@ -1347,7 +1356,7 @@ async function loadFleet() {
         <div class="card-badge">Active</div>
       </div>
     `).join('');
-    
+
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load fleet: ${err.message}</div>`;
     showToast('Could not fetch fleet data.', 'error');
@@ -1358,60 +1367,60 @@ async function loadFleet() {
    ADMIN: Assign Staff Shift
 ═══════════════════════════════════════════ */
 document.getElementById('assign-shift-btn')?.addEventListener('click', async () => {
-    const staffId = document.getElementById('shift-staff-id').value;
-    const role = document.getElementById('shift-role').value.trim();
-    const start = document.getElementById('shift-start').value;
-    const end = document.getElementById('shift-end').value;
-    const resultEl = document.getElementById('shift-result');
-    const btn = document.getElementById('assign-shift-btn');
+  const staffId = document.getElementById('shift-staff-id').value;
+  const role = document.getElementById('shift-role').value.trim();
+  const start = document.getElementById('shift-start').value;
+  const end = document.getElementById('shift-end').value;
+  const resultEl = document.getElementById('shift-result');
+  const btn = document.getElementById('assign-shift-btn');
 
-    if (!staffId || !role || !start || !end) { 
-        showToast('All fields are required.', 'error'); 
-        return; 
+  if (!staffId || !role || !start || !end) {
+    showToast('All fields are required.', 'error');
+    return;
+  }
+
+  if (new Date(start) >= new Date(end)) {
+    showToast('End time must be after start time.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Assigning…';
+
+  try {
+    const res = await fetch(`${API}/shifts/assign`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        staff_id: parseInt(staffId),
+        role_assigned: role,
+        start_time: start,
+        end_time: end
+      })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      showResult(resultEl, `✅ ${data.message}`, true);
+      showToast('Shift scheduled.', 'success');
+
+      // Clear the inputs so the admin can assign the next person!
+      document.getElementById('shift-staff-id').value = '';
+      document.getElementById('shift-role').value = '';
+      document.getElementById('shift-start').value = '';
+      document.getElementById('shift-end').value = '';
+    } else {
+      // This will display our Overlap or Fatigue errors!
+      showResult(resultEl, `❌ ${data.error}`, false);
+      showToast('Scheduling failed.', 'error');
     }
-
-    if (new Date(start) >= new Date(end)) {
-        showToast('End time must be after start time.', 'error'); 
-        return; 
-    }
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Assigning…';
-
-    try {
-        const res = await fetch(`${API}/shifts/assign`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                staff_id: parseInt(staffId),
-                role_assigned: role,
-                start_time: start,
-                end_time: end
-            })
-        });
-        
-        const data = await res.json();
-        
-        if (res.ok) {
-            showResult(resultEl, `✅ ${data.message}`, true);
-            showToast('Shift scheduled.', 'success');
-            
-            // Clear the inputs so the admin can assign the next person!
-            document.getElementById('shift-staff-id').value = '';
-            document.getElementById('shift-role').value = '';
-            document.getElementById('shift-start').value = '';
-            document.getElementById('shift-end').value = '';
-        } else {
-            // This will display our Overlap or Fatigue errors!
-            showResult(resultEl, `❌ ${data.error}`, false);
-            showToast('Scheduling failed.', 'error');
-        }
-    } catch (err) {
-        showResult(resultEl, `Network error: ${err.message}`, false);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Assign Shift';
-    }
+  } catch (err) {
+    showResult(resultEl, `Network error: ${err.message}`, false);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Assign Shift';
+  }
 });
 
 /* ═══════════════════════════════════════════
