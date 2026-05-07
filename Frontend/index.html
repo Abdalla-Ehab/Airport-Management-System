@@ -123,9 +123,9 @@
             <section id="view-book" class="view hidden">
                 <div class="view-header">
                     <h2>Book a Flight</h2>
-                    <p>Reserve your seat today</p>
+                    <p>Reserve your seat today (Supports Direct & 1-Stop Transit)</p>
                 </div>
-                <div class="form-card glass-dark">
+                <div class="form-card glass-dark" style="max-width: 800px;">
 
                     <div class="form-row flex-row-15">
                         <div class="form-group flex-1">
@@ -149,29 +149,37 @@
                         </select>
                     </div>
 
-                    <div class="form-group mt-20">
-                        <label>Arrival Time</label>
-                        <input type="text" id="book-arrival-time" class="input-glass" placeholder="Select a flight to view arrival time" readonly disabled />
+                    <div id="seat-selection-container" class="hidden mt-20">
+                        <h3 style="text-align: center; color: var(--sky-light);">Select Your Seat</h3>
+                        <div class="seat-legend">
+                            <div class="legend-item"><div class="legend-box" style="background: var(--sky);"></div> Available</div>
+                            <div class="legend-item"><div class="legend-box" style="background: var(--success);"></div> Selected</div>
+                            <div class="legend-item"><div class="legend-box" style="background: var(--error);"></div> Occupied</div>
+                        </div>
+                        
+                        <div class="plane-fuselage" id="plane-seats">
+                            </div>
+                        <input type="hidden" id="selected-seat-no" />
+                        <input type="hidden" id="selected-seat-no-leg2" />
                     </div>
-                    <div class="form-group">
+
+                    <div class="form-group mt-20">
                         <label>Travel Class</label>
                         <div class="class-selector">
                             <label class="class-option">
-                                <input type="radio" name="travel-class" value="Economy" checked />
-                                <span>🪑 Economy</span>
+                                <input type="radio" name="travel-class" value="Economy" checked /><span>🪑 Economy</span>
                             </label>
                             <label class="class-option">
-                                <input type="radio" name="travel-class" value="Business" />
-                                <span>💼 Business</span>
+                                <input type="radio" name="travel-class" value="Business" /><span>💼 Business</span>
                             </label>
                             <label class="class-option">
-                                <input type="radio" name="travel-class" value="First" />
-                                <span>⭐ First Class</span>
+                                <input type="radio" name="travel-class" value="First" /><span>⭐ First</span>
                             </label>
                         </div>
                     </div>
-                    <button class="btn-primary" id="book-btn">Confirm Booking</button>
-                    <div id="book-result" class="result-area hidden"></div>
+                    
+                    <button class="btn-primary mt-20" id="book-btn" disabled>Confirm Booking</button>
+                    <div id="book-result" class="result-area hidden mt-20"></div>
                 </div>
             </section>
 

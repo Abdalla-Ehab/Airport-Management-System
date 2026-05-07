@@ -472,141 +472,223 @@ async function loadAirports() {
 }
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Book a Flight
+   PASSENGER: Book a Flight (TRANSIT + SEAT MAP)
 ═══════════════════════════════════════════ */
+let currentFlightData = null; // Stores currently selected flight(s)
 
-// 1. Load Airports into the Dropdowns when the tab opens
+// 1. Load Airports
 async function initBookingView() {
   try {
     const res = await fetch(`${API}/airports`);
-    const data = await res.json();
-    const airports = Array.isArray(data) ? data : (data.content || data.data || []);
-
+    const airports = await res.json();
     let options = '<option value="">Select Airport...</option>';
     airports.forEach(a => {
-      options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city || a.airport_id)}</option>`;
+      options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city)}</option>`;
     });
-
     document.getElementById('book-origin').innerHTML = options;
     document.getElementById('book-dest').innerHTML = options;
-  } catch (e) {
-    console.log("Failed to load airports for booking view.");
-  }
+  } catch (e) { console.log("Failed to load airports."); }
 }
 
-// 2. Listen for changes on the dropdowns to search for flights
+// 2. Search Direct AND Transit Flights
 ['book-origin', 'book-dest'].forEach(id => {
-  document.getElementById(id).addEventListener('change', async () => {
-    const origin = document.getElementById('book-origin').value;
-    const dest = document.getElementById('book-dest').value;
-    const flightSelect = document.getElementById('book-flight-select');
+  document.getElementById('book-origin').addEventListener('change', searchFlights);
+  document.getElementById('book-dest').addEventListener('change', searchFlights);
+});
 
-    if (!origin || !dest) {
-      flightSelect.innerHTML = '<option value="">Please select Origin and Destination first</option>';
-      flightSelect.disabled = true;
+async function searchFlights() {
+  const origin = document.getElementById('book-origin').value;
+  const dest = document.getElementById('book-dest').value;
+  const select = document.getElementById('book-flight-select');
+  document.getElementById('seat-selection-container').classList.add('hidden');
+  document.getElementById('book-btn').disabled = true;
+
+  if (!origin || !dest) return;
+  select.innerHTML = '<option value="">Searching routes...</option>';
+  select.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/flights`);
+    const allFlights = await res.json();
+
+    // 1. Find Direct Flights
+    const directFlights = allFlights.filter(f => String(f.departure_airport_id) === origin && String(f.arrival_airport_id) === dest);
+    
+    // 2. Find 1-Stop Transit Flights
+    const leg1 = allFlights.filter(f => String(f.departure_airport_id) === origin);
+    const leg2 = allFlights.filter(f => String(f.arrival_airport_id) === dest);
+    let transitFlights = [];
+    
+    leg1.forEach(f1 => {
+        leg2.forEach(f2 => {
+            // If Leg1 arrives where Leg2 departs
+            if (String(f1.arrival_airport_id) === String(f2.departure_airport_id)) {
+                // Ensure layover is logical (Leg 1 arrives before Leg 2 departs)
+                const arr = new Date(f1.arrival_time);
+                const dep = new Date(f2.departure_time);
+                if (arr < dep) {
+                    transitFlights.push({ leg1: f1, leg2: f2, layoverAt: f1.arrival_airport_id });
+                }
+            }
+        });
+    });
+
+    if (directFlights.length === 0 && transitFlights.length === 0) {
+      select.innerHTML = '<option value="">No routes available</option>';
       return;
     }
 
-    flightSelect.innerHTML = '<option value="">Searching flights...</option>';
-    flightSelect.disabled = true;
+    let options = '<option value="">Select a Route...</option>';
+    
+    // Add Direct Options
+    directFlights.forEach(f => {
+      const fn = f.flight_number || f.flight_id;
+      options += `<option value='{"type":"direct", "f1":${f.flight_id}}'>✅ DIRECT: ${fn} | Departs: ${f.departure_time}</option>`;
+    });
 
-    try {
-      const res = await fetch(`${API}/flights`);
-      const data = await res.json();
-      const flights = Array.isArray(data) ? data : (data.content || data.data || []);
+    // Add Transit Options
+    transitFlights.forEach(t => {
+      const fn1 = t.leg1.flight_number || t.leg1.flight_id;
+      const fn2 = t.leg2.flight_number || t.leg2.flight_id;
+      options += `<option value='{"type":"transit", "f1":${t.leg1.flight_id}, "f2":${t.leg2.flight_id}}'>🔄 1-STOP: ${fn1} ➔ ${fn2} | Departs: ${t.leg1.departure_time}</option>`;
+    });
 
-      // Filter flights to find only the ones that match the requested route!
-      const availableFlights = flights.filter(f =>
-        String(f.departure_airport_id) === String(origin) &&
-        String(f.arrival_airport_id) === String(dest)
-      );
-
-      if (availableFlights.length === 0) {
-        flightSelect.innerHTML = '<option value="">No flights available for this route</option>';
-      } else {
-        let options = '<option value="">Select a Flight...</option>';
-        availableFlights.forEach(f => {
-          // We are secretly hiding the arrival time inside "data-arrival"
-          options += `<option value="${f.flight_id}" data-arrival="${f.arrival_time || 'TBA'}">Flight ${f.flight_id} - Departs: ${f.departure_time || 'TBA'}</option>`;
-        });
-        flightSelect.innerHTML = options;
-        flightSelect.disabled = false;
-      }
-    } catch (e) {
-      flightSelect.innerHTML = '<option value="">Error loading flights</option>';
-    }
-  });
-});
-
-// Listen for when a user selects a specific flight
-document.getElementById('book-flight-select').addEventListener('change', (e) => {
-  const selectElement = e.target;
-  const arrivalInput = document.getElementById('book-arrival-time');
-
-  // Find the option the user just clicked
-  const selectedOption = selectElement.options[selectElement.selectedIndex];
-
-  // Grab the secret arrival time we hid inside it
-  const arrivalTime = selectedOption.getAttribute('data-arrival');
-
-  if (arrivalTime) {
-    arrivalInput.value = arrivalTime;
-    arrivalInput.style.color = "white"; // Make it pop when filled
-  } else {
-    arrivalInput.value = '';
+    select.innerHTML = options;
+    select.disabled = false;
+  } catch (e) {
+    select.innerHTML = '<option value="">Error finding routes</option>';
   }
+}
+
+// 3. When a Route is Selected -> Render Airplane!
+document.getElementById('book-flight-select').addEventListener('change', async (e) => {
+    if(!e.target.value) {
+        document.getElementById('seat-selection-container').classList.add('hidden');
+        document.getElementById('book-btn').disabled = true;
+        return;
+    }
+
+    currentFlightData = JSON.parse(e.target.value);
+    document.getElementById('selected-seat-no').value = '';
+    document.getElementById('selected-seat-no-leg2').value = '';
+    
+    const seatContainer = document.getElementById('seat-selection-container');
+    const plane = document.getElementById('plane-seats');
+    
+    plane.innerHTML = '<div class="plane-cockpit">Front of Aircraft</div>';
+    seatContainer.classList.remove('hidden');
+    document.getElementById('book-btn').disabled = true; // Wait for seat selection
+
+    // We will render the seat map for the FIRST flight. 
+    // (If it's transit, we'll auto-assign leg 2 to keep the UI from becoming chaotic)
+    try {
+        const res = await fetch(`${API}/flights/${currentFlightData.f1}/seats`);
+        let occupiedSeats = [];
+        if(res.ok) occupiedSeats = await res.json();
+
+        // Generate 15 Rows of 6 Seats (90 seats total for visual)
+        const rows = 15; 
+        const letters = ['A','B','C','D','E','F'];
+
+        for(let r=1; r<=rows; r++) {
+            let rowDiv = document.createElement('div');
+            rowDiv.className = 'seat-row';
+            
+            letters.forEach((col, index) => {
+                const seatId = `${r}${col}`;
+                const isOccupied = occupiedSeats.includes(seatId);
+                
+                let seat = document.createElement('div');
+                seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
+                seat.textContent = isOccupied ? '' : seatId;
+                seat.dataset.id = seatId;
+                
+                if(!isOccupied) {
+                    seat.addEventListener('click', () => {
+                        // Deselect all others
+                        document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
+                        seat.classList.add('selected');
+                        document.getElementById('selected-seat-no').value = seatId;
+                        
+                        // If transit, generate a random seat for the second flight
+                        if(currentFlightData.type === 'transit') {
+                             document.getElementById('selected-seat-no-leg2').value = `${Math.floor(Math.random()*15)+1}C`;
+                        }
+                        
+                        document.getElementById('book-btn').disabled = false; // Enable booking!
+                    });
+                }
+                
+                rowDiv.appendChild(seat);
+                
+                // Add Aisle in the middle
+                if(index === 2) {
+                    let aisle = document.createElement('div');
+                    aisle.className = 'aisle';
+                    aisle.textContent = r;
+                    rowDiv.appendChild(aisle);
+                }
+            });
+            plane.appendChild(rowDiv);
+        }
+    } catch(e) {
+        console.error("Could not load seat map.");
+    }
 });
 
-// 3. The actual Book Button Logic
+// 4. Submit Booking(s) to the Database
 document.getElementById('book-btn').addEventListener('click', async () => {
-  // Grab the flight ID from the new dropdown!
-  const flightId = document.getElementById('book-flight-select').value;
   const className = document.querySelector('input[name="travel-class"]:checked')?.value;
+  const seat1 = document.getElementById('selected-seat-no').value;
+  const seat2 = document.getElementById('selected-seat-no-leg2').value;
   const resultEl = document.getElementById('book-result');
   const btn = document.getElementById('book-btn');
-
-  if (!flightId) { showToast('Please search and select an available flight.', 'error'); return; }
-  if (!className) { showToast('Please select a travel class.', 'error'); return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Booking…';
 
   try {
-    const res = await fetch(`${API}/bookings/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        flight_id: parseInt(flightId),
-        passenger_id: currentUser.id,
-        class_name: className,
-      }),
-    });
+    // Helper function to post a single booking
+    const postBooking = async (f_id, seat, isTransitFlag) => {
+        return await fetch(`${API}/bookings/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                flight_id: f_id,
+                passenger_id: currentUser.id,
+                seat_no: seat,
+                class_name: className,
+                is_transit: isTransitFlag // Sets the DB boolean we defined earlier!
+            })
+        });
+    };
 
-    const text = await res.text();
-    let msg;
-    try { msg = JSON.parse(text); } catch { msg = text; }
+    if(currentFlightData.type === 'direct') {
+        const res = await postBooking(currentFlightData.f1, seat1, false);
+        if(res.ok) {
+            showResult(resultEl, `🎉 Booking confirmed!<br>Seat: <strong>${seat1}</strong><br>Class: ${className}`, true);
+        } else throw new Error("Booking failed. Seat might have been taken.");
+        
+    } else if (currentFlightData.type === 'transit') {
+        // Book Leg 1
+        const res1 = await postBooking(currentFlightData.f1, seat1, true);
+        if(!res1.ok) throw new Error("Failed to book first leg.");
+        
+        // Book Leg 2
+        const res2 = await postBooking(currentFlightData.f2, seat2, true);
+        if(!res2.ok) throw new Error("Failed to book connecting leg.");
 
-    if (res.ok) {
-      const ticketNo = (typeof msg === 'object' ? (msg.ticketNo || msg.ticket_no || msg.id || 'N/A') : msg);
-      showResult(resultEl, `🎉 Booking confirmed!<br>Ticket Number: <strong>${ticketNo}</strong><br>Class: ${className}`, true);
-      showToast('Flight booked successfully!', 'success');
-
-      // Reset the form
-      document.getElementById('book-origin').value = '';
-      document.getElementById('book-dest').value = '';
-      document.getElementById('book-flight-select').innerHTML = '<option value="">Please select Origin and Destination first</option>';
-      document.getElementById('book-flight-select').disabled = true;
-
-    } else {
-      const errMsg = (typeof msg === 'object') ? (msg.message || msg.error || JSON.stringify(msg)) : msg;
-      showResult(resultEl, `Booking failed: ${errMsg}`, false);
-      showToast('Booking failed.', 'error');
+        showResult(resultEl, `🎉 Transit Journey Confirmed!<br>Leg 1 Seat: <strong>${seat1}</strong><br>Leg 2 Seat: <strong>${seat2}</strong>`, true);
     }
+
+    showToast('Flight booked successfully!', 'success');
+    document.getElementById('seat-selection-container').classList.add('hidden');
+    document.getElementById('book-flight-select').value = '';
+
   } catch (err) {
-    showResult(resultEl, `Network error: ${err.message}`, false);
-    showToast('Network error during booking.', 'error');
+    showResult(resultEl, `Error: ${err.message}`, false);
+    showToast('Booking error.', 'error');
   } finally {
-    btn.disabled = false;
     btn.innerHTML = 'Confirm Booking';
   }
 });

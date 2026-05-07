@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -38,11 +37,20 @@ public class BookingController {
         return bookingRepository.findAll(); 
     }
 
+    // =================================================================================
+    // NEW: Fetch occupied seats to paint them RED on the visual airplane layout
+    // =================================================================================
+    @GetMapping("/flights/{flightId}/seats")
+    public ResponseEntity<List<String>> getBookedSeats(@PathVariable Long flightId) {
+        List<String> bookedSeats = bookingRepository.findBookedSeatsByFlightId(flightId);
+        return ResponseEntity.ok(bookedSeats);
+    }
+
     @PostMapping("/create")
-    @Transactional // 1. THIS IS THE FIX: Locks the entire method into a single transaction
+    @Transactional // Locks the entire method into a single transaction
     public ResponseEntity<?> createBooking(@RequestBody BookFlightRequest request) {
         
-        // 2. THIS IS THE FIX: Use the locked query to prevent simultaneous double-booking
+        // 1. Use the locked query to prevent simultaneous double-booking
         Optional<Flight> flightOpt = flightRepository.findByIdLocked(request.getFlight_id());
         
         if (flightOpt.isEmpty()) {
@@ -73,30 +81,28 @@ public class BookingController {
         newBooking.setFlight_id(request.getFlight_id());
         newBooking.setPassenger_id(request.getPassenger_id());
         newBooking.setClass_name(request.getClass_name());
-        newBooking.setIs_transit(false);
+        
+        // UPDATE: Read the exact seat and transit status from the frontend
+        newBooking.setSeat_no(request.getSeat_no());
+        newBooking.setIs_transit(request.getIs_transit() != null ? request.getIs_transit() : false);
 
-        // 6. Assign a smart, sequential seat instead of a random one
-        long seatNumber = currentBookings + 1; // If 45 people are booked, you are person 46
-        String[] letters = {"A", "B", "C", "D", "E", "F"};
-        String seatLabel = (seatNumber / 6 + 1) + letters[(int)(seatNumber % 6)];
-        newBooking.setSeat_no(seatLabel);
-
-        // 7. Try to save safely
+        // 6. Try to save safely
         try {
             bookingRepository.save(newBooking);
 
             // Return a JSON Map so the frontend can read the ticket number properly!
             Map<String, Object> successResponse = new HashMap<>();
             successResponse.put("ticket_no", newBooking.getTicket_no()); 
-            successResponse.put("message", "Success! Flight Booked. Your seat is: " + seatLabel + 
+            successResponse.put("message", "Success! Flight Booked. Your seat is: " + request.getSeat_no() + 
                     " (Flight capacity: " + (currentBookings + 1) + "/" + maxSeats + " seats filled)");
             
             return ResponseEntity.ok(successResponse);
 
         } catch (DataIntegrityViolationException e) {
             // Catches the MySQL duplicate constraints without crashing the server
+            // If two people click the exact same seat at the exact same millisecond, this safely rejects the slower one!
             Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Booking failed! You are already booked on this flight, or this specific seat is taken.");
+            errorResponse.put("error", "Booking failed! The seat " + request.getSeat_no() + " was just taken, or you are already booked on this flight.");
             
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
