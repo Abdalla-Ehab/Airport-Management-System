@@ -1150,6 +1150,81 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
+   STAFF: Maintenance & Grounding Dashboard
+═══════════════════════════════════════════ */
+async function initMaintenanceView() {
+    const grid = document.getElementById('maintenance-grid');
+    grid.innerHTML = '<div class="skeleton-loader"></div><div class="skeleton-loader"></div>';
+
+    try {
+        const res = await fetch(`${API}/aircraft`);
+        if (!res.ok) throw new Error('Failed to load aircraft');
+        const fleet = await res.json();
+
+        if (!fleet.length) {
+            grid.innerHTML = '<p style="color:var(--silver)">No aircraft found in the fleet.</p>';
+            return;
+        }
+
+        grid.innerHTML = fleet.map(a => {
+            const status = a.status || 'ACTIVE';
+            
+            // Dynamic styling based on safety status
+            let badgeColor = 'var(--success)';
+            let icon = '✈️';
+            if (status === 'GROUNDED') { badgeColor = 'var(--error)'; icon = '🛑'; }
+            if (status === 'MAINTENANCE') { badgeColor = 'var(--warn)'; icon = '🔧'; }
+
+            return `
+                <div class="data-card" id="aircraft-card-${a.aircraft_id}">
+                    <div class="card-icon">${icon}</div>
+                    <h3>${escHtml(a.type)}</h3>
+                    <div class="card-detail" style="font-family: monospace; letter-spacing: 1px;">${escHtml(a.registration_no)}</div>
+                    
+                    <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="background: ${badgeColor}; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                            ${status}
+                        </span>
+                        
+                        <select class="input-glass" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="updateAircraftStatus(${a.aircraft_id}, this.value)">
+                            <option value="">Change Status...</option>
+                            <option value="ACTIVE">Mark ACTIVE</option>
+                            <option value="MAINTENANCE">Send to MAINTENANCE</option>
+                            <option value="GROUNDED">GROUND Aircraft</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (err) {
+        grid.innerHTML = `<div class="result-area result-error">Network error loading fleet.</div>`;
+    }
+}
+
+// Function to handle the Dropdown change
+async function updateAircraftStatus(aircraftId, newStatus) {
+    if (!newStatus) return;
+
+    try {
+        const res = await fetch(`${API}/aircraft/${aircraftId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (res.ok) {
+            showToast(`Aircraft status updated to ${newStatus}`, 'success');
+            initMaintenanceView(); // Reload the grid to show the new colors/icons
+        } else {
+            showToast('Failed to update aircraft status', 'error');
+        }
+    } catch (err) {
+        showToast('Network error while updating status', 'error');
+    }
+}
+
+/* ═══════════════════════════════════════════
    ADMIN: Schedule Flight
 ═══════════════════════════════════════════ */
 // 1. Load Airlines into the Dropdown
