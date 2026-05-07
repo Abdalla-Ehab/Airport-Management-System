@@ -16,6 +16,7 @@ public class Flight {
     private Long departure_airport_id;
     private Long arrival_airport_id;
     private String flight_number;
+    private String status;
     public Long getFlight_id() {
         return flight_id;
     }
@@ -75,6 +76,12 @@ public class Flight {
     }
     public void setFlight_number(String flight_number) {
         this.flight_number = flight_number;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }

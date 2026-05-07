@@ -633,7 +633,7 @@ async function selectFlight(flightId, flightNumber) {
     } catch(e) { console.error("Could not load seat map."); }
 }
 
-// 4. Handle Class Switching (Locks/Unlocks seats dynamically)
+// 4. Handle Class Switching (Locks seats and calculates live inventory)
 document.querySelectorAll('input[name="travel-class"]').forEach(radio => {
     radio.addEventListener('change', applyClassFilter);
 });
@@ -645,15 +645,32 @@ function applyClassFilter() {
     document.getElementById('selected-seat-no').value = '';
     document.getElementById('book-btn').disabled = true;
 
+    let availableInClass = 0; // Track live inventory
+
     document.querySelectorAll('.seat').forEach(seat => {
         seat.classList.remove('selected'); // Clear selections
         
         if (seat.dataset.class !== selectedClass) {
-            seat.classList.add('wrong-class'); // Gray out
+            seat.classList.add('wrong-class'); // Gray out wrong class
         } else {
             seat.classList.remove('wrong-class'); // Make clickable
+            
+            // If the seat is in the correct class AND is not occupied, add it to inventory!
+            if (!seat.classList.contains('occupied')) {
+                availableInClass++;
+            }
         }
     });
+
+    // Update the UI with the live inventory count
+    const inventoryDisplay = document.getElementById('class-inventory-count');
+    if (inventoryDisplay) {
+        if (availableInClass === 0) {
+            inventoryDisplay.innerHTML = `<span style="color: var(--error);">Sold Out</span>`;
+        } else {
+            inventoryDisplay.innerHTML = `<span style="color: var(--success);">${availableInClass} seats available in ${selectedClass} Class</span>`;
+        }
+    }
 }
 
 // 5. Submit Booking

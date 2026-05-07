@@ -10,6 +10,8 @@ public class BoardingPass {
     private Long ticket_no;
     private Integer sequence_number;
     private LocalDateTime issue_time;
+    private String boarding_group;
+    private Boolean is_boarded;
     public Long getBoarding_pass_id() {
         return boarding_pass_id;
     }
@@ -34,4 +36,17 @@ public class BoardingPass {
     public void setIssue_time(LocalDateTime issue_time) {
         this.issue_time = issue_time;
     }
+    public String getBoarding_group() {
+        return boarding_group;
+    }
+    public void setBoarding_group(String boarding_group) {
+        this.boarding_group = boarding_group;
+    }
+    public Boolean getIs_boarded() {
+        return is_boarded;
+    }
+    public void setIs_boarded(Boolean is_boarded) {
+        this.is_boarded = is_boarded;
+    }
+    
 }
