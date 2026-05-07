@@ -9,6 +9,8 @@ const API = 'http://localhost:8080/api';
 
 /* ── STATE ── */
 let currentUser = null;  // { username, role, id }
+// Lock the date picker to only allow today or past dates
+document.getElementById('reg-dob').max = new Date().toISOString().split("T")[0];
 
 /* ═══════════════════════════════════════════
    ROLE DEFINITIONS & NAV CONFIG (UPDATED)
@@ -52,7 +54,7 @@ const NAV_CONFIG = {
     {
       category: 'Flight Operations', icon: '🌍',
       items: [
-        { view: 'schedule', label: 'Master Scheduler' },
+        { view: 'schedule', label: 'Master Scheduler', onEnter:initScheduleView },
         { view: 'active-flights', label: 'Live Traffic Map' } // Placeholder for future
       ]
     },
@@ -980,8 +982,35 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
 /* ═══════════════════════════════════════════
    ADMIN: Schedule Flight
 ═══════════════════════════════════════════ */
+// 1. Load Airlines into the Dropdown
+async function initScheduleView() {
+  try {
+    const res = await fetch(`${API}/airlines`);
+    const data = await res.json();
+    const airlines = Array.isArray(data) ? data : (data.content || data.data || []);
+    
+    let options = '<option value="">Select Airline...</option>';
+    airlines.forEach(a => {
+      // Smart Fallback: If your database doesn't have an official 2-letter iata_code yet, 
+      // this automatically generates one from the first 2 letters of the airline's name!
+      const code = a.iata_code || a.iataCode || a.name.substring(0, 2).toUpperCase();
+      options += `<option value="${code}">${code} (${a.name})</option>`;
+    });
+    
+    document.getElementById('sched-airline-code').innerHTML = options;
+  } catch (err) {
+    console.log("Could not load airlines for scheduler");
+  }
+}
+// 2. Schedule the Flight!
 document.getElementById('sched-btn').addEventListener('click', async () => {
-  const flightNo = document.getElementById('sched-flight-no').value.trim();
+  // Grab the split inputs
+  const airlineCode = document.getElementById('sched-airline-code').value;
+  const routeNo = document.getElementById('sched-route-no').value.trim();
+  
+  // THE MAGIC: Stitch them together to make a real-world flight number! (e.g., EK + 201 = EK201)
+  const realFlightNumber = `${airlineCode}${routeNo}`; 
+  
   const aircraftId = document.getElementById('sched-aircraft-id').value.trim();
   const origin = document.getElementById('sched-origin').value.trim();
   const dest = document.getElementById('sched-dest').value.trim();
@@ -990,7 +1019,7 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
   const resultEl = document.getElementById('sched-result');
   const btn = document.getElementById('sched-btn');
 
-  if (!flightNo || !aircraftId || !origin || !dest || !depart) {
+  if (!airlineCode || !routeNo || !aircraftId || !origin || !dest || !depart) {
     showToast('Please fill all required fields.', 'error'); return;
   }
 
@@ -1002,9 +1031,9 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        flightNo,
+        flight_number: realFlightNumber, // Send the newly combined real-world number!
         aircraft_id: parseInt(aircraftId),
-        origin,
+        origin: origin,
         destination: dest,
         departure_time: depart,
         arrival_time: arrive,
@@ -1013,10 +1042,13 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
     const text = await res.text();
     let msg;
     try { msg = JSON.parse(text); } catch { msg = text; }
-    const id = (typeof msg === 'object') ? (msg.id || msg.flightId || '—') : '—';
+    
     if (res.ok) {
-      showResult(resultEl, `🗓️ Flight <strong>${escHtml(flightNo)}</strong> scheduled! (ID: ${id})`, true);
-      showToast('Flight scheduled successfully!', 'success');
+      showResult(resultEl, `🗓️ Flight <strong>${escHtml(realFlightNumber)}</strong> scheduled successfully!`, true);
+      showToast('Flight scheduled!', 'success');
+      
+      // Clear the route number so they can schedule the next one quickly
+      document.getElementById('sched-route-no').value = '';
     } else {
       const errMsg = (typeof msg === 'object') ? (msg.message || msg.error || JSON.stringify(msg)) : msg;
       showResult(resultEl, `Scheduling failed: ${errMsg}`, false);

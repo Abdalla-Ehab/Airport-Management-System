@@ -271,14 +271,19 @@
                     <p>Create and manage flight operations</p>
                 </div>
                 <div class="form-card glass-dark">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Flight Number</label>
-                            <input type="text" id="sched-flight-no" placeholder="e.g. AX-201" />
+                    <div class="form-row flex-row-15">
+                        <div class="form-group flex-1">
+                            <label>Flight Identifier (IATA + Route)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <select id="sched-airline-code" class="input-glass" style="flex: 1.2;">
+                                    <option value="">Airline...</option>
+                                </select>
+                                <input type="number" id="sched-route-no" class="input-glass" style="flex: 1;" placeholder="e.g. 201" min="1" max="9999" />
+                            </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group flex-1">
                             <label>Aircraft ID</label>
-                            <input type="number" id="sched-aircraft-id" placeholder="e.g. 5" />
+                            <input type="number" id="sched-aircraft-id" class="input-glass" placeholder="e.g. 5" />
                         </div>
                     </div>
                     <div class="form-row">

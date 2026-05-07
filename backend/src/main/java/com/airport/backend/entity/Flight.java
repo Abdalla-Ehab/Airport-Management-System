@@ -15,6 +15,7 @@ public class Flight {
     private Long arrival_gate_id;
     private Long departure_airport_id;
     private Long arrival_airport_id;
+    private String flight_number;
     public Long getFlight_id() {
         return flight_id;
     }
@@ -69,4 +70,11 @@ public class Flight {
     public void setArrival_airport_id(Long arrival_airport_id) {
         this.arrival_airport_id = arrival_airport_id;
     }
+    public String getFlight_number() {
+        return flight_number;
+    }
+    public void setFlight_number(String flight_number) {
+        this.flight_number = flight_number;
+    }
+    
 }
