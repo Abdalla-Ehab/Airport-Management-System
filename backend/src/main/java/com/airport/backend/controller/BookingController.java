@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import org.springframework.dao.DataIntegrityViolationException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -38,7 +37,7 @@ public class BookingController {
     }
 
     // =================================================================================
-    // NEW: Fetch occupied seats to paint them RED on the visual airplane layout
+    // Fetch occupied seats to paint them RED on the visual airplane layout
     // =================================================================================
     @GetMapping("/flights/{flightId}/seats")
     public ResponseEntity<List<String>> getBookedSeats(@PathVariable Long flightId) {
@@ -76,35 +75,41 @@ public class BookingController {
                     .body("Booking Failed: Flight " + flight.getFlight_id() + " is completely sold out! (Capacity: " + maxSeats + ")");
         }
 
-        // 5. If there is space, process the booking
+        // 5. PROACTIVE CHECKS (Stops the Server Crash!)
+        
+        // Check A: Has this passenger already booked a seat on this flight?
+        long existingUserBookings = bookingRepository.countByFlightAndPassenger(flight.getFlight_id(), request.getPassenger_id());
+        if (existingUserBookings > 0) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Booking failed! You already have a ticket for this flight.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        // Check B: Look at the database to see if the seat is taken
+        List<String> takenSeats = bookingRepository.findBookedSeatsByFlightId(flight.getFlight_id());
+        if (takenSeats.contains(request.getSeat_no())) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Booking failed! Seat " + request.getSeat_no() + " was just taken by someone else.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        // 6. If space, passenger, and seat are valid, process the booking
         Booking newBooking = new Booking();
         newBooking.setFlight_id(request.getFlight_id());
         newBooking.setPassenger_id(request.getPassenger_id());
         newBooking.setClass_name(request.getClass_name());
-        
-        // UPDATE: Read the exact seat and transit status from the frontend
         newBooking.setSeat_no(request.getSeat_no());
         newBooking.setIs_transit(request.getIs_transit() != null ? request.getIs_transit() : false);
 
-        // 6. Try to save safely
-        try {
-            bookingRepository.save(newBooking);
+        // 7. Save safely (No try/catch needed anymore!)
+        bookingRepository.save(newBooking);
 
-            // Return a JSON Map so the frontend can read the ticket number properly!
-            Map<String, Object> successResponse = new HashMap<>();
-            successResponse.put("ticket_no", newBooking.getTicket_no()); 
-            successResponse.put("message", "Success! Flight Booked. Your seat is: " + request.getSeat_no() + 
-                    " (Flight capacity: " + (currentBookings + 1) + "/" + maxSeats + " seats filled)");
-            
-            return ResponseEntity.ok(successResponse);
-
-        } catch (DataIntegrityViolationException e) {
-            // Catches the MySQL duplicate constraints without crashing the server
-            // If two people click the exact same seat at the exact same millisecond, this safely rejects the slower one!
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Booking failed! The seat " + request.getSeat_no() + " was just taken, or you are already booked on this flight.");
-            
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-        }
+        // 8. Return a JSON Map so the frontend can read the ticket number properly
+        Map<String, Object> successResponse = new HashMap<>();
+        successResponse.put("ticket_no", newBooking.getTicket_no()); 
+        successResponse.put("message", "Success! Flight Booked. Your seat is: " + request.getSeat_no() + 
+                " (Flight capacity: " + (currentBookings + 1) + "/" + maxSeats + " seats filled)");
+        
+        return ResponseEntity.ok(successResponse);
     }
 }

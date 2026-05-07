@@ -939,3 +939,43 @@ body {
 }
 .legend-item { display: flex; align-items: center; gap: 8px; }
 .legend-box { width: 16px; height: 16px; border-radius: 4px; }
+
+/* =============================================
+   FLIGHT SEARCH RESULTS (TRIP.COM STYLE)
+============================================= */
+.flight-result-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+.flight-result-card:hover {
+    background: rgba(43, 127, 255, 0.08);
+    border-color: rgba(43, 127, 255, 0.3);
+}
+.flight-times { display: flex; align-items: center; gap: 20px; flex: 2; }
+.time-block h3 { font-size: 1.4rem; color: white; margin-bottom: 4px; }
+.time-block p { font-size: 0.8rem; color: var(--silver-dim); }
+.flight-duration { text-align: center; color: var(--silver); font-size: 0.8rem; position: relative; padding: 0 15px; }
+.flight-duration::after { content: '→'; position: absolute; right: -5px; top: 0; color: var(--sky); }
+.flight-price { flex: 1; text-align: right; font-size: 1.5rem; font-weight: bold; color: var(--success); }
+.flight-action { flex: 1; text-align: right; }
+
+/* =============================================
+   CLASS-BASED SEAT MAP
+============================================= */
+.seat.wrong-class {
+    background: #334155 !important; 
+    border-bottom-color: #1e293b !important;
+    color: rgba(255,255,255,0.2);
+    cursor: not-allowed;
+}
+/* Visual distinct rows */
+.seat[data-class="First"] { width: 45px; height: 45px; border-radius: 10px 10px 4px 4px; }
+.seat[data-class="Business"] { width: 40px; height: 40px; }
+.row-divider { width: 100%; height: 2px; background: rgba(0,0,0,0.1); margin: 10px 0; text-align: center; color: #6b7c96; font-size: 0.7rem; line-height: 0; }
+.row-divider span { background: #e0e5ec; padding: 0 10px; }

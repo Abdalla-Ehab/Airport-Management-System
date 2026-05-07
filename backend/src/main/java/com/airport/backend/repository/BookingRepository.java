@@ -11,12 +11,13 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     
-    // Custom SQL query to count how many bookings exist for a specific flight
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight_id = ?1")
     long countBookingsByFlightId(Long flightId);
     
-    // NEW: Fetch all occupied seats for a specific flight to power the Visual Seat Map!
     @Query("SELECT b.seat_no FROM Booking b WHERE b.flight_id = :flightId")
     List<String> findBookedSeatsByFlightId(@Param("flightId") Long flightId);
-    
+
+    // NEW: Check if the passenger is already booked on this exact flight
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight_id = :flightId AND b.passenger_id = :passengerId")
+    long countByFlightAndPassenger(@Param("flightId") Long flightId, @Param("passengerId") Long passengerId);
 }
