@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // 1. Added Import
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
+// 2. THIS LOCKS THE ENTIRE CLASS!
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/api/shifts")
 public class ShiftController {
