@@ -9,6 +9,7 @@ import com.airport.backend.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // 1. Added Import
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+// 2. THIS LOCKS THE ENTIRE CLASS!
+@PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
 @RestController
 @RequestMapping("/api/gate")
 public class GateController {
