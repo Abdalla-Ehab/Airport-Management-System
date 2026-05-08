@@ -105,6 +105,7 @@ document.getElementById('tab-register').addEventListener('click', () => {
 });
 
 // REAL LOGIN (Checks database)
+// REAL LOGIN (Checks database)
 async function authenticate(username, password) {
   try {
     const res = await fetch(`${API}/auth/login`, {
@@ -113,7 +114,10 @@ async function authenticate(username, password) {
       body: JSON.stringify({ username, password }),
     });
     if (res.ok) {
-      return await res.json(); // Expects Spring Boot to return { id, username, role }
+      const data = await res.json();
+      // NEW: Save the JWT token to the browser's session storage!
+      sessionStorage.setItem('jwt_token', data.token); 
+      return data; 
     }
   } catch (err) {
     console.error("Database connection failed", err);
@@ -148,9 +152,9 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         firstName: fn,
         lastName: ln,
         email: email,
-        phone: phone,
-        dob: dob,             // 2. ADDED DOB HERE
-        passportNo: passport, // 2. ADDED PASSPORT HERE
+        phoneNumber: phone,
+        dob: dob,            
+        passportNo: passport,
         username: username,
         password: password
       })

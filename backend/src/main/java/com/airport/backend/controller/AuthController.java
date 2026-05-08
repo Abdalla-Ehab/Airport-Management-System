@@ -1,166 +1,115 @@
 package com.airport.backend.controller;
 
-import com.airport.backend.dto.LoginRequest;
-import com.airport.backend.dto.StaffRegisterRequest;
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
 import com.airport.backend.repository.PassengerRepository;
 import com.airport.backend.repository.StaffRepository;
+import com.airport.backend.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+// import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
+    private PassengerRepository passengerRepository;
+    @Autowired
     private StaffRepository staffRepository;
 
     @Autowired
-    private PassengerRepository passengerRepository;
+    private PasswordEncoder passwordEncoder; // Hashes passwords
+    @Autowired
+    private AuthenticationManager authenticationManager; // Verifies passwords
+    @Autowired
+    private JwtService jwtService; // Generates Tokens
+    @Autowired
+    private UserDetailsService userDetailsService;
 
+    // ==========================================
+    // 1. SECURE LOGIN (Dispenses JWT Token)
+    // ==========================================
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        
-        // 1. Check if the user is a Staff member
-        Optional<Staff> staffOpt = staffRepository.findByUsername(loginRequest.getUsername());
-        if (staffOpt.isPresent()) {
-            Staff staff = staffOpt.get();
-            if (staff.getPassword().equals(loginRequest.getPassword())) {
-                // Instead of a String, we return a Map which Spring Boot automatically converts to JSON
-                Map<String, Object> response = new HashMap<>();
-                response.put("id", staff.getStaff_id());
-                response.put("username", staff.getUsername());
-                
-                // If your database has different staff roles (e.g., "security", "baggage"), you can pass it. 
-                // The frontend checks for "staff" or "admin".
-                String role = (staff.getRole() != null) ? staff.getRole().toLowerCase() : "staff";
-                response.put("role", role); 
-                
-                return ResponseEntity.ok(response);
-            }
-        }
-
-        // 2. Check if the user is a Passenger
-        Optional<Passenger> passengerOpt = passengerRepository.findByUsername(loginRequest.getUsername());
-        if (passengerOpt.isPresent()) {
-            Passenger passenger = passengerOpt.get();
-            if (passenger.getPassword().equals(loginRequest.getPassword())) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("id", passenger.getPassenger_id());
-                response.put("username", passenger.getUsername());
-                response.put("role", "passenger"); // Tells the frontend to show passenger menus
-                return ResponseEntity.ok(response);
-            }
-        }
-
-        // 3. HARDCODED ADMIN (Since we don't have an Admin database table yet)
-        if (loginRequest.getUsername().equals("admin") && loginRequest.getPassword().equals("admin123")) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", 0);
-            response.put("username", "System Admin");
-            response.put("role", "admin"); // Tells the frontend to show the Admin menus
-            return ResponseEntity.ok(response);
-        }
-
-        // 4. If neither matched, return an Unauthorized error
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: Invalid username or password!");
-    }
-
-    // ==========================================
-    // NEW REGISTRATION ENDPOINTS FOR THE FRONTEND
-    // ==========================================
-
-    @PostMapping("/register/passenger")
-    public ResponseEntity<?> registerPassenger(@RequestBody LoginRequest request) {
-        // 1. Check for duplicates
-        if (passengerRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
-        }
-
-        Passenger p = new Passenger();
-        
-        // 2. Account Credentials
-        p.setUsername(request.getUsername());
-        p.setPassword(request.getPassword());
-        
-        // 3. Basic Contact Info
-        p.setFirst_name(request.getFirstName());
-        p.setLast_name(request.getLastName());
-        p.setEmail(request.getEmail());
-        p.setPhone_number(request.getPhone()); 
-        
-        // 4. THE FIX: Required Identity Fields
-        // This converts the "YYYY-MM-DD" string from the frontend into a real Java Date
-        p.setDob(LocalDate.parse(request.getDob())); 
-        p.setPassport_no(request.getPassportNo());
-        
-        // 5. Save to Database
-        passengerRepository.save(p);
-        
-        return ResponseEntity.ok("Passenger registered successfully");
-    }
-
-    @PostMapping("/register/staff")
-    public ResponseEntity<?> registerStaff(@RequestBody StaffRegisterRequest request) { // FIX: Uses the new DTO!
-        if (staffRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists!");
-        }
-
-        Staff s = new Staff();
-        s.setUsername(request.getUsername());
-        s.setPassword(request.getPassword());
-        
-        // REAL DATA from the frontend mapping exactly to the new DTO names
-        s.setFirst_name(request.getFirst_name());
-        s.setLast_name(request.getLast_name());
-        s.setEmail(request.getEmail());
-        s.setPhone_number(request.getPhone_number());
-        
-        // FIX: Add the Missing Required Fields for the Database
-        s.setDept_id(request.getDept_id()); 
-        
-        // Safely set the hire date (defaults to today if not provided)
-        if (request.getHire_date() != null) {
-            s.setHire_date(request.getHire_date());
-        } else {
-            s.setHire_date(LocalDate.now());
-        }
-        
-        // ==========================================
-        // Server-Side Role Validation
-        // ==========================================
-        String requestedRole = request.getRole();
-        
-        // 1. If no role is provided, default to a standard staff member
-        if (requestedRole == null || requestedRole.trim().isEmpty()) {
-            s.setRole("staff");
-        } else {
-            String cleanRole = requestedRole.trim().toLowerCase();
-            
-            // 2. BLOCK ADMIN ESCALATION: Never allow a user to assign themselves admin rights
-            if (cleanRole.equals("admin") || cleanRole.equals("system admin")) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Security Violation: Cannot assign admin privileges.");
-            }
-            
-            // 3. Save the clean, safe role
-            s.setRole(cleanRole);
-        }
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
 
         try {
-            staffRepository.save(s);
-            return ResponseEntity.ok("Staff registered successfully");
+            // 1. Let Spring Security check the BCrypt password
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+            // 2. If successful, generate the JWT Token
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String token = jwtService.generateToken(userDetails);
+
+            // 3. Determine if they are Staff or Passenger and send back their data + Token
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", username);
+
+            Optional<Staff> staffOpt = staffRepository.findByUsername(username);
+            if (staffOpt.isPresent()) {
+                response.put("id", staffOpt.get().getStaff_id());
+                response.put("role", staffOpt.get().getRole().toLowerCase());
+                return ResponseEntity.ok(response);
+            }
+
+            Optional<Passenger> passOpt = passengerRepository.findByUsername(username);
+            if (passOpt.isPresent()) {
+                response.put("id", passOpt.get().getPassengerId());
+                response.put("role", "passenger");
+                return ResponseEntity.ok(response);
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Role not found"));
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Database error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
         }
+    }
+
+    // ==========================================
+    // 2. SECURE PASSENGER REGISTRATION
+    // ==========================================
+    @PostMapping("/register/passenger")
+    public ResponseEntity<?> registerPassenger(@RequestBody Passenger passenger) {
+        if (passengerRepository.findByUsername(passenger.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+        }
+
+        // HASH THE PASSWORD BEFORE SAVING!
+        passenger.setPassword(passwordEncoder.encode(passenger.getPassword()));
+        passengerRepository.save(passenger);
+
+        return ResponseEntity.ok(Map.of("message", "Passenger registered securely"));
+    }
+
+    // ==========================================
+    // 3. SECURE STAFF REGISTRATION
+    // ==========================================
+    @PostMapping("/register/staff")
+    public ResponseEntity<?> registerStaff(@RequestBody Staff staff) {
+        if (staffRepository.findByUsername(staff.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
+        }
+
+        // HASH THE PASSWORD BEFORE SAVING!
+        staff.setPassword(passwordEncoder.encode(staff.getPassword()));
+        staffRepository.save(staff);
+
+        return ResponseEntity.ok(Map.of("message", "Staff registered securely"));
     }
 }
