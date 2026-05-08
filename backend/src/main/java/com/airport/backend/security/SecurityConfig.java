@@ -40,7 +40,11 @@ public class SecurityConfig {
                 // Allow public access to Auth and basic lookup endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/airports/**").permitAll()
-                .requestMatchers("/api/flights").permitAll() 
+                .requestMatchers("/api/flights").permitAll()
+                // Allow public access to the root/home page and static resources
+                .requestMatchers("/", "/index.html").permitAll()
+                .requestMatchers("/*.css", "/*.js", "/*.ico", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
                 // Any other request MUST be authenticated
                 .anyRequest().authenticated()
             )

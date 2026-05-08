@@ -5,9 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>twixNexus — Airport Management System</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
 </head>
 
 <body>
@@ -102,9 +104,9 @@
                     <div class="user-role" id="nav-role">Passenger Portal</div>
                 </div>
             </div>
-            
+
             <ul class="nav-links" id="nav-links"></ul>
-            
+
             <button class="btn-logout" id="logout-btn">⬅ Sign Out</button>
         </nav>
 
@@ -130,11 +132,15 @@
                     <div class="form-row flex-row-15" style="align-items: flex-end;">
                         <div class="form-group flex-1">
                             <label>Origin</label>
-                            <select id="book-origin" class="input-glass"><option value="">Loading...</option></select>
+                            <select id="book-origin" class="input-glass">
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                         <div class="form-group flex-1">
                             <label>Destination</label>
-                            <select id="book-dest" class="input-glass"><option value="">Loading...</option></select>
+                            <select id="book-dest" class="input-glass">
+                                <option value="">Loading...</option>
+                            </select>
                         </div>
                         <div class="form-group flex-1">
                             <label>Date</label>
@@ -150,7 +156,8 @@
                                 <option value="5">5 Adults</option>
                             </select>
                         </div>
-                        <button class="btn-primary" id="search-flights-btn" style="flex: 0.5; padding: 14px;">Search</button>
+                        <button class="btn-primary" id="search-flights-btn"
+                            style="flex: 0.5; padding: 14px;">Search</button>
                     </div>
 
                     <div id="flight-results-container" class="mt-20 hidden">
@@ -158,29 +165,45 @@
                         <div id="flight-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                     </div>
 
-                    <div id="seat-selection-container" class="hidden mt-20" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                        
+                    <div id="seat-selection-container" class="hidden mt-20"
+                        style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+
                         <div class="form-group">
-                            <label style="text-align: center; font-size: 1rem; color: white;">1. Select Travel Class</label>
-                            <div class="class-selector" id="seat-class-selector" style="max-width: 500px; margin: 0 auto;">
-                                <label class="class-option"><input type="radio" name="travel-class" value="First" /><span>⭐ First</span></label>
-                                <label class="class-option"><input type="radio" name="travel-class" value="Business" /><span>💼 Business</span></label>
-                                <label class="class-option"><input type="radio" name="travel-class" value="Economy" checked /><span>🪑 Economy</span></label>
+                            <label style="text-align: center; font-size: 1rem; color: white;">1. Select Travel
+                                Class</label>
+                            <div class="class-selector" id="seat-class-selector"
+                                style="max-width: 500px; margin: 0 auto;">
+                                <label class="class-option"><input type="radio" name="travel-class"
+                                        value="First" /><span>⭐ First</span></label>
+                                <label class="class-option"><input type="radio" name="travel-class"
+                                        value="Business" /><span>💼 Business</span></label>
+                                <label class="class-option"><input type="radio" name="travel-class" value="Economy"
+                                        checked /><span>🪑 Economy</span></label>
                             </div>
-                            <div id="class-inventory-count" style="text-align: center; margin-top: 12px; font-size: 0.95rem; font-weight: bold;"></div>
+                            <div id="class-inventory-count"
+                                style="text-align: center; margin-top: 12px; font-size: 0.95rem; font-weight: bold;">
+                            </div>
                         </div>
 
                         <div class="seat-legend" style="margin-top: 25px;">
-                            <div class="legend-item"><div class="legend-box" style="background: var(--sky);"></div> Available</div>
-                            <div class="legend-item"><div class="legend-box" style="background: var(--success);"></div> Selected</div>
-                            <div class="legend-item"><div class="legend-box" style="background: #334155;"></div> Wrong Class</div>
-                            <div class="legend-item"><div class="legend-box" style="background: var(--error);"></div> Occupied</div>
-                        </div>
-                        
-                        <div class="plane-fuselage" id="plane-seats">
+                            <div class="legend-item">
+                                <div class="legend-box" style="background: var(--sky);"></div> Available
                             </div>
+                            <div class="legend-item">
+                                <div class="legend-box" style="background: var(--success);"></div> Selected
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box" style="background: #334155;"></div> Wrong Class
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-box" style="background: var(--error);"></div> Occupied
+                            </div>
+                        </div>
+
+                        <div class="plane-fuselage" id="plane-seats">
+                        </div>
                         <input type="hidden" id="selected-seat-no" />
-                        
+
                         <button class="btn-primary mt-20" id="book-btn" disabled>Confirm Booking</button>
                         <div id="book-result" class="result-area hidden mt-20"></div>
                     </div>
@@ -222,7 +245,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="form-group mt-20">
                         <label>Select Flight</label>
                         <select id="status-flight-select" class="input-glass" disabled>
@@ -261,12 +284,15 @@
                 <div class="form-card glass-dark">
                     <div class="form-group">
                         <label>Scan Barcode</label>
-                        <input type="text" id="scan-barcode" class="input-glass" placeholder="e.g. BG-A1B2C3D4" style="font-family: monospace; font-size: 1.2rem; letter-spacing: 2px;" autocomplete="off" />
+                        <input type="text" id="scan-barcode" class="input-glass" placeholder="e.g. BG-A1B2C3D4"
+                            style="font-family: monospace; font-size: 1.2rem; letter-spacing: 2px;"
+                            autocomplete="off" />
                     </div>
                     <div class="form-row mt-15">
                         <div class="form-group">
                             <label>Scan Location</label>
-                            <input type="text" id="scan-location" class="input-glass" placeholder="e.g. Cairo T3 Sorting, Gate F4..." />
+                            <input type="text" id="scan-location" class="input-glass"
+                                placeholder="e.g. Cairo T3 Sorting, Gate F4..." />
                         </div>
                         <div class="form-group">
                             <label>Status Override (Optional)</label>
@@ -298,7 +324,8 @@
                     </div>
                     <div class="form-group">
                         <label>Incident Report</label>
-                        <textarea id="sec-report" class="input-glass" rows="5" placeholder="Describe the incident..."></textarea>
+                        <textarea id="sec-report" class="input-glass" rows="5"
+                            placeholder="Describe the incident..."></textarea>
                     </div>
                     <button class="btn-primary" id="sec-btn">Submit Report</button>
                     <div id="sec-result" class="result-area hidden"></div>
@@ -318,7 +345,8 @@
                                 <select id="sched-airline-code" class="input-glass" style="flex: 1.2;">
                                     <option value="">Airline...</option>
                                 </select>
-                                <input type="number" id="sched-route-no" class="input-glass" style="flex: 1;" placeholder="e.g. 201" min="1" max="9999" />
+                                <input type="number" id="sched-route-no" class="input-glass" style="flex: 1;"
+                                    placeholder="e.g. 201" min="1" max="9999" />
                             </div>
                         </div>
                         <div class="form-group flex-1">
@@ -432,7 +460,8 @@
                         </div>
                         <div class="form-group">
                             <label>Role for Shift</label>
-                            <input type="text" id="shift-role" placeholder="e.g., Gate Agent Terminal A" class="input-glass" />
+                            <input type="text" id="shift-role" placeholder="e.g., Gate Agent Terminal A"
+                                class="input-glass" />
                         </div>
                     </div>
                     <div class="form-row mt-15">
@@ -454,4 +483,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

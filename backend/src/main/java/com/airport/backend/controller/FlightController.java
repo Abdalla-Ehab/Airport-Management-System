@@ -1,7 +1,7 @@
 package com.airport.backend.controller;
 
 import com.airport.backend.entity.Flight;
-import com.airport.backend.repository.FlightRepository;
+import com.airport.backend.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,25 +13,18 @@ import java.util.List;
 public class FlightController {
     
     @Autowired
-    private FlightRepository flightRepository;
+    private FlightService flightService;
 
-    // ==========================================
-    // 1. PUBLIC: Anyone can view the flight board
-    // ==========================================
     @GetMapping
     public List<Flight> getAllFlights() {
-        return flightRepository.findAll();
+        return flightService.getAllFlights();
     }
 
-    // ==========================================
-    // 2. LOCKED: Only Admins can schedule flights
-    // ==========================================
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> scheduleFlight(@RequestBody Flight flight) {
         try {
-            Flight savedFlight = flightRepository.save(flight);
-            // Return a JSON message that matches what your frontend expects
+            Flight savedFlight = flightService.saveFlight(flight);
             return ResponseEntity.ok(savedFlight); 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Failed to schedule flight: " + e.getMessage());
