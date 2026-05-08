@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Security: Ignore environment variables and production configs
+.env
+application-prod.properties
+
+# Security: Ignore environment variables and production configs
+.env
+secrets.properties
+application-prod.properties

@@ -112,8 +112,8 @@ async function authenticate(username, password) {
     });
     if (res.ok) {
       const data = await res.json();
-      sessionStorage.setItem('jwt_token', data.token); 
-      return data; 
+      sessionStorage.setItem('jwt_token', data.token);
+      return data;
     }
   } catch (err) {
     console.error("Database connection failed", err);
@@ -148,7 +148,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
         lastName: ln,
         email: email,
         phoneNumber: phone,
-        dob: dob,            
+        dob: dob,
         passportNo: passport,
         username: username,
         password: password
@@ -157,7 +157,7 @@ document.getElementById('register-btn').addEventListener('click', async () => {
 
     if (res.ok) {
       showToast('Account created! You can now log in.', 'success');
-      document.getElementById('tab-login').click(); 
+      document.getElementById('tab-login').click();
       document.getElementById('reg-firstname').value = '';
       document.getElementById('reg-lastname').value = '';
       document.getElementById('reg-email').value = '';
@@ -187,7 +187,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
   const password = document.getElementById('staff-password').value.trim();
 
   const deptElement = document.getElementById('reg-staff-dept');
-  const deptId = deptElement ? parseInt(deptElement.value) : 1; 
+  const deptId = deptElement ? parseInt(deptElement.value) : 1;
 
   const resultEl = document.getElementById('add-staff-result');
 
@@ -199,7 +199,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
   try {
     const res = await fetch(`${API}/auth/register/staff`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
@@ -212,7 +212,7 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
         username: username,
         password: password,
         dept_id: deptId,
-        hire_date: new Date().toISOString().split("T")[0] 
+        hire_date: new Date().toISOString().split("T")[0]
       })
     });
 
@@ -324,7 +324,7 @@ function buildNav(role) {
 document.getElementById('login-btn').addEventListener('click', async () => {
   const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value.trim();
-  const errEl = document.getElementById('auth-error'); 
+  const errEl = document.getElementById('auth-error');
   const btn = document.getElementById('login-btn');
 
   if (!username || !password) {
@@ -499,7 +499,7 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
   const listEl = document.getElementById('flight-list');
   const btn = document.getElementById('search-flights-btn');
 
-  document.getElementById('seat-selection-container').classList.add('hidden'); 
+  document.getElementById('seat-selection-container').classList.add('hidden');
 
   if (!origin || !dest || !date) { showToast('Please select origin, destination, and date.', 'error'); return; }
 
@@ -513,7 +513,7 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
     const allFlights = await res.json();
 
     const available = allFlights.filter(f => {
-      const flightDate = f.departure_time.split('T')[0].split(' ')[0]; 
+      const flightDate = f.departure_time.split('T')[0].split(' ')[0];
       return String(f.departure_airport_id) === origin &&
         String(f.arrival_airport_id) === dest &&
         flightDate === date;
@@ -529,7 +529,7 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
       const depTime = new Date(f.departure_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const arrTime = new Date(f.arrival_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const fn = f.flight_number || `FL-${f.flight_id}`;
-      const pseudoPrice = 150 + (f.flight_id % 300); 
+      const pseudoPrice = 150 + (f.flight_id % 300);
 
       const card = document.createElement('div');
       card.className = 'flight-result-card';
@@ -556,8 +556,8 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
 
 async function selectFlight(flightId, flightNumber) {
   currentFlightData = flightId;
-  selectedSeatsArr = []; 
-  
+  selectedSeatsArr = [];
+
   const hiddenInput = document.getElementById('selected-seat-no');
   if (hiddenInput) hiddenInput.value = '';
 
@@ -571,7 +571,9 @@ async function selectFlight(flightId, flightNumber) {
   seatContainer.scrollIntoView({ behavior: 'smooth' });
 
   try {
-    const res = await fetch(`${API}/bookings/flights/${flightId}/seats`);
+    const res = await fetch(`${API}/bookings/flights/${flightId}/seats`, {
+      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') }
+    });
     let occupiedSeats = [];
     if (res.ok) occupiedSeats = await res.json();
 
@@ -589,7 +591,7 @@ async function selectFlight(flightId, flightNumber) {
         let seat = document.createElement('div');
         seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
         seat.dataset.id = seatId;
-        seat.dataset.class = className; 
+        seat.dataset.class = className;
         seat.textContent = isOccupied ? '' : seatId;
 
         if (!isOccupied) {
@@ -649,17 +651,17 @@ function applyClassFilter() {
 
   document.getElementById('selected-seat-no').value = '';
   document.getElementById('book-btn').disabled = true;
-  selectedSeatsArr = []; 
+  selectedSeatsArr = [];
 
-  let availableInClass = 0; 
+  let availableInClass = 0;
 
   document.querySelectorAll('.seat').forEach(seat => {
-    seat.classList.remove('selected'); 
+    seat.classList.remove('selected');
 
     if (seat.dataset.class !== selectedClass) {
-      seat.classList.add('wrong-class'); 
+      seat.classList.add('wrong-class');
     } else {
-      seat.classList.remove('wrong-class'); 
+      seat.classList.remove('wrong-class');
       if (!seat.classList.contains('occupied')) {
         availableInClass++;
       }
@@ -680,7 +682,7 @@ function applyClassFilter() {
 document.getElementById('book-btn').addEventListener('click', async () => {
   const className = document.querySelector('input[name="travel-class"]:checked').value;
   const seatNosArray = document.getElementById('selected-seat-no').value.split(',');
-  
+
   const resultEl = document.getElementById('book-result');
   const btn = document.getElementById('book-btn');
 
@@ -690,14 +692,14 @@ document.getElementById('book-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/bookings/create`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
       body: JSON.stringify({
         flight_id: currentFlightData,
         passenger_id: currentUser.id,
-        seat_nos: seatNosArray, 
+        seat_nos: seatNosArray,
         class_name: className,
         is_transit: false
       })
@@ -739,7 +741,7 @@ document.getElementById('checkin-btn').addEventListener('click', async () => {
   bpEl.classList.add('hidden');
 
   try {
-    const res = await fetch(`${API}/checkin/${encodeURIComponent(ticketNo)}`, { 
+    const res = await fetch(`${API}/checkin/${encodeURIComponent(ticketNo)}`, {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') } // TOKEN ADDED
     });
@@ -1015,7 +1017,7 @@ document.getElementById('bag-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/baggage`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
@@ -1058,7 +1060,7 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/security`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
@@ -1108,7 +1110,7 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/baggage/scan`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
@@ -1210,7 +1212,7 @@ async function updateAircraftStatus(aircraftId, newStatus) {
   try {
     const res = await fetch(`${API}/aircraft/${aircraftId}/status`, {
       method: 'PUT',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
@@ -1219,7 +1221,7 @@ async function updateAircraftStatus(aircraftId, newStatus) {
 
     if (res.ok) {
       showToast(`Aircraft status updated to ${newStatus}`, 'success');
-      initMaintenanceView(); 
+      initMaintenanceView();
     } else {
       showToast('Failed to update aircraft status', 'error');
     }
@@ -1271,12 +1273,12 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/flights`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
       body: JSON.stringify({
-        flight_number: realFlightNumber, 
+        flight_number: realFlightNumber,
         aircraft_id: parseInt(aircraftId),
         origin: origin,
         destination: dest,
@@ -1369,7 +1371,7 @@ document.getElementById('assign-shift-btn')?.addEventListener('click', async () 
   try {
     const res = await fetch(`${API}/shifts/assign`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
       },
