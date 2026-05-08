@@ -930,8 +930,9 @@ body {
 .seat.occupied::after { content: '×'; color: white; font-size: 1.2rem; }
 
 .seat.selected {
-    background: var(--success) !important; border-bottom-color: #179e76 !important;
-    box-shadow: 0 0 10px var(--success); transform: scale(1.1);
+    background-color: var(--success) !important;
+    border-color: var(--success) !important;
+    color: #000 !important;
 }
 
 .seat-legend {

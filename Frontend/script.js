@@ -493,6 +493,7 @@ async function loadAirports() {
    PASSENGER: Book a Flight (WIZARD & SEAT MAP)
 ═══════════════════════════════════════════ */
 let currentFlightData = null;
+let selectedSeatsArr = [];
 
 // 1. Initialize Dropdowns and Date Picker
 async function initBookingView() {
@@ -579,7 +580,10 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
 // 3. Render the Class-Divided Airplane!
 async function selectFlight(flightId, flightNumber) {
   currentFlightData = flightId;
-  document.getElementById('selected-seat-no').value = '';
+  selectedSeatsArr = []; // Clear array on new flight
+  
+  const hiddenInput = document.getElementById('selected-seat-no');
+  if (hiddenInput) hiddenInput.value = '';
 
   const seatContainer = document.getElementById('seat-selection-container');
   const plane = document.getElementById('plane-seats');
@@ -588,7 +592,6 @@ async function selectFlight(flightId, flightNumber) {
   seatContainer.classList.remove('hidden');
   document.getElementById('book-btn').disabled = true;
 
-  // Scroll down to the plane
   seatContainer.scrollIntoView({ behavior: 'smooth' });
 
   try {
@@ -597,6 +600,8 @@ async function selectFlight(flightId, flightNumber) {
     if (res.ok) occupiedSeats = await res.json();
 
     const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const passDropdown = document.getElementById('book-passengers');
+    let requiredSeats = passDropdown ? parseInt(passDropdown.value) : 1;
 
     // Helper to build rows
     const buildRow = (r, className) => {
@@ -609,18 +614,31 @@ async function selectFlight(flightId, flightNumber) {
         let seat = document.createElement('div');
         seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
         seat.dataset.id = seatId;
-        seat.dataset.class = className; // Tag the seat with its class!
+        seat.dataset.class = className; 
         seat.textContent = isOccupied ? '' : seatId;
 
         if (!isOccupied) {
           seat.addEventListener('click', () => {
-            // Prevent clicking if it's the wrong class
             if (seat.classList.contains('wrong-class')) return;
 
-            document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
-            seat.classList.add('selected');
-            document.getElementById('selected-seat-no').value = seatId;
-            document.getElementById('book-btn').disabled = false;
+            // Toggle Selection Logic
+            if (seat.classList.contains('selected')) {
+              seat.classList.remove('selected');
+              selectedSeatsArr = selectedSeatsArr.filter(s => s !== seatId);
+            } else {
+              if (selectedSeatsArr.length < requiredSeats) {
+                seat.classList.add('selected');
+                selectedSeatsArr.push(seatId);
+              } else {
+                showToast(`You only selected ${requiredSeats} passenger(s) for this search.`, 'info');
+                return;
+              }
+            }
+
+            if (hiddenInput) hiddenInput.value = selectedSeatsArr.join(',');
+
+            const bookBtn = document.getElementById('book-btn');
+            if (bookBtn) bookBtn.disabled = (selectedSeatsArr.length !== requiredSeats);
           });
         }
 
@@ -634,19 +652,17 @@ async function selectFlight(flightId, flightNumber) {
       plane.appendChild(rowDiv);
     };
 
-    // Rows 1-2: FIRST CLASS
-    plane.innerHTML += `<div class="row-divider"><span>First Class</span></div>`;
+    // THE FIX: Use insertAdjacentHTML to safely add HTML without destroying listeners
+    plane.insertAdjacentHTML('beforeend', `<div class="row-divider"><span>First Class</span></div>`);
     for (let r = 1; r <= 2; r++) buildRow(r, "First");
 
-    // Rows 3-5: BUSINESS CLASS
-    plane.innerHTML += `<div class="row-divider"><span>Business Class</span></div>`;
+    plane.insertAdjacentHTML('beforeend', `<div class="row-divider"><span>Business Class</span></div>`);
     for (let r = 3; r <= 5; r++) buildRow(r, "Business");
 
-    // Rows 6-15: ECONOMY CLASS
-    plane.innerHTML += `<div class="row-divider"><span>Economy Class</span></div>`;
+    plane.insertAdjacentHTML('beforeend', `<div class="row-divider"><span>Economy Class</span></div>`);
     for (let r = 6; r <= 15; r++) buildRow(r, "Economy");
 
-    applyClassFilter(); // Apply initial class colors based on radio buttons
+    applyClassFilter();
 
   } catch (e) { console.error("Could not load seat map."); }
 }
@@ -662,25 +678,23 @@ function applyClassFilter() {
   // Reset selection if they change classes
   document.getElementById('selected-seat-no').value = '';
   document.getElementById('book-btn').disabled = true;
+  selectedSeatsArr = []; // THE FIX: Physically empty the JS array so they can pick seats again!
 
-  let availableInClass = 0; // Track live inventory
+  let availableInClass = 0; 
 
   document.querySelectorAll('.seat').forEach(seat => {
-    seat.classList.remove('selected'); // Clear selections
+    seat.classList.remove('selected'); 
 
     if (seat.dataset.class !== selectedClass) {
-      seat.classList.add('wrong-class'); // Gray out wrong class
+      seat.classList.add('wrong-class'); 
     } else {
-      seat.classList.remove('wrong-class'); // Make clickable
-
-      // If the seat is in the correct class AND is not occupied, add it to inventory!
+      seat.classList.remove('wrong-class'); 
       if (!seat.classList.contains('occupied')) {
         availableInClass++;
       }
     }
   });
 
-  // Update the UI with the live inventory count
   const inventoryDisplay = document.getElementById('class-inventory-count');
   if (inventoryDisplay) {
     if (availableInClass === 0) {
