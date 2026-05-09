@@ -1,6 +1,7 @@
 package com.airport.backend.controller;
 
 import com.airport.backend.dto.BaggageScanRequest;
+import com.airport.backend.response.ApiResponse;
 import com.airport.backend.service.BaggageService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ public class BaggageController {
     private BaggageService baggageService;
 
     @PostMapping("/scan")
-    public ResponseEntity<Map<String, String>> scanBaggage(@Valid @RequestBody BaggageScanRequest request) {
-        return ResponseEntity.ok(baggageService.processScan(request));
+    public ResponseEntity<ApiResponse<Map<String, String>>> scanBaggage(@Valid @RequestBody BaggageScanRequest request) {
+        Map<String, String> response = baggageService.processScan(request);
+        return ResponseEntity.ok(ApiResponse.success("Scan processed successfully", response));
     }
 }

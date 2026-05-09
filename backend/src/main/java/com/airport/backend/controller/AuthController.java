@@ -3,8 +3,7 @@ package com.airport.backend.controller;
 import com.airport.backend.dto.LoginRequest;
 import com.airport.backend.dto.PassengerRegisterRequest;
 import com.airport.backend.dto.StaffRegisterRequest;
-// import com.airport.backend.entity.Passenger;
-// import com.airport.backend.entity.Staff;
+import com.airport.backend.response.ApiResponse;
 import com.airport.backend.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,33 +21,33 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginRequest request) {
         try {
             Map<String, Object> tokenData = authService.authenticateUser(request);
-            return ResponseEntity.ok(tokenData);
+            return ResponseEntity.ok(ApiResponse.success("Login successful", tokenData));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(e.getMessage()));
         }
     }
 
-@PostMapping("/register/passenger")
-    public ResponseEntity<?> registerPassenger(@RequestBody PassengerRegisterRequest request) {
+    @PostMapping("/register/passenger")
+    public ResponseEntity<ApiResponse<Void>> registerPassenger(@RequestBody PassengerRegisterRequest request) {
         try {
             authService.registerPassenger(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Passenger registered successfully"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Passenger registered successfully", null));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
         }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register/staff")
-    public ResponseEntity<?> registerStaff(@RequestBody StaffRegisterRequest request) {
+    public ResponseEntity<ApiResponse<Void>> registerStaff(@RequestBody StaffRegisterRequest request) {
         try {
             authService.registerStaff(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Staff member registered successfully"));
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Staff member registered successfully", null));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
         }
     }
 }

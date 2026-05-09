@@ -1,5 +1,6 @@
 package com.airport.backend.controller;
 
+import com.airport.backend.response.ApiResponse;
 import com.airport.backend.response.CheckInResponse;
 import com.airport.backend.service.CheckInService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,8 @@ public class CheckInController {
 
     @PreAuthorize("hasRole('PASSENGER')")
     @PostMapping("/{ticketNo}")
-    public ResponseEntity<CheckInResponse> generateBoardingPass(@PathVariable Long ticketNo, Authentication authentication) {
-        // Notice how we pass authentication.getName() straight into the service!
-        return ResponseEntity.ok(checkInService.generateBoardingPass(ticketNo, authentication.getName()));
+    public ResponseEntity<ApiResponse<CheckInResponse>> generateBoardingPass(@PathVariable Long ticketNo, Authentication authentication) {
+        CheckInResponse response = checkInService.generateBoardingPass(ticketNo, authentication.getName());
+        return ResponseEntity.ok(ApiResponse.success("Boarding pass generated successfully", response));
     }
 }

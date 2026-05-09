@@ -10,10 +10,12 @@ const API = 'http://localhost:8080/api';
 /* ── STATE ── */
 let currentUser = null;  // { username, role, id }
 // Lock the date picker to only allow today or past dates
-document.getElementById('reg-dob').max = new Date().toISOString().split("T")[0];
+if (document.getElementById('reg-dob')) {
+  document.getElementById('reg-dob').max = new Date().toISOString().split("T")[0];
+}
 
 /* ═══════════════════════════════════════════
-   ROLE DEFINITIONS & NAV CONFIG (UPDATED)
+   ROLE DEFINITIONS & NAV CONFIG
 ═══════════════════════════════════════════ */
 const NAV_CONFIG = {
   passenger: [
@@ -22,7 +24,7 @@ const NAV_CONFIG = {
       items: [
         { view: 'book', label: 'Book a Flight', onEnter: initBookingView },
         { view: 'status', label: 'Flight Status', onEnter: initStatusView },
-        { view: 'history', label: 'Flight History' } // Placeholder for future
+        { view: 'history', label: 'Flight History' }
       ]
     },
     {
@@ -30,7 +32,7 @@ const NAV_CONFIG = {
       items: [
         { view: 'home', label: 'Airports Network', onEnter: loadAirports },
         { view: 'checkin', label: 'Check-In Kiosk' },
-        { view: 'dutyfree', label: 'Duty-Free Shops' } // Placeholder for future
+        { view: 'dutyfree', label: 'Duty-Free Shops' }
       ]
     }
   ],
@@ -62,14 +64,14 @@ const NAV_CONFIG = {
       category: 'Flight Operations', icon: '🌍',
       items: [
         { view: 'schedule', label: 'Master Scheduler', onEnter: initScheduleView },
-        { view: 'active-flights', label: 'Live Traffic Map' } // Placeholder for future
+        { view: 'active-flights', label: 'Live Traffic Map' }
       ]
     },
     {
       category: 'Asset Management', icon: '🔧',
       items: [
         { view: 'fleet', label: 'Fleet & Aircraft', onEnter: loadFleet },
-        { view: 'maintenance', label: 'Maintenance Logs' } // Placeholder for future
+        { view: 'maintenance', label: 'Maintenance Logs' }
       ]
     },
     {
@@ -102,7 +104,6 @@ document.getElementById('tab-register').addEventListener('click', () => {
   document.getElementById('auth-error').classList.add('hidden');
 });
 
-// REAL LOGIN (Checks database)
 async function authenticate(username, password) {
   try {
     const res = await fetch(`${API}/auth/login`, {
@@ -112,8 +113,10 @@ async function authenticate(username, password) {
     });
     if (res.ok) {
       const data = await res.json();
-      sessionStorage.setItem('jwt_token', data.token);
-      return data;
+      // Unwrapping just in case Auth is standardized
+      const payload = data.data || data;
+      sessionStorage.setItem('jwt_token', payload.token || data.token);
+      return payload;
     }
   } catch (err) {
     console.error("Database connection failed", err);
@@ -121,7 +124,6 @@ async function authenticate(username, password) {
   return null;
 }
 
-// PASSENGER REGISTRATION (Public - No Token Needed)
 document.getElementById('register-btn').addEventListener('click', async () => {
   const dob = document.getElementById('reg-dob').value;
   const passport = document.getElementById('reg-passport').value.trim();
@@ -144,28 +146,15 @@ document.getElementById('register-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        firstName: fn,
-        lastName: ln,
-        email: email,
-        phoneNumber: phone,
-        dob: dob,
-        passportNo: passport,
-        username: username,
-        password: password
+        firstName: fn, lastName: ln, email: email, phoneNumber: phone,
+        dob: dob, passportNo: passport, username: username, password: password
       })
     });
 
     if (res.ok) {
       showToast('Account created! You can now log in.', 'success');
       document.getElementById('tab-login').click();
-      document.getElementById('reg-firstname').value = '';
-      document.getElementById('reg-lastname').value = '';
-      document.getElementById('reg-email').value = '';
-      document.getElementById('reg-phone').value = '';
-      document.getElementById('reg-dob').value = '';
-      document.getElementById('reg-passport').value = '';
-      document.getElementById('reg-username').value = '';
-      document.getElementById('reg-password').value = '';
+      document.querySelectorAll('#form-register input').forEach(i => i.value = '');
     } else {
       errEl.textContent = 'Registration failed. Username or Email might already exist.';
       errEl.classList.remove('hidden');
@@ -176,7 +165,6 @@ document.getElementById('register-btn').addEventListener('click', async () => {
   }
 });
 
-// ADMIN: ADD STAFF (Protected - Needs Token)
 document.getElementById('add-staff-btn')?.addEventListener('click', async () => {
   const fn = document.getElementById('staff-fn').value.trim();
   const ln = document.getElementById('staff-ln').value.trim();
@@ -185,10 +173,8 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
   const role = document.getElementById('staff-role').value;
   const username = document.getElementById('staff-username').value.trim();
   const password = document.getElementById('staff-password').value.trim();
-
   const deptElement = document.getElementById('reg-staff-dept');
   const deptId = deptElement ? parseInt(deptElement.value) : 1;
-
   const resultEl = document.getElementById('add-staff-result');
 
   if (!fn || !username || !password) {
@@ -201,29 +187,18 @@ document.getElementById('add-staff-btn')?.addEventListener('click', async () => 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
-        first_name: fn,
-        last_name: ln,
-        email: email,
-        phone_number: phone,
-        role: role,
-        username: username,
-        password: password,
-        dept_id: deptId,
+        first_name: fn, last_name: ln, email: email, phone_number: phone,
+        role: role, username: username, password: password, dept_id: deptId,
         hire_date: new Date().toISOString().split("T")[0]
       })
     });
 
     if (res.ok) {
-      showResult(resultEl, `✅ Staff account '${username}' created successfully as ${role}!`, true);
-      document.getElementById('staff-fn').value = '';
-      document.getElementById('staff-ln').value = '';
-      document.getElementById('staff-email').value = '';
-      document.getElementById('staff-phone').value = '';
-      document.getElementById('staff-username').value = '';
-      document.getElementById('staff-password').value = '';
+      showResult(resultEl, `✅ Staff account '${username}' created successfully!`, true);
+      document.querySelectorAll('#view-add-staff input').forEach(i => i.value = '');
     } else {
       const errorText = await res.text();
       showResult(resultEl, `❌ Failed to create staff account: ${errorText}`, false);
@@ -366,7 +341,6 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     showToast('Welcome back, ' + displayUsername + '!', 'success');
 
   } catch (error) {
-    console.error("Login UI Error:", error);
     btn.disabled = false;
     btn.innerHTML = 'Sign In';
     errEl.textContent = 'A system error occurred. Check the console.';
@@ -380,19 +354,15 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   });
 });
 
-/* ═══════════════════════════════════════════
-   LOGOUT
-═══════════════════════════════════════════ */
 document.getElementById('logout-btn').addEventListener('click', () => {
   currentUser = null;
-  sessionStorage.removeItem('jwt_token'); // CLEAR THE TOKEN ON LOGOUT!
+  sessionStorage.removeItem('jwt_token');
   document.getElementById('app-shell').style.display = 'none';
   document.getElementById('app-shell').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('login-screen').classList.add('active');
   document.getElementById('login-username').value = '';
   document.getElementById('login-password').value = '';
-  document.getElementById('login-error').classList.add('hidden');
   showToast('Signed out successfully.', 'info');
 });
 
@@ -418,9 +388,6 @@ function showResult(el, message, isSuccess) {
   el.classList.remove('hidden');
 }
 
-/* ═══════════════════════════════════════════
-   SECURITY: HTML Escape
-═══════════════════════════════════════════ */
 function escHtml(str) {
   if (!str) return '';
   return String(str)
@@ -428,11 +395,11 @@ function escHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, '&#39;'); // &#39; is the safe HTML code for a single quote!
 }
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Load Airports (Public)
+   PASSENGER: Load Airports
 ═══════════════════════════════════════════ */
 async function loadAirports() {
   const grid = document.getElementById('airports-grid');
@@ -442,7 +409,9 @@ async function loadAirports() {
     const res = await fetch(`${API}/airports`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const airports = Array.isArray(data) ? data : (data.content || data.data || []);
+
+    // THE FIX: Unwrapping ApiResponse data if present
+    const airports = data.data || data.content || (Array.isArray(data) ? data : []);
 
     if (!airports.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No airports found.</p>';
@@ -453,8 +422,7 @@ async function loadAirports() {
       const country = a.country ? `, ${a.country}` : '';
       const name = a.airport_name || a.airportName || a.name || 'Airport';
       const city = a.city || a.location || 'Unknown City';
-      const searchQuery = encodeURIComponent(`${name} ${city}`);
-      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(name + ' ' + city)}`;
 
       return `
         <div class="data-card hover-lift" onclick="window.open('${mapsUrl}', '_blank')">
@@ -468,12 +436,11 @@ async function loadAirports() {
 
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load airports: ${err.message}</div>`;
-    showToast('Could not fetch airport data.', 'error');
   }
 }
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Book a Flight (Protected)
+   PASSENGER: Book a Flight
 ═══════════════════════════════════════════ */
 let currentFlightData = null;
 let selectedSeatsArr = [];
@@ -482,7 +449,11 @@ async function initBookingView() {
   document.getElementById('book-date').min = new Date().toISOString().split("T")[0];
   try {
     const res = await fetch(`${API}/airports`);
-    const airports = await res.json();
+    const json = await res.json();
+
+    // THE FIX: Unwrapping ApiResponse data if present
+    const airports = json.data || json.content || (Array.isArray(json) ? json : []);
+
     let options = '<option value="">Select Airport...</option>';
     airports.forEach(a => options += `<option value="${a.id || a.airport_id}">${escHtml(a.name || a.city)}</option>`);
     document.getElementById('book-origin').innerHTML = options;
@@ -510,7 +481,10 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
 
   try {
     const res = await fetch(`${API}/flights`);
-    const allFlights = await res.json();
+    const json = await res.json();
+
+    // THE FIX: Safely unwrap the ApiResponse wrapper
+    const allFlights = json.data || json.content || (Array.isArray(json) ? json : []);
 
     const available = allFlights.filter(f => {
       const flightDate = f.departure_time.split('T')[0].split(' ')[0];
@@ -567,15 +541,19 @@ async function selectFlight(flightId, flightNumber) {
   plane.innerHTML = '<div class="plane-cockpit">Front of Aircraft (' + flightNumber + ')</div>';
   seatContainer.classList.remove('hidden');
   document.getElementById('book-btn').disabled = true;
-
   seatContainer.scrollIntoView({ behavior: 'smooth' });
 
   try {
     const res = await fetch(`${API}/bookings/flights/${flightId}/seats`, {
       headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') }
     });
+
     let occupiedSeats = [];
-    if (res.ok) occupiedSeats = await res.json();
+    if (res.ok) {
+      const json = await res.json();
+      // THE FIX: Unwrap seats
+      occupiedSeats = json.data || json;
+    }
 
     const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
     const passDropdown = document.getElementById('book-passengers');
@@ -606,13 +584,12 @@ async function selectFlight(flightId, flightNumber) {
                 seat.classList.add('selected');
                 selectedSeatsArr.push(seatId);
               } else {
-                showToast(`You only selected ${requiredSeats} passenger(s) for this search.`, 'info');
+                showToast(`You only selected ${requiredSeats} passenger(s).`, 'info');
                 return;
               }
             }
 
             if (hiddenInput) hiddenInput.value = selectedSeatsArr.join(',');
-
             const bookBtn = document.getElementById('book-btn');
             if (bookBtn) bookBtn.disabled = (selectedSeatsArr.length !== requiredSeats);
           });
@@ -648,16 +625,13 @@ document.querySelectorAll('input[name="travel-class"]').forEach(radio => {
 
 function applyClassFilter() {
   const selectedClass = document.querySelector('input[name="travel-class"]:checked').value;
-
   document.getElementById('selected-seat-no').value = '';
   document.getElementById('book-btn').disabled = true;
   selectedSeatsArr = [];
-
   let availableInClass = 0;
 
   document.querySelectorAll('.seat').forEach(seat => {
     seat.classList.remove('selected');
-
     if (seat.dataset.class !== selectedClass) {
       seat.classList.add('wrong-class');
     } else {
@@ -678,7 +652,6 @@ function applyClassFilter() {
   }
 }
 
-// 5. Submit Booking (Protected - Needs Token)
 document.getElementById('book-btn').addEventListener('click', async () => {
   const className = document.querySelector('input[name="travel-class"]:checked').value;
   const seatNosArray = document.getElementById('selected-seat-no').value.split(',');
@@ -694,7 +667,7 @@ document.getElementById('book-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
         flight_id: currentFlightData,
@@ -710,12 +683,14 @@ document.getElementById('book-btn').addEventListener('click', async () => {
     try { msg = JSON.parse(text); } catch { msg = text; }
 
     if (res.ok) {
+      // THE FIX: Unwrap the ApiResponse for the booking payload
+      const payload = msg.data || msg;
       const seatsString = seatNosArray.join(', ');
-      showResult(resultEl, `🎉 Booking confirmed!<br>Ticket Number(s): <strong>${msg.ticket_nos ? msg.ticket_nos.join(', ') : msg.ticket_no}</strong><br>Seats: <strong>${seatsString}</strong>`, true);
+      showResult(resultEl, `🎉 Booking confirmed!<br>Ticket Number(s): <strong>${payload.ticket_nos ? payload.ticket_nos.join(', ') : payload.ticket_no}</strong><br>Seats: <strong>${seatsString}</strong>`, true);
       showToast('Flight booked successfully!', 'success');
       document.getElementById('seat-selection-container').classList.add('hidden');
     } else {
-      const errMsg = msg.error || 'Failed to book.';
+      const errMsg = msg.message || msg.error || 'Failed to book.';
       showResult(resultEl, `Error: ${errMsg}`, false);
       showToast('Booking failed.', 'error');
     }
@@ -727,7 +702,7 @@ document.getElementById('book-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Check-In (Protected)
+   PASSENGER: Check-In 
 ═══════════════════════════════════════════ */
 document.getElementById('checkin-btn').addEventListener('click', async () => {
   const ticketNo = document.getElementById('checkin-ticket').value.trim();
@@ -743,18 +718,20 @@ document.getElementById('checkin-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/checkin/${encodeURIComponent(ticketNo)}`, {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') } // TOKEN ADDED
+      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') }
     });
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); } catch { data = {}; }
 
     if (res.ok) {
-      renderBoardingPass(bpEl, data, ticketNo);
+      // THE FIX: Unwrap check-in payload
+      const payload = data.data || data;
+      renderBoardingPass(bpEl, payload, ticketNo);
       bpEl.classList.remove('hidden');
-      showToast('Check-in successful! Boarding pass ready.', 'success');
+      showToast('Check-in successful!', 'success');
     } else {
-      const errMsg = (typeof data === 'object') ? (data.message || data.error || text) : text;
+      const errMsg = data.message || data.error || text;
       bpEl.classList.add('hidden');
       showResult(document.getElementById('boarding-pass'), `Check-in failed: ${errMsg}`, false);
       bpEl.classList.remove('hidden');
@@ -763,7 +740,6 @@ document.getElementById('checkin-btn').addEventListener('click', async () => {
   } catch (err) {
     bpEl.innerHTML = `<div class="result-area result-error">Network error: ${err.message}</div>`;
     bpEl.classList.remove('hidden');
-    showToast('Network error during check-in.', 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = 'Check In Now';
@@ -776,8 +752,8 @@ async function renderBoardingPass(el, data, ticketNo) {
   try {
     const res = await fetch(`${API}/airports`);
     if (res.ok) {
-      const airData = await res.json();
-      const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+      const airJson = await res.json();
+      const airports = airJson.data || airJson.content || (Array.isArray(airJson) ? airJson : []);
       const found = airports.find(a => String(a.id || a.airport_id) === String(airportName));
       if (found) {
         airportName = found.name || found.airportName || found.city || airportName;
@@ -835,14 +811,13 @@ async function renderBoardingPass(el, data, ticketNo) {
 }
 
 /* ═══════════════════════════════════════════
-   PASSENGER: Flight Status (Public)
+   PASSENGER: Flight Status 
 ═══════════════════════════════════════════ */
-
 async function initStatusView() {
   try {
     const res = await fetch(`${API}/airports`);
-    const data = await res.json();
-    const airports = Array.isArray(data) ? data : (data.content || data.data || []);
+    const json = await res.json();
+    const airports = json.data || json.content || (Array.isArray(json) ? json : []);
 
     let options = '<option value="">Select Airport...</option>';
     airports.forEach(a => {
@@ -873,8 +848,8 @@ async function initStatusView() {
 
     try {
       const res = await fetch(`${API}/flights`);
-      const data = await res.json();
-      const flights = Array.isArray(data) ? data : (data.content || data.data || []);
+      const json = await res.json();
+      const flights = json.data || json.content || (Array.isArray(json) ? json : []);
 
       const availableFlights = flights.filter(f =>
         String(f.departure_airport_id) === String(origin) &&
@@ -911,8 +886,8 @@ document.getElementById('status-btn').addEventListener('click', async () => {
   try {
     const res = await fetch(`${API}/flights`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const all = await res.json();
-    const list = Array.isArray(all) ? all : (all.content || all.data || []);
+    const json = await res.json();
+    const list = json.data || json.content || (Array.isArray(json) ? json : []);
 
     const flight = list.find(f => String(f.id || f.flightId || f.flight_id) === String(flightId));
 
@@ -926,8 +901,8 @@ document.getElementById('status-btn').addEventListener('click', async () => {
 
       try {
         const airRes = await fetch(`${API}/airports`);
-        const airData = await airRes.json();
-        const airports = Array.isArray(airData) ? airData : (airData.content || airData.data || []);
+        const airJson = await airRes.json();
+        const airports = airJson.data || airJson.content || (Array.isArray(airJson) ? airJson : []);
 
         const o = airports.find(a => String(a.id || a.airport_id) === String(flight.departure_airport_id));
         if (o) originName = o.name || o.airportName || o.city || originName;
@@ -938,8 +913,8 @@ document.getElementById('status-btn').addEventListener('click', async () => {
 
       try {
         const lineRes = await fetch(`${API}/airlines`);
-        const lineData = await lineRes.json();
-        const airlines = Array.isArray(lineData) ? lineData : (lineData.content || lineData.data || []);
+        const lineJson = await lineRes.json();
+        const airlines = lineJson.data || lineJson.content || (Array.isArray(lineJson) ? lineJson : []);
 
         const al = airlines.find(a => String(a.id || a.airline_id) === String(flight.airline_id));
         if (al) airlineName = al.name || al.airlineName || airlineName;
@@ -1001,7 +976,7 @@ document.getElementById('status-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   STAFF: Baggage Drop (Protected)
+   STAFF: Baggage Drop 
 ═══════════════════════════════════════════ */
 document.getElementById('bag-btn').addEventListener('click', async () => {
   const ticketNo = document.getElementById('bag-ticket').value.trim();
@@ -1019,24 +994,24 @@ document.getElementById('bag-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({ ticketNo, weight: parseFloat(weight) }),
     });
     const text = await res.text();
     let msg;
     try { msg = JSON.parse(text); } catch { msg = text; }
-    const msgStr = (typeof msg === 'object') ? (msg.message || JSON.stringify(msg)) : msg;
+
     if (res.ok) {
       showResult(resultEl, `🧳 Baggage processed!<br>Ticket: <strong>${escHtml(ticketNo)}</strong> | Weight: <strong>${weight} kg</strong>`, true);
       showToast('Baggage drop complete.', 'success');
     } else {
+      const msgStr = (typeof msg === 'object') ? (msg.message || msg.error || JSON.stringify(msg)) : msg;
       showResult(resultEl, `Failed: ${msgStr}`, false);
       showToast('Baggage processing failed.', 'error');
     }
   } catch (err) {
     showResult(resultEl, `Network error: ${err.message}`, false);
-    showToast('Network error.', 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = 'Process Baggage';
@@ -1044,7 +1019,7 @@ document.getElementById('bag-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   STAFF: Security Log (Protected)
+   STAFF: Security Log 
 ═══════════════════════════════════════════ */
 document.getElementById('sec-btn').addEventListener('click', async () => {
   const terminal = document.getElementById('sec-terminal').value;
@@ -1062,7 +1037,7 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
         terminal,
@@ -1074,18 +1049,17 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
     const text = await res.text();
     let msg;
     try { msg = JSON.parse(text); } catch { msg = text; }
-    const msgStr = (typeof msg === 'object') ? (msg.message || JSON.stringify(msg)) : msg;
+
     if (res.ok) {
       showResult(resultEl, `🔒 Incident report filed for <strong>${escHtml(terminal)}</strong>.`, true);
       document.getElementById('sec-report').value = '';
       showToast('Security report submitted.', 'success');
     } else {
+      const msgStr = (typeof msg === 'object') ? (msg.message || msg.error || JSON.stringify(msg)) : msg;
       showResult(resultEl, `Failed: ${msgStr}`, false);
-      showToast('Report submission failed.', 'error');
     }
   } catch (err) {
     showResult(resultEl, `Network error: ${err.message}`, false);
-    showToast('Network error.', 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = 'Submit Report';
@@ -1093,7 +1067,7 @@ document.getElementById('sec-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   STAFF: Barcode Scanner (Protected)
+   STAFF: Barcode Scanner 
 ═══════════════════════════════════════════ */
 document.getElementById('scan-btn')?.addEventListener('click', async () => {
   const barcode = document.getElementById('scan-barcode').value.trim();
@@ -1112,7 +1086,7 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
         barcode: barcode,
@@ -1122,9 +1096,12 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
       }),
     });
 
-    const data = await res.json();
+    const json = await res.json();
 
     if (res.ok) {
+      // THE FIX: Unwrap the ApiResponse payload
+      const data = json.data || json;
+
       showResult(resultEl, `
                 <div style="display:flex; justify-content: space-between; align-items:center;">
                     <div>
@@ -1143,7 +1120,7 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
       document.getElementById('scan-barcode').value = '';
       document.getElementById('scan-barcode').focus();
     } else {
-      showResult(resultEl, `❌ Scan Failed: ${data.error || 'Unknown error'}`, false);
+      showResult(resultEl, `❌ Scan Failed: ${json.message || json.error || 'Unknown error'}`, false);
     }
   } catch (err) {
     showResult(resultEl, `Network error: ${err.message}`, false);
@@ -1154,7 +1131,7 @@ document.getElementById('scan-btn')?.addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   STAFF: Maintenance & Grounding Dashboard (Protected)
+   STAFF: Maintenance Dashboard
 ═══════════════════════════════════════════ */
 async function initMaintenanceView() {
   const grid = document.getElementById('maintenance-grid');
@@ -1162,10 +1139,13 @@ async function initMaintenanceView() {
 
   try {
     const res = await fetch(`${API}/aircraft`, {
-      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') } // TOKEN ADDED
+      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') }
     });
     if (!res.ok) throw new Error('Failed to load aircraft');
-    const fleet = await res.json();
+
+    const json = await res.json();
+    // THE FIX: Unwrap the ApiResponse for fleet
+    const fleet = json.data || json.content || (Array.isArray(json) ? json : []);
 
     if (!fleet.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No aircraft found in the fleet.</p>';
@@ -1214,7 +1194,7 @@ async function updateAircraftStatus(aircraftId, newStatus) {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({ status: newStatus })
     });
@@ -1231,13 +1211,13 @@ async function updateAircraftStatus(aircraftId, newStatus) {
 }
 
 /* ═══════════════════════════════════════════
-   ADMIN: Schedule Flight (Protected)
+   ADMIN: Schedule Flight 
 ═══════════════════════════════════════════ */
 async function initScheduleView() {
   try {
     const res = await fetch(`${API}/airlines`);
-    const data = await res.json();
-    const airlines = Array.isArray(data) ? data : (data.content || data.data || []);
+    const json = await res.json();
+    const airlines = json.data || json.content || (Array.isArray(json) ? json : []);
 
     let options = '<option value="">Select Airline...</option>';
     airlines.forEach(a => {
@@ -1275,7 +1255,7 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
         flight_number: realFlightNumber,
@@ -1297,11 +1277,9 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
     } else {
       const errMsg = (typeof msg === 'object') ? (msg.message || msg.error || JSON.stringify(msg)) : msg;
       showResult(resultEl, `Scheduling failed: ${errMsg}`, false);
-      showToast('Failed to schedule flight.', 'error');
     }
   } catch (err) {
     showResult(resultEl, `Network error: ${err.message}`, false);
-    showToast('Network error.', 'error');
   } finally {
     btn.disabled = false;
     btn.innerHTML = 'Schedule Flight';
@@ -1309,18 +1287,20 @@ document.getElementById('sched-btn').addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════
-   ADMIN: Load Fleet (Protected)
+   ADMIN: Load Fleet 
 ═══════════════════════════════════════════ */
 async function loadFleet() {
   const grid = document.getElementById('fleet-grid');
   grid.innerHTML = '<div class="skeleton-loader"></div><div class="skeleton-loader"></div><div class="skeleton-loader"></div>';
   try {
     const res = await fetch(`${API}/aircraft`, {
-      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') } // TOKEN ADDED
+      headers: { 'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    const fleet = Array.isArray(data) ? data : (data.content || data.data || []);
+    const json = await res.json();
+
+    // THE FIX: Unwrap the ApiResponse for fleet
+    const fleet = json.data || json.content || (Array.isArray(json) ? json : []);
 
     if (!fleet.length) {
       grid.innerHTML = '<p style="color:var(--silver)">No aircraft found.</p>';
@@ -1340,12 +1320,11 @@ async function loadFleet() {
 
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load fleet: ${err.message}</div>`;
-    showToast('Could not fetch fleet data.', 'error');
   }
 }
 
 /* ═══════════════════════════════════════════
-   ADMIN: Assign Staff Shift (Protected)
+   ADMIN: Assign Staff Shift
 ═══════════════════════════════════════════ */
 document.getElementById('assign-shift-btn')?.addEventListener('click', async () => {
   const staffId = document.getElementById('shift-staff-id').value;
@@ -1373,7 +1352,7 @@ document.getElementById('assign-shift-btn')?.addEventListener('click', async () 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token') // TOKEN ADDED
+        'Authorization': 'Bearer ' + sessionStorage.getItem('jwt_token')
       },
       body: JSON.stringify({
         staff_id: parseInt(staffId),
@@ -1388,13 +1367,9 @@ document.getElementById('assign-shift-btn')?.addEventListener('click', async () 
     if (res.ok) {
       showResult(resultEl, `✅ ${data.message}`, true);
       showToast('Shift scheduled.', 'success');
-
-      document.getElementById('shift-staff-id').value = '';
-      document.getElementById('shift-role').value = '';
-      document.getElementById('shift-start').value = '';
-      document.getElementById('shift-end').value = '';
+      document.querySelectorAll('#view-roster input').forEach(i => i.value = '');
     } else {
-      showResult(resultEl, `❌ ${data.error}`, false);
+      showResult(resultEl, `❌ ${data.message || data.error}`, false);
       showToast('Scheduling failed.', 'error');
     }
   } catch (err) {
