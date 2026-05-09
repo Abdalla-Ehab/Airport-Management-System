@@ -1,7 +1,7 @@
 package com.airport.backend.repository;
 
 import com.airport.backend.entity.Flight;
-import com.airport.backend.enums.FlightStatus;
+// import com.airport.backend.enums.FlightStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
