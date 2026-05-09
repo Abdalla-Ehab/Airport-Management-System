@@ -1,6 +1,8 @@
 package com.airport.backend.service;
 
 import com.airport.backend.dto.LoginRequest;
+import com.airport.backend.dto.PassengerRegisterRequest; // Added import!
+import com.airport.backend.dto.StaffRegisterRequest;     // Added import!
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
 import com.airport.backend.repository.PassengerRepository;
@@ -82,28 +84,52 @@ public class AuthService {
         return jwtService.generateToken(extraClaims, userDetails);
     }
 
-    // --- REGISTRATION LOGIC ---
+// --- REGISTRATION LOGIC ---
     @Transactional
-    public void registerPassenger(Passenger newPassenger) {
-        if (passengerRepository.findByUsername(newPassenger.getUsername()).isPresent() ||
-            staffRepository.findByUsername(newPassenger.getUsername()).isPresent()) {
+    public void registerPassenger(PassengerRegisterRequest dto) {
+        if (passengerRepository.findByUsername(dto.getUsername()).isPresent() ||
+            staffRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new RuntimeException("Username is already taken.");
         }
         
-        newPassenger.setPassword(passwordEncoder.encode(newPassenger.getPassword()));
+        // Manual Mapping: The Firewall
+        Passenger newPassenger = new Passenger();
+        
+        // Changed these to camelCase to match your Passenger entity!
+        newPassenger.setFirstName(dto.getFirstName()); 
+        newPassenger.setLastName(dto.getLastName());
+        newPassenger.setEmail(dto.getEmail());
+        newPassenger.setPhoneNumber(dto.getPhoneNumber());
+        newPassenger.setPassportNo(dto.getPassportNo());
+        newPassenger.setUsername(dto.getUsername());
+        
+        // Hash the password
+        newPassenger.setPassword(passwordEncoder.encode(dto.getPassword()));
+        
         passengerRepository.save(newPassenger);
     }
 
     @Transactional
-    public void registerStaff(Staff newStaff) {
-        if (staffRepository.findByUsername(newStaff.getUsername()).isPresent() ||
-            passengerRepository.findByUsername(newStaff.getUsername()).isPresent()) {
+    public void registerStaff(StaffRegisterRequest dto) {
+        if (staffRepository.findByUsername(dto.getUsername()).isPresent() ||
+            passengerRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new RuntimeException("Username is already taken.");
         }
 
-        newStaff.setPassword(passwordEncoder.encode(newStaff.getPassword()));
+        // Manual Mapping: The Firewall
+        Staff newStaff = new Staff();
+        newStaff.setFirst_name(dto.getFirst_name()); 
+        newStaff.setLast_name(dto.getLast_name());
+        newStaff.setEmail(dto.getEmail());
+        newStaff.setPhone_number(dto.getPhone_number());
+        newStaff.setRole(dto.getRole());
+        newStaff.setDept_id(dto.getDept_id());
+        newStaff.setUsername(dto.getUsername());
+
+        // System-controlled fields
+        newStaff.setPassword(passwordEncoder.encode(dto.getPassword()));
         newStaff.setHire_date(LocalDate.now());
         
         staffRepository.save(newStaff);
     }
-}
+} // <-- This is the missing bracket!

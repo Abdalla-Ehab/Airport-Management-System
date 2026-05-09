@@ -1,6 +1,8 @@
 package com.airport.backend.controller;
 
 import com.airport.backend.dto.LoginRequest;
+import com.airport.backend.dto.PassengerRegisterRequest;
+import com.airport.backend.dto.StaffRegisterRequest;
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
 import com.airport.backend.service.AuthService;
@@ -29,22 +31,21 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register/passenger")
-    public ResponseEntity<?> registerPassenger(@RequestBody Passenger passenger) {
+@PostMapping("/register/passenger")
+    public ResponseEntity<?> registerPassenger(@RequestBody PassengerRegisterRequest request) {
         try {
-            authService.registerPassenger(passenger);
+            authService.registerPassenger(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Passenger registered successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Only Admins can register new Staff members
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register/staff")
-    public ResponseEntity<?> registerStaff(@RequestBody Staff staff) {
+    public ResponseEntity<?> registerStaff(@RequestBody StaffRegisterRequest request) {
         try {
-            authService.registerStaff(staff);
+            authService.registerStaff(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Staff member registered successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
