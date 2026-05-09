@@ -1110,3 +1110,56 @@ body {
 
     gap: 18px;
 }
+
+.status-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(160px, 1fr));
+
+    gap: 16px;
+
+    margin-top: 16px;
+}
+
+.flight-header {
+
+    font-size: 1.1rem;
+
+    font-weight: bold;
+
+    margin-bottom: 16px;
+}
+
+.flight-result-card {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+.flight-times {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.flight-duration {
+
+    opacity: .7;
+}
+
+.flight-price {
+
+    font-size: 1.2rem;
+
+    font-weight: bold;
+
+    color: var(--sky-light);
+}
