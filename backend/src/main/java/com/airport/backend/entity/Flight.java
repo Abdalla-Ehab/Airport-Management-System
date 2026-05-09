@@ -3,6 +3,8 @@ package com.airport.backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import com.airport.backend.enums.FlightStatus;
+
 @Entity
 @Table(name = "flight")
 public class Flight {
@@ -10,8 +12,8 @@ public class Flight {
     private Long flight_id;
 
     private String flight_number;
-    private String status;
-    private LocalDateTime departure_time;
+    @Enumerated(EnumType.STRING)
+    private FlightStatus status;    private LocalDateTime departure_time;
     private LocalDateTime arrival_time;
 
     // --- ENTERPRISE JPA RELATIONSHIPS ---
@@ -46,8 +48,6 @@ public class Flight {
     public String getFlight_number() { return flight_number; }
     public void setFlight_number(String flight_number) { this.flight_number = flight_number; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
 
     public LocalDateTime getDeparture_time() { return departure_time; }
     public void setDeparture_time(LocalDateTime departure_time) { this.departure_time = departure_time; }
@@ -72,4 +72,10 @@ public class Flight {
 
     public Airport getArrivalAirport() { return arrivalAirport; }
     public void setArrivalAirport(Airport arrivalAirport) { this.arrivalAirport = arrivalAirport; }
+    public FlightStatus getStatus() {
+        return status;
+    }
+    public void setStatus(FlightStatus status) {
+        this.status = status;
+    }
 }

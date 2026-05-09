@@ -3,6 +3,7 @@ package com.airport.backend.service;
 import com.airport.backend.entity.BoardingPass;
 import com.airport.backend.entity.Booking;
 import com.airport.backend.entity.Flight;
+import com.airport.backend.enums.FlightStatus; // IMPORTANT IMPORT
 import com.airport.backend.repository.BoardingPassRepository;
 import com.airport.backend.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,6 @@ public class GateService {
 
     @Autowired private FlightRepository flightRepository;
     @Autowired private BoardingPassRepository boardingPassRepository;
-    
-    // Look! BookingRepository is completely gone!
 
     // --- FLIGHT STATUS MANAGEMENT ---
     @Transactional
@@ -26,7 +25,8 @@ public class GateService {
         Flight flight = flightRepository.findById(flightId)
                 .orElseThrow(() -> new RuntimeException("Flight not found."));
 
-        flight.setStatus(newStatus.toUpperCase());
+        // THE FIX: Convert the String input to the FlightStatus Enum
+        flight.setStatus(FlightStatus.valueOf(newStatus.toUpperCase()));
         flightRepository.save(flight);
     }
 
@@ -38,13 +38,15 @@ public class GateService {
         BoardingPass pass = boardingPassRepository.findById(boardingPassId)
                 .orElseThrow(() -> new RuntimeException("Invalid Boarding Pass ID."));
 
-        // 2 & 3. THE ULTIMATE MAGIC OF JPA!
+        // 2 & 3. JPA Relationship Navigation
         Booking booking = pass.getBooking();
         Flight flight = booking.getFlight();
         
         // 4. Gate Verification: Is the flight actually boarding?
-        if (!"BOARDING".equalsIgnoreCase(flight.getStatus())) {
-            throw new RuntimeException("Boarding Rejected: Flight is currently " + flight.getStatus() + ".");
+        // THE FIX: Compare the Enum directly with FlightStatus.BOARDING
+        if (flight.getStatus() != FlightStatus.BOARDING) {
+            String currentStatus = flight.getStatus() != null ? flight.getStatus().name() : "UNKNOWN";
+            throw new RuntimeException("Boarding Rejected: Flight is currently " + currentStatus + ".");
         }
 
         // 5. Security Verification: Did they already scan this pass?
@@ -56,7 +58,7 @@ public class GateService {
         pass.setIs_boarded(true);
         boardingPassRepository.save(pass);
 
-        // 7. Return success data to the Gate Agent's screen
+        // 7. Return success data
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Passenger successfully boarded.");
         response.put("seat", booking.getSeat_no());
