@@ -24,8 +24,6 @@ public class CheckInServiceImpl implements CheckInService {
     @Autowired private BookingRepository bookingRepository;
     @Autowired private BoardingPassRepository boardingPassRepository;
     @Autowired private PassengerRepository passengerRepository;
-    
-    // LOOK! We completely deleted the FlightRepository. We don't need it!
 
     @Override
     @Transactional
@@ -38,13 +36,10 @@ public class CheckInServiceImpl implements CheckInService {
                 .orElseThrow(() -> new ResourceNotFoundException("Check-In Failed: Ticket Number " + ticketNo + " does not exist."));
 
         // SECURITY CHECK: IDOR Protection
-        // REACHING THROUGH THE PASSENGER OBJECT!
         if (!booking.getPassenger().getPassengerId().equals(loggedInUser.getPassengerId())) {
             throw new RuntimeException("Security Violation: You do not have permission to check in this ticket.");
         }
 
-        // Prevent Double Check-In
-        // (Assuming your BoardingPass repository method is findByTicket_no or findByTicketNumber)
         if (boardingPassRepository.findByTicketNumber(ticketNo).isPresent()) {
             throw new BusinessValidationException("Check-In Failed: A boarding pass has already been issued for Ticket " + ticketNo + "!");
         }
@@ -57,19 +52,19 @@ public class CheckInServiceImpl implements CheckInService {
         boardingPassRepository.save(boardingPass);
 
         // --- THE MAGIC OF JPA ---
-        // We just grab the flight directly from the booking object!
         Flight f = booking.getFlight();
 
         return new CheckInResponse(
                 "Success! You are checked in.",
                 ticketNo,
-                f.getFlight_id(), // REACHING THROUGH THE FLIGHT OBJECT
+                f.getFlight_id(),
                 booking.getSeat_no(),
                 booking.getClass_name(),
                 boardingPass.getSequence_number(),
-                f.getDeparture_gate_id(), // REACHING THROUGH THE FLIGHT OBJECT
-                f.getDeparture_airport_id(), // REACHING THROUGH THE FLIGHT OBJECT
-                f.getDeparture_time() // REACHING THROUGH THE FLIGHT OBJECT
+                // REACHING THROUGH THE OBJECTS:
+                f.getDepartureGate() != null ? f.getDepartureGate().getGate_id() : null,
+                f.getDepartureAirport() != null ? f.getDepartureAirport().getAirport_id() : null,
+                f.getDeparture_time()
         );
     }
 }

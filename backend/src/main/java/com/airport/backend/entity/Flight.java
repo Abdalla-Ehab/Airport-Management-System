@@ -1,4 +1,5 @@
 package com.airport.backend.entity;
+
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -7,81 +8,68 @@ import java.time.LocalDateTime;
 public class Flight {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long flight_id;
-    private LocalDateTime departure_time;
-    private LocalDateTime arrival_time;
-    private Long airline_id;
-    private Long aircraft_id;
-    private Long departure_gate_id;
-    private Long arrival_gate_id;
-    private Long departure_airport_id;
-    private Long arrival_airport_id;
+
     private String flight_number;
     private String status;
-    public Long getFlight_id() {
-        return flight_id;
-    }
-    public void setFlight_id(Long flight_id) {
-        this.flight_id = flight_id;
-    }
-    public LocalDateTime getDeparture_time() {
-        return departure_time;
-    }
-    public void setDeparture_time(LocalDateTime departure_time) {
-        this.departure_time = departure_time;
-    }
-    public LocalDateTime getArrival_time() {
-        return arrival_time;
-    }
-    public void setArrival_time(LocalDateTime arrival_time) {
-        this.arrival_time = arrival_time;
-    }
-    public Long getAirline_id() {
-        return airline_id;
-    }
-    public void setAirline_id(Long airline_id) {
-        this.airline_id = airline_id;
-    }
-    public Long getAircraft_id() {
-        return aircraft_id;
-    }
-    public void setAircraft_id(Long aircraft_id) {
-        this.aircraft_id = aircraft_id;
-    }
-    public Long getDeparture_gate_id() {
-        return departure_gate_id;
-    }
-    public void setDeparture_gate_id(Long departure_gate_id) {
-        this.departure_gate_id = departure_gate_id;
-    }
-    public Long getArrival_gate_id() {
-        return arrival_gate_id;
-    }
-    public void setArrival_gate_id(Long arrival_gate_id) {
-        this.arrival_gate_id = arrival_gate_id;
-    }
-    public Long getDeparture_airport_id() {
-        return departure_airport_id;
-    }
-    public void setDeparture_airport_id(Long departure_airport_id) {
-        this.departure_airport_id = departure_airport_id;
-    }
-    public Long getArrival_airport_id() {
-        return arrival_airport_id;
-    }
-    public void setArrival_airport_id(Long arrival_airport_id) {
-        this.arrival_airport_id = arrival_airport_id;
-    }
-    public String getFlight_number() {
-        return flight_number;
-    }
-    public void setFlight_number(String flight_number) {
-        this.flight_number = flight_number;
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    
+    private LocalDateTime departure_time;
+    private LocalDateTime arrival_time;
+
+    // --- ENTERPRISE JPA RELATIONSHIPS ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "airline_id")
+    private Airline airline;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aircraft_id")
+    private Aircraft aircraft;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_gate_id")
+    private Gate departureGate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_gate_id")
+    private Gate arrivalGate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departure_airport_id")
+    private Airport departureAirport;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "arrival_airport_id")
+    private Airport arrivalAirport;
+
+    // --- GETTERS AND SETTERS ---
+    public Long getFlight_id() { return flight_id; }
+    public void setFlight_id(Long flight_id) { this.flight_id = flight_id; }
+
+    public String getFlight_number() { return flight_number; }
+    public void setFlight_number(String flight_number) { this.flight_number = flight_number; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public LocalDateTime getDeparture_time() { return departure_time; }
+    public void setDeparture_time(LocalDateTime departure_time) { this.departure_time = departure_time; }
+
+    public LocalDateTime getArrival_time() { return arrival_time; }
+    public void setArrival_time(LocalDateTime arrival_time) { this.arrival_time = arrival_time; }
+
+    public Airline getAirline() { return airline; }
+    public void setAirline(Airline airline) { this.airline = airline; }
+
+    public Aircraft getAircraft() { return aircraft; }
+    public void setAircraft(Aircraft aircraft) { this.aircraft = aircraft; }
+
+    public Gate getDepartureGate() { return departureGate; }
+    public void setDepartureGate(Gate departureGate) { this.departureGate = departureGate; }
+
+    public Gate getArrivalGate() { return arrivalGate; }
+    public void setArrivalGate(Gate arrivalGate) { this.arrivalGate = arrivalGate; }
+
+    public Airport getDepartureAirport() { return departureAirport; }
+    public void setDepartureAirport(Airport departureAirport) { this.departureAirport = departureAirport; }
+
+    public Airport getArrivalAirport() { return arrivalAirport; }
+    public void setArrivalAirport(Airport arrivalAirport) { this.arrivalAirport = arrivalAirport; }
 }
