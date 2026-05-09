@@ -4,7 +4,6 @@ import com.airport.backend.entity.BoardingPass;
 import com.airport.backend.entity.Booking;
 import com.airport.backend.entity.Flight;
 import com.airport.backend.repository.BoardingPassRepository;
-import com.airport.backend.repository.BookingRepository;
 import com.airport.backend.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,8 @@ public class GateService {
 
     @Autowired private FlightRepository flightRepository;
     @Autowired private BoardingPassRepository boardingPassRepository;
-    @Autowired private BookingRepository bookingRepository; 
+    
+    // Look! BookingRepository is completely gone!
 
     // --- FLIGHT STATUS MANAGEMENT ---
     @Transactional
@@ -38,11 +38,8 @@ public class GateService {
         BoardingPass pass = boardingPassRepository.findById(boardingPassId)
                 .orElseThrow(() -> new RuntimeException("Invalid Boarding Pass ID."));
 
-        // 2. Use the ticket_no on the pass to find the actual Booking details
-        Booking booking = bookingRepository.findById(pass.getTicket_no())
-                .orElseThrow(() -> new RuntimeException("Booking record not found for this pass."));
-
-        // 3. THE MAGIC OF JPA: The flight is already loaded inside the booking!
+        // 2 & 3. THE ULTIMATE MAGIC OF JPA!
+        Booking booking = pass.getBooking();
         Flight flight = booking.getFlight();
         
         // 4. Gate Verification: Is the flight actually boarding?

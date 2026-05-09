@@ -51,7 +51,7 @@ public class CheckInServiceImpl implements CheckInService {
 
         // Generate Boarding Pass
         BoardingPass boardingPass = new BoardingPass();
-        boardingPass.setTicket_no(ticketNo);
+        boardingPass.setBooking(booking);
         boardingPass.setIssue_time(LocalDateTime.now());
         boardingPass.setSequence_number(new Random().nextInt(150) + 1);
         boardingPassRepository.save(boardingPass);
