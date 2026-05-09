@@ -1,16 +1,24 @@
+import { initLogin }
+from './auth/login.js';
 
-import { initLogin } from './auth/login.js';
-import { initRegister } from './auth/register.js';
-import { initNavigation } from './navigation.js';
-import { loadFlights } from './booking/bookingView.js';
+import { initRegister }
+from './auth/register.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+import { initLogout }
+from './auth/logout.js';
 
-    initLogin();
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
 
-    initRegister();
+        initLogin();
 
-    initNavigation();
+        initRegister();
 
-    loadFlights();
-});
+        initLogout();
+
+        console.log(
+            'Airport Management System Initialized'
+        );
+    }
+);

@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>twixNexus — Airport Management System</title>
-    <link rel="stylesheet" href="/" />
+    <link rel="stylesheet" href="/backend/src/main/resources/static/css/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
@@ -30,7 +30,7 @@
                 <button id="tab-register" class="btn-primary btn-outline flex-1 btn-pad">Register</button>
             </div>
 
-            <div id="form-login">
+            <form id="login-form">
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
@@ -40,9 +40,9 @@
                     <input type="password" id="login-password" placeholder="••••••••" />
                 </div>
                 <button class="btn-primary mt-20" id="login-btn">Sign In</button>
-            </div>
+            </form>
 
-            <div id="form-register" class="hidden">
+            <form id="register-form" class="hidden">
                 <div class="form-row mt-15">
                     <div class="form-group">
                         <label>Date of Birth</label>
@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <button class="btn-primary mt-20" id="register-btn">Create Account</button>
-            </div>
+            </form>
 
             <div id="auth-error" class="msg-error hidden"></div>
         </div>
@@ -481,7 +481,8 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="/js/main.js"></script>
+    <!-- <script src="legacy-script.js" defer></script> -->
 </body>
 
 </html>

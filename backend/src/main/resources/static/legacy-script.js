@@ -418,25 +418,48 @@ async function loadAirports() {
       return;
     }
 
-    grid.innerHTML = airports.map(a => {
-      const country = a.country ? `, ${a.country}` : '';
-      const name = a.airport_name || a.airportName || a.name || 'Airport';
-      const city = a.city || a.location || 'Unknown City';
-      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(name + ' ' + city)}`;
+    grid.innerHTML = '';
 
-      return `
-        const card = document.createElement('div');
-        card.className = 'data-card hover-lift';
-        card.addEventListener('click', () => {
-          window.open(mapsUrl, '_blank');
-        });
-          <div class="card-icon">🏢</div>
-            <h3>${escHtml(name)}</h3>
-            <div class="card-detail">📍 ${escHtml(city)}${escHtml(country)}</div>
-            <div class="card-action-link">🌍 View on Map ↗</div>
+    airports.forEach(a => {
+
+      const country = a.country ? `, ${a.country}` : '';
+
+      const name =
+        a.airport_name ||
+        a.airportName ||
+        a.name ||
+        'Airport';
+
+      const city =
+        a.city ||
+        a.location ||
+        'Unknown City';
+
+      const mapsUrl =
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + city)
+        }`;
+
+      const card = document.createElement('div');
+
+      card.className = 'data-card hover-lift';
+
+      card.addEventListener('click', () => {
+        window.open(mapsUrl, '_blank');
+      });
+
+      card.innerHTML = `
+        <div class="card-icon">🏢</div>
+        <h3>${escHtml(name)}</h3>
+        <div class="card-detail">
+            📍 ${escHtml(city)}${escHtml(country)}
         </div>
-      `;
-    }).join('');
+        <div class="card-action-link">
+            🌍 View on Map ↗
+        </div>
+    `;
+
+      grid.appendChild(card);
+    });
 
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Failed to load airports: ${err.message}</div>`;
@@ -510,17 +533,57 @@ document.getElementById('search-flights-btn').addEventListener('click', async ()
       const pseudoPrice = 150 + (f.flight_id % 300);
 
       const card = document.createElement('div');
+
       card.className = 'flight-result-card';
+
       card.innerHTML = `
-                <div style="flex: 1; color: var(--sky-light); font-weight: bold;">${fn}</div>
-                <div class="flight-times">
-                    <div class="time-block"><h3>${depTime}</h3><p>Departure</p></div>
-                    <div class="flight-duration">Direct</div>
-                    <div class="time-block"><h3>${arrTime}</h3><p>Arrival</p></div>
-                </div>
-                <div class="flight-price">US$${pseudoPrice}</div>
-                <div class="flight-action"><button class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;" onclick="selectFlight(${f.flight_id}, '${fn}')">Select</button></div>
-            `;
+    <div style="flex: 1; color: var(--sky-light); font-weight: bold;">
+        ${fn}
+    </div>
+
+    <div class="flight-times">
+        <div class="time-block">
+            <h3>${depTime}</h3>
+            <p>Departure</p>
+        </div>
+
+        <div class="flight-duration">
+            Direct
+        </div>
+
+        <div class="time-block">
+            <h3>${arrTime}</h3>
+            <p>Arrival</p>
+        </div>
+    </div>
+
+    <div class="flight-price">
+        US$${pseudoPrice}
+    </div>
+`;
+
+      const btnContainer = document.createElement('div');
+
+      btnContainer.className = 'flight-action';
+
+      const selectBtn = document.createElement('button');
+
+      selectBtn.className = 'btn-primary';
+
+      selectBtn.style.padding = '8px 16px';
+
+      selectBtn.style.fontSize = '0.9rem';
+
+      selectBtn.textContent = 'Select';
+
+      selectBtn.addEventListener('click', () => {
+        selectFlight(f.flight_id, fn);
+      });
+
+      btnContainer.appendChild(selectBtn);
+
+      card.appendChild(btnContainer);
+
       listEl.appendChild(card);
     });
 
@@ -1156,34 +1219,102 @@ async function initMaintenanceView() {
       return;
     }
 
-    grid.innerHTML = fleet.map(a => {
-      const status = a.status || 'ACTIVE';
-      let badgeColor = 'var(--success)';
-      let icon = '✈️';
-      if (status === 'GROUNDED') { badgeColor = 'var(--error)'; icon = '🛑'; }
-      if (status === 'MAINTENANCE') { badgeColor = 'var(--warn)'; icon = '🔧'; }
+grid.innerHTML = '';
 
-      return `
-                <div class="data-card" id="aircraft-card-${a.aircraft_id}">
-                    <div class="card-icon">${icon}</div>
-                    <h3>${escHtml(a.type)}</h3>
-                    <div class="card-detail" style="font-family: monospace; letter-spacing: 1px;">${escHtml(a.registration_no)}</div>
-                    
-                    <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
-                        <span style="background: ${badgeColor}; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
-                            ${status}
-                        </span>
-                        
-                        <select class="input-glass" style="width: auto; padding: 4px 8px; font-size: 0.8rem;" onchange="updateAircraftStatus(${a.aircraft_id}, this.value)">
-                            <option value="">Change Status...</option>
-                            <option value="ACTIVE">Mark ACTIVE</option>
-                            <option value="MAINTENANCE">Send to MAINTENANCE</option>
-                            <option value="GROUNDED">GROUND Aircraft</option>
-                        </select>
-                    </div>
-                </div>
-            `;
-    }).join('');
+fleet.forEach(a => {
+
+    const status = a.status || 'ACTIVE';
+
+    let badgeColor = 'var(--success)';
+    let icon = '✈️';
+
+    if (status === 'GROUNDED') {
+        badgeColor = 'var(--error)';
+        icon = '🛑';
+    }
+
+    if (status === 'MAINTENANCE') {
+        badgeColor = 'var(--warn)';
+        icon = '🔧';
+    }
+
+    const card = document.createElement('div');
+
+    card.className = 'data-card';
+
+    card.id = `aircraft-card-${a.aircraft_id}`;
+
+    card.innerHTML = `
+        <div class="card-icon">${icon}</div>
+
+        <h3>${escHtml(a.type)}</h3>
+
+        <div class="card-detail"
+             style="font-family: monospace; letter-spacing: 1px;">
+             ${escHtml(a.registration_no)}
+        </div>
+
+        <div class="maintenance-controls">
+            <span
+                class="status-badge"
+                style="
+                    background:${badgeColor};
+                    color:#000;
+                    padding:4px 8px;
+                    border-radius:4px;
+                    font-size:.75rem;
+                    font-weight:bold;
+                "
+            >
+                ${status}
+            </span>
+        </div>
+    `;
+
+    const controls =
+        card.querySelector('.maintenance-controls');
+
+    const select =
+        document.createElement('select');
+
+    select.className = 'input-glass';
+
+    select.style.width = 'auto';
+
+    select.style.padding = '4px 8px';
+
+    select.style.fontSize = '0.8rem';
+
+    select.innerHTML = `
+        <option value="">
+            Change Status...
+        </option>
+
+        <option value="ACTIVE">
+            Mark ACTIVE
+        </option>
+
+        <option value="MAINTENANCE">
+            Send to MAINTENANCE
+        </option>
+
+        <option value="GROUNDED">
+            GROUND Aircraft
+        </option>
+    `;
+
+    select.addEventListener('change', (e) => {
+        updateAircraftStatus(
+            a.aircraft_id,
+            e.target.value
+        );
+    });
+
+    controls.appendChild(select);
+
+    grid.appendChild(card);
+
+});
 
   } catch (err) {
     grid.innerHTML = `<div class="result-area result-error">Network error loading fleet.</div>`;

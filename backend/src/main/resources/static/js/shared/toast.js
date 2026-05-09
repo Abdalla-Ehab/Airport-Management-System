@@ -1,20 +1,40 @@
+export function showToast(message, type = 'info') {
 
-export function showToast(message, type = 'success') {
+    const icons = {
+        success: '✅',
+        error: '❌',
+        info: 'ℹ️'
+    };
 
     const container =
         document.getElementById('toast-container');
 
-    if (!container) return;
+    const toast =
+        document.createElement('div');
 
-    const toast = document.createElement('div');
+    toast.className =
+        `toast toast-${type}`;
 
-    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <span class="toast-icon">
+            ${icons[type]}
+        </span>
 
-    toast.textContent = message;
+        <span>${message}</span>
+    `;
 
     container.appendChild(toast);
 
     setTimeout(() => {
-        toast.remove();
-    }, 3000);
+
+        toast.style.animation =
+            'slideOut 0.3s cubic-bezier(.4,0,.2,1) forwards';
+
+        setTimeout(() => {
+
+            toast.remove();
+
+        }, 300);
+
+    }, 3800);
 }

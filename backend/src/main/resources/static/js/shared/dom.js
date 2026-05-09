@@ -1,15 +1,19 @@
-
 export function $(id) {
     return document.getElementById(id);
 }
 
-export function create(tag, className = '') {
+export function show(el) {
+    el.classList.remove('hidden');
+}
 
-    const el = document.createElement(tag);
+export function hide(el) {
+    el.classList.add('hidden');
+}
 
-    if (className) {
-        el.className = className;
-    }
+export function activate(el) {
+    el.classList.add('active');
+}
 
-    return el;
+export function deactivate(el) {
+    el.classList.remove('active');
 }

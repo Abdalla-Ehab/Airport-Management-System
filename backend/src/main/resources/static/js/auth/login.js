@@ -1,35 +1,112 @@
+import { loginRequest } from '../api/authApi.js';
 
-import { login } from '../api/authApi.js';
-import { saveToken, saveUser } from '../shared/storage.js';
-import { showToast } from '../shared/toast.js';
+import {
+    setToken,
+    setCurrentUser
+} from '../shared/storage.js';
+
+import { state } from '../shared/state.js';
+
+import { showToast }
+from '../shared/toast.js';
+
+import {
+    hide,
+    show
+} from '../shared/dom.js';
+
+import { buildNavigation }
+from '../navigation.js';
 
 export function initLogin() {
 
-    const form = document.getElementById('login-form');
+    const btn =
+        document.getElementById('login-btn');
 
-    if (!form) return;
+    btn.addEventListener('click', login);
+}
 
-    form.addEventListener('submit', async (e) => {
+async function login() {
 
-        e.preventDefault();
+    const username =
+        document.getElementById('login-username')
+        .value
+        .trim();
 
-        const username = document.getElementById('login-username').value;
-        const password = document.getElementById('login-password').value;
+    const password =
+        document.getElementById('login-password')
+        .value
+        .trim();
 
-        try {
+    const errEl =
+        document.getElementById('auth-error');
 
-            const payload = await login(username, password);
+    const btn =
+        document.getElementById('login-btn');
 
-            saveToken(payload.token);
-            saveUser(payload);
+    if (!username || !password) {
 
-            showToast('Login successful', 'success');
+        errEl.textContent =
+            'Please enter username and password';
 
-            location.reload();
+        show(errEl);
 
-        } catch (err) {
+        return;
+    }
 
-            showToast(err.message, 'error');
+    try {
+
+        btn.disabled = true;
+
+        btn.innerHTML =
+            'Authenticating...';
+
+        const user =
+            await loginRequest(
+                username,
+                password
+            );
+
+        state.currentUser = user;
+
+        setCurrentUser(user);
+
+        if (user.token) {
+            setToken(user.token);
         }
-    });
+
+        document.getElementById('nav-username')
+            .textContent = user.username;
+
+        document.getElementById('nav-role')
+            .textContent = user.role;
+
+        document.getElementById('nav-avatar')
+            .textContent =
+                user.username[0].toUpperCase();
+
+        hide(document.getElementById('login-screen'));
+
+        show(document.getElementById('app-shell'));
+
+        buildNavigation(user.role);
+
+        showToast(
+            `Welcome back ${user.username}`,
+            'success'
+        );
+
+    } catch (err) {
+
+        errEl.textContent =
+            err.message;
+
+        show(errEl);
+
+    } finally {
+
+        btn.disabled = false;
+
+        btn.innerHTML = 'Sign In';
+    }
 }

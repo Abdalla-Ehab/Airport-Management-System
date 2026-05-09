@@ -1,13 +1,21 @@
-
 export function navigate(viewId) {
 
     document
         .querySelectorAll('.view')
-        .forEach(v => v.classList.add('hidden'));
+        .forEach(v => {
 
-    const view = document.getElementById(viewId);
+            v.classList.add('hidden');
+            v.classList.remove('active');
+        });
 
-    if (view) {
-        view.classList.remove('hidden');
-    }
+    const target =
+        document.getElementById(
+            `view-${viewId}`
+        );
+
+    if (!target) return;
+
+    target.classList.remove('hidden');
+
+    target.classList.add('active');
 }

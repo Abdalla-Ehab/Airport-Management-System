@@ -980,3 +980,58 @@ body {
 .seat[data-class="Business"] { width: 40px; height: 40px; }
 .row-divider { width: 100%; height: 2px; background: rgba(0,0,0,0.1); margin: 10px 0; text-align: center; color: #6b7c96; font-size: 0.7rem; line-height: 0; }
 .row-divider span { background: #e0e5ec; padding: 0 10px; }
+
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px 18px;
+    margin-top: 12px;
+
+    border-radius: 12px;
+
+    backdrop-filter: blur(10px);
+
+    animation: slideIn .3s ease;
+}
+
+.toast-success {
+    background: rgba(16,185,129,.15);
+    border: 1px solid rgba(16,185,129,.35);
+}
+
+.toast-error {
+    background: rgba(239,68,68,.15);
+    border: 1px solid rgba(239,68,68,.35);
+}
+
+.toast-info {
+    background: rgba(59,130,246,.15);
+    border: 1px solid rgba(59,130,246,.35);
+}
+
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    z-index: 9999;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.hidden {
+    display: none !important;
+}

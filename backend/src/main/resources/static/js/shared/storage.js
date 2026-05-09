@@ -1,5 +1,4 @@
-
-export function saveToken(token) {
+export function setToken(token) {
     sessionStorage.setItem('jwt_token', token);
 }
 
@@ -7,16 +6,18 @@ export function getToken() {
     return sessionStorage.getItem('jwt_token');
 }
 
-export function saveUser(user) {
+export function clearSession() {
+    sessionStorage.clear();
+}
+
+export function setCurrentUser(user) {
     sessionStorage.setItem('current_user', JSON.stringify(user));
 }
 
-export function getUser() {
-    return JSON.parse(
-        sessionStorage.getItem('current_user')
-    );
-}
+export function getCurrentUser() {
+    const raw = sessionStorage.getItem('current_user');
 
-export function clearSession() {
-    sessionStorage.clear();
+    if (!raw) return null;
+
+    return JSON.parse(raw);
 }

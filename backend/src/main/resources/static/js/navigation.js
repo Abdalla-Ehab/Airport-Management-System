@@ -1,17 +1,80 @@
+import { navigate }
+from './router.js';
 
-import { navigate } from './router.js';
+const NAV_CONFIG = {
 
-export function initNavigation() {
+    passenger: [
+        {
+            view: 'home',
+            label: 'Airports'
+        },
+        {
+            view: 'book',
+            label: 'Book Flight'
+        },
+        {
+            view: 'status',
+            label: 'Flight Status'
+        }
+    ],
 
-    document
-        .querySelectorAll('[data-view]')
-        .forEach(link => {
+    staff: [
+        {
+            view: 'baggage',
+            label: 'Baggage'
+        },
+        {
+            view: 'scanner',
+            label: 'Scanner'
+        }
+    ],
 
-            link.addEventListener('click', () => {
+    admin: [
+        {
+            view: 'schedule',
+            label: 'Scheduler'
+        },
+        {
+            view: 'fleet',
+            label: 'Fleet'
+        }
+    ]
+};
 
-                const view = link.dataset.view;
+export function buildNavigation(role) {
 
-                navigate(view);
-            });
+    const container =
+        document.getElementById('nav-links');
+
+    container.innerHTML = '';
+
+    const items =
+        NAV_CONFIG[role] || [];
+
+    items.forEach(item => {
+
+        const li =
+            document.createElement('li');
+
+        const a =
+            document.createElement('a');
+
+        a.textContent =
+            item.label;
+
+        a.href = '#';
+
+        a.addEventListener('click', () => {
+
+            navigate(item.view);
         });
+
+        li.appendChild(a);
+
+        container.appendChild(li);
+    });
+
+    if (items.length) {
+        navigate(items[0].view);
+    }
 }

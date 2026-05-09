@@ -1,9 +1,12 @@
+import { API_BASE } from '../shared/constants.js';
+import { getToken } from '../shared/storage.js';
 
-export const API_BASE = 'http://localhost:8080/api';
+export async function apiRequest(
+    endpoint,
+    options = {}
+) {
 
-export async function apiRequest(endpoint, options = {}) {
-
-    const token = sessionStorage.getItem('jwt_token');
+    const token = getToken();
 
     const headers = {
         'Content-Type': 'application/json',
@@ -11,13 +14,16 @@ export async function apiRequest(endpoint, options = {}) {
     };
 
     if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-        ...options,
-        headers
-    });
+    const response = await fetch(
+        `${API_BASE}${endpoint}`,
+        {
+            ...options,
+            headers
+        }
+    );
 
     let data = null;
 
@@ -26,9 +32,9 @@ export async function apiRequest(endpoint, options = {}) {
     } catch {}
 
     if (!response.ok) {
+
         throw new Error(
             data?.message ||
-            data?.error ||
             'Request failed'
         );
     }
