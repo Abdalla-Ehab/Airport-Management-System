@@ -425,7 +425,11 @@ async function loadAirports() {
       const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(name + ' ' + city)}`;
 
       return `
-        <div class="data-card hover-lift" onclick="window.open('${mapsUrl}', '_blank')">
+        const card = document.createElement('div');
+        card.className = 'data-card hover-lift';
+        card.addEventListener('click', () => {
+          window.open(mapsUrl, '_blank');
+        });
           <div class="card-icon">🏢</div>
             <h3>${escHtml(name)}</h3>
             <div class="card-detail">📍 ${escHtml(city)}${escHtml(country)}</div>
