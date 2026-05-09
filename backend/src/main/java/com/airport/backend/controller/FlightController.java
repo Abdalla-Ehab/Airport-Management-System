@@ -1,5 +1,6 @@
 package com.airport.backend.controller;
 
+import com.airport.backend.dto.FlightRequest;
 import com.airport.backend.entity.Flight;
 import com.airport.backend.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,15 @@ public class FlightController {
         return flightService.getAllFlights();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> scheduleFlight(@RequestBody Flight flight) {
+    public ResponseEntity<?> scheduleFlight(@RequestBody FlightRequest request) {
         try {
-            Flight savedFlight = flightService.saveFlight(flight);
+            // THIS is the line that fixes the error!
+            Flight savedFlight = flightService.scheduleFlight(request);
             return ResponseEntity.ok(savedFlight); 
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to schedule flight: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

@@ -20,4 +20,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     // NEW: Check if the passenger is already booked on this exact flight
     @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight_id = :flightId AND b.passenger_id = :passengerId")
     long countByFlightAndPassenger(@Param("flightId") Long flightId, @Param("passengerId") Long passengerId);
+    // NEW: Find all bookings for a specific flight
+    @Query("SELECT b FROM Booking b WHERE b.flight_id = :flightId")
+    List<Booking> findByFlightId(@Param("flightId") Long flightId);
+
+    // NEW: Find all bookings for a specific passenger
+    @Query("SELECT b FROM Booking b WHERE b.passenger_id = :passengerId")
+    List<Booking> findByPassengerId(@Param("passengerId") Long passengerId);
 }
