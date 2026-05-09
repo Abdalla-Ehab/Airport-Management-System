@@ -1,11 +1,13 @@
 package com.airport.backend.enums;
 
 public enum FlightStatus {
+
     SCHEDULED,
     BOARDING,
-    DEPARTED,
-    IN_AIR,
-    LANDED,
+    GATE_CLOSED,
     DELAYED,
-    CANCELLED
+    DEPARTED,
+    LANDED,
+    CANCELLED,
+    DIVERTED
 }

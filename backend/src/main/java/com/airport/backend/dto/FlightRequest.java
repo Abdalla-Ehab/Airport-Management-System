@@ -11,6 +11,7 @@ public class FlightRequest {
     private Long departure_gate_id;
     private LocalDateTime departure_time;
     private LocalDateTime arrival_time;
+    private Long arrival_gate_id;
 
     // Getters and Setters
     public String getFlight_number() {
@@ -75,6 +76,14 @@ public class FlightRequest {
 
     public void setDeparture_gate_id(Long departure_gate_id) {
         this.departure_gate_id = departure_gate_id;
+    }
+
+    public Long getArrival_gate_id() {
+        return arrival_gate_id;
+    }
+
+    public void setArrival_gate_id(Long arrival_gate_id) {
+        this.arrival_gate_id = arrival_gate_id;
     }
 
 }
