@@ -3,6 +3,7 @@ package com.airport.backend.controller;
 import com.airport.backend.dto.BookFlightRequest;
 import com.airport.backend.response.BookingResponse;
 import com.airport.backend.service.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,25 +20,21 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody BookFlightRequest request, Authentication authentication) {
-        try {
-            List<BookingResponse> tickets = bookingService.createBooking(request, authentication.getName());
-            return ResponseEntity.ok(Map.of(
-                    "message", "Booking successful",
-                    "tickets", tickets
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+    public ResponseEntity<?> createBooking(@Valid @RequestBody BookFlightRequest request, Authentication authentication) {
+        // The @Valid annotation triggers the GlobalExceptionHandler if the data is bad!
+        List<BookingResponse> tickets = bookingService.createBooking(request, authentication.getName());
+        
+        return ResponseEntity.ok(Map.of(
+                "message", "Booking successful",
+                "tickets", tickets
+        ));
     }
 
     @GetMapping("/my")
     public ResponseEntity<?> getMyBookings(Authentication authentication) {
-        try {
-            List<BookingResponse> tickets = bookingService.getMyBookings(authentication.getName());
-            return ResponseEntity.ok(tickets);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        // If the service throws a RuntimeException, the GlobalExceptionHandler catches it!
+        List<BookingResponse> tickets = bookingService.getMyBookings(authentication.getName());
+        
+        return ResponseEntity.ok(tickets);
     }
 }
