@@ -11,20 +11,21 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     
-    @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight_id = ?1")
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight.flight_id = ?1")
     long countBookingsByFlightId(Long flightId);
     
-    @Query("SELECT b.seat_no FROM Booking b WHERE b.flight_id = :flightId")
+    @Query("SELECT b.seat_no FROM Booking b WHERE b.flight.flight_id = :flightId")
     List<String> findBookedSeatsByFlightId(@Param("flightId") Long flightId);
 
     // NEW: Check if the passenger is already booked on this exact flight
-    @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight_id = :flightId AND b.passenger_id = :passengerId")
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.flight.flight_id = :flightId AND b.passenger.passengerId = :passengerId")
     long countByFlightAndPassenger(@Param("flightId") Long flightId, @Param("passengerId") Long passengerId);
+
     // NEW: Find all bookings for a specific flight
-    @Query("SELECT b FROM Booking b WHERE b.flight_id = :flightId")
+    @Query("SELECT b FROM Booking b WHERE b.flight.flight_id = :flightId")
     List<Booking> findByFlightId(@Param("flightId") Long flightId);
 
     // NEW: Find all bookings for a specific passenger
-    @Query("SELECT b FROM Booking b WHERE b.passenger_id = :passengerId")
+    @Query("SELECT b FROM Booking b WHERE b.passenger.passengerId = :passengerId")
     List<Booking> findByPassengerId(@Param("passengerId") Long passengerId);
 }

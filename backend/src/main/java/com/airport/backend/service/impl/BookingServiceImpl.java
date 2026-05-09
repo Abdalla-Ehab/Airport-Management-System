@@ -22,60 +22,63 @@ import java.util.stream.Collectors;
 @Service
 public class BookingServiceImpl implements BookingService {
 
-    @Autowired private BookingRepository bookingRepository;
-    @Autowired private FlightRepository flightRepository;
-    @Autowired private PassengerRepository passengerRepository;
-    @Autowired private BookingValidationService validationService;
-    @Autowired private BookingMapper bookingMapper;
+        @Autowired
+        private BookingRepository bookingRepository;
+        @Autowired
+        private FlightRepository flightRepository;
+        @Autowired
+        private PassengerRepository passengerRepository;
+        @Autowired
+        private BookingValidationService validationService;
+        @Autowired
+        private BookingMapper bookingMapper;
 
-    @Override
-    @Transactional
-    public List<BookingResponse> createBooking(BookFlightRequest request, String username) {
-        
-        // 1. Fetch Entities
-        Passenger passenger = passengerRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Passenger not found"));
+        @Override
+        @Transactional
+        public List<BookingResponse> createBooking(BookFlightRequest request, String username) {
 
-        Flight flight = flightRepository.findById(request.getFlight_id()) 
-                .orElseThrow(() -> new RuntimeException("Flight not found"));
+                // 1. Fetch Entities
+                Passenger passenger = passengerRepository.findByUsername(username)
+                                .orElseThrow(() -> new RuntimeException("Passenger not found"));
 
-        // 2. Fetch Existing Bookings using our new custom query
-        List<Booking> existingBookings = bookingRepository.findByFlightId(flight.getFlight_id());
+                Flight flight = flightRepository.findById(request.getFlight_id())
+                                .orElseThrow(() -> new RuntimeException("Flight not found"));
 
-        // 3. Delegate to Validation Layer
-        validationService.validateSeatsAreAvailable(request.getSeat_nos(), existingBookings);
+                // 2. Fetch Existing Bookings using our new custom query
+                List<Booking> existingBookings = bookingRepository.findByFlightId(flight.getFlight_id());
 
-        // 4. Process Business Logic (Using strict ID mapping!)
-        List<Booking> newBookings = new ArrayList<>();
-        for (String seat : request.getSeat_nos()) {
-            Booking booking = new Booking();
-            booking.setFlight_id(flight.getFlight_id());       // Fixed!
-            booking.setPassenger_id(passenger.getPassengerId()); // Fixed!
-            booking.setSeat_no(seat);
-            booking.setClass_name(request.getClass_name());
-            
-            // Note: booking_time was removed because it doesn't exist in your entity!
-            
-            newBookings.add(booking);
+                // 3. Delegate to Validation Layer
+                validationService.validateSeatsAreAvailable(request.getSeat_nos(), existingBookings);
+
+                // 4. Process Business Logic
+                List<Booking> newBookings = new ArrayList<>();
+                for (String seat : request.getSeat_nos()) {
+                        Booking booking = new Booking();
+                        booking.setFlight(flight); // <--- Now passing the entire Flight object!
+                        booking.setPassenger(passenger); // <--- Now passing the entire Passenger object!
+                        booking.setSeat_no(seat);
+                        booking.setClass_name(request.getClass_name());
+
+                        newBookings.add(booking);
+                }
+
+                // 5. Persistence
+                bookingRepository.saveAll(newBookings);
+
+                // 6. Delegate to Mapper Layer
+                return newBookings.stream()
+                                .map(bookingMapper::toResponse)
+                                .collect(Collectors.toList());
         }
 
-        // 5. Persistence
-        bookingRepository.saveAll(newBookings);
+        @Override
+        public List<BookingResponse> getMyBookings(String username) {
+                Passenger passenger = passengerRepository.findByUsername(username)
+                                .orElseThrow(() -> new RuntimeException("Passenger not found"));
 
-        // 6. Delegate to Mapper Layer
-        return newBookings.stream()
-                .map(bookingMapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BookingResponse> getMyBookings(String username) {
-        Passenger passenger = passengerRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Passenger not found"));
-
-        // Using our new custom query here too!
-        return bookingRepository.findByPassengerId(passenger.getPassengerId()).stream()
-                .map(bookingMapper::toResponse)
-                .collect(Collectors.toList());
-    }
+                // Using our new custom query here too!
+                return bookingRepository.findByPassengerId(passenger.getPassengerId()).stream()
+                                .map(bookingMapper::toResponse)
+                                .collect(Collectors.toList());
+        }
 }

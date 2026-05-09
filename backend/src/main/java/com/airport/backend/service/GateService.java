@@ -42,10 +42,8 @@ public class GateService {
         Booking booking = bookingRepository.findById(pass.getTicket_no())
                 .orElseThrow(() -> new RuntimeException("Booking record not found for this pass."));
 
-        // 3. Use the flight_id on the Booking to find the actual Flight details
-        // Note: Make sure your Booking entity has getFlight_id() or getFlightId()
-        Flight flight = flightRepository.findById(booking.getFlight_id())
-                .orElseThrow(() -> new RuntimeException("Flight record not found."));
+        // 3. THE MAGIC OF JPA: The flight is already loaded inside the booking!
+        Flight flight = booking.getFlight();
         
         // 4. Gate Verification: Is the flight actually boarding?
         if (!"BOARDING".equalsIgnoreCase(flight.getStatus())) {

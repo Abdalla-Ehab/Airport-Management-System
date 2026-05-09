@@ -9,8 +9,8 @@ public class BookingMapper {
 
     public BookingResponse toResponse(Booking booking) {
         return new BookingResponse(
-            booking.getTicket_no(),    // Fixed: Uses ticket_no instead of booking_id
-            booking.getFlight_id(),    // Fixed: Pulls the ID directly
+            booking.getTicket_no(),
+            booking.getFlight().getFlight_id(), // REACHING THROUGH THE OBJECT!
             booking.getSeat_no(),
             booking.getClass_name()
         );
