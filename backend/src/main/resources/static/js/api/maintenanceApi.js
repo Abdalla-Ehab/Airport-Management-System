@@ -34,7 +34,7 @@ export async function getMaintenanceLogs() {
     );
 }
 
-export async function createMaintenanceRecord(
+export async function createMaintenanceLog(
     payload
 ) {
 
@@ -42,6 +42,7 @@ export async function createMaintenanceRecord(
         '/maintenance',
         {
             method: 'POST',
+
             body: JSON.stringify(payload)
         }
     );
