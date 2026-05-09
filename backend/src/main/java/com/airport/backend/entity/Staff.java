@@ -2,6 +2,8 @@ package com.airport.backend.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+import com.airport.backend.enums.Role;
+
 @Entity
 @Table(name = "staff")
 public class Staff {
@@ -21,7 +23,11 @@ public class Staff {
     private String last_name;
     private String username;
     private String password;
-    private String role;
+    
+    // THIS IS THE CRITICAL FIX! Tells the database to use text ("ADMIN") instead of numbers
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    
     private String email;
     private String phone_number;
     private LocalDate hire_date;
@@ -48,11 +54,11 @@ public class Staff {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 
     public String getPhone_number() { return phone_number; }
     public void setPhone_number(String phone_number) { this.phone_number = phone_number; }

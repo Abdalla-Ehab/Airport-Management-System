@@ -1,6 +1,7 @@
 package com.airport.backend.config;
 
 import com.airport.backend.entity.Staff;
+import com.airport.backend.enums.Role; // THE NEW IMPORT
 import com.airport.backend.repository.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -40,7 +41,8 @@ public class DataSeeder implements CommandLineRunner {
             // CRITICAL: We must hash the password before saving!
             admin.setPassword(passwordEncoder.encode("admin123"));
             
-            admin.setRole("ADMIN"); 
+            // THE FIX: Use the strict Enum object instead of a String
+            admin.setRole(Role.ADMIN); 
             admin.setHire_date(LocalDate.now());
 
             staffRepository.save(admin);

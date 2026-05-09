@@ -1,10 +1,11 @@
 package com.airport.backend.service;
 
 import com.airport.backend.dto.LoginRequest;
-import com.airport.backend.dto.PassengerRegisterRequest; // Added import!
-import com.airport.backend.dto.StaffRegisterRequest;     // Added import!
+import com.airport.backend.dto.PassengerRegisterRequest; 
+import com.airport.backend.dto.StaffRegisterRequest;     
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
+import com.airport.backend.enums.Role; // NEW IMPORT!
 import com.airport.backend.repository.PassengerRepository;
 import com.airport.backend.repository.StaffRepository;
 import com.airport.backend.security.JwtService;
@@ -48,10 +49,12 @@ public class AuthService {
             Staff staff = staffOpt.get();
             if (passwordEncoder.matches(request.getPassword(), staff.getPassword())) {
                 
-                String roleStr = "ROLE_" + staff.getRole().toUpperCase();
+                // THE FIX: Use .name() to get the string value of the Enum
+                String roleStr = "ROLE_" + staff.getRole().name();
                 String token = createSpringSecurityToken(staff.getUsername(), staff.getPassword(), roleStr);
                 
-                return buildAuthResponse(token, staff.getUsername(), staff.getRole().toLowerCase(), staff.getStaff_id());
+                // THE FIX: Use .name().toLowerCase() for the frontend payload
+                return buildAuthResponse(token, staff.getUsername(), staff.getRole().name().toLowerCase(), staff.getStaff_id());
             }
         }
 
@@ -84,7 +87,7 @@ public class AuthService {
         return jwtService.generateToken(extraClaims, userDetails);
     }
 
-// --- REGISTRATION LOGIC ---
+    // --- REGISTRATION LOGIC ---
     @Transactional
     public void registerPassenger(PassengerRegisterRequest dto) {
         if (passengerRepository.findByUsername(dto.getUsername()).isPresent() ||
@@ -95,7 +98,6 @@ public class AuthService {
         // Manual Mapping: The Firewall
         Passenger newPassenger = new Passenger();
         
-        // Changed these to camelCase to match your Passenger entity!
         newPassenger.setFirstName(dto.getFirstName()); 
         newPassenger.setLastName(dto.getLastName());
         newPassenger.setEmail(dto.getEmail());
@@ -122,7 +124,11 @@ public class AuthService {
         newStaff.setLast_name(dto.getLast_name());
         newStaff.setEmail(dto.getEmail());
         newStaff.setPhone_number(dto.getPhone_number());
-        newStaff.setRole(dto.getRole());
+        
+        // THE FIX: Convert the String from the DTO into the strict Role Enum!
+        // We add .replace(" ", "_") just in case the frontend sends something like "GATE AGENT" instead of "STAFF"
+        newStaff.setRole(Role.valueOf(dto.getRole().toUpperCase().replace(" ", "_")));
+        
         newStaff.setDept_id(dto.getDept_id());
         newStaff.setUsername(dto.getUsername());
 
@@ -132,4 +138,4 @@ public class AuthService {
         
         staffRepository.save(newStaff);
     }
-} // <-- This is the missing bracket!
+}

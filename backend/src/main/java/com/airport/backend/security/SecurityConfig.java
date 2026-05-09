@@ -1,5 +1,6 @@
 package com.airport.backend.security;
 
+import com.airport.backend.enums.Role; // NEW IMPORT FOR RBAC
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Required for Step 1.4 (@PreAuthorize)
+@EnableMethodSecurity // Keeps @PreAuthorize working if you still have any!
 public class SecurityConfig {
 
     @Autowired
@@ -37,15 +38,21 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable()) // Disable CSRF as we use JWT
             .authorizeHttpRequests(auth -> auth
-                // Allow public access to Auth and basic lookup endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/airports/**").permitAll()
-                .requestMatchers("/api/flights").permitAll()
-                // Allow public access to the root/home page and static resources
-                .requestMatchers("/", "/index.html").permitAll()
-                .requestMatchers("/*.css", "/*.js", "/*.ico", "/css/**", "/js/**", "/images/**").permitAll()
+                // 1. PUBLIC ENDPOINTS (Anyone can access)
+                .requestMatchers("/api/auth/**", "/api/airports/**", "/api/flights").permitAll()
+                .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.ico", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
-                // Any other request MUST be authenticated
+                
+                // 2. PASSENGER & ADMIN ENDPOINTS
+                .requestMatchers("/api/checkin/**", "/api/bookings/**").hasAnyRole(Role.PASSENGER.name(), Role.ADMIN.name())
+                
+                // 3. STAFF & ADMIN ENDPOINTS
+                .requestMatchers("/api/baggage/**", "/api/gate/**", "/api/shifts/**").hasAnyRole(Role.STAFF.name(), Role.ADMIN.name())
+                
+                // 4. ADMIN ONLY ENDPOINTS
+                .requestMatchers("/api/flights/schedule", "/api/staff/**").hasRole(Role.ADMIN.name())
+                
+                // 5. DEFAULT FALLBACK (Anything else requires login)
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,9 +64,7 @@ public class SecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        // Pass the userDetailsService directly into the constructor!
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -69,7 +74,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // Setting up Step 1.2 early
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

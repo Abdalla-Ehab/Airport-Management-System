@@ -26,14 +26,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        
+
         // 1. Try to find a Staff member
         Optional<Staff> staffOpt = staffRepository.findByUsername(username);
         if (staffOpt.isPresent()) {
             Staff staff = staffOpt.get();
             // Prefix role with "ROLE_" for Spring Security RBAC conventions
-            String role = "ROLE_" + staff.getRole().toUpperCase().replace(" ", "_");
-            return new User(staff.getUsername(), staff.getPassword(), 
+            String role = "ROLE_" + staff.getRole().name();
+            return new User(staff.getUsername(), staff.getPassword(),
                     Collections.singletonList(new SimpleGrantedAuthority(role)));
         }
 
@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<Passenger> passOpt = passengerRepository.findByUsername(username);
         if (passOpt.isPresent()) {
             Passenger passenger = passOpt.get();
-            return new User(passenger.getUsername(), passenger.getPassword(), 
+            return new User(passenger.getUsername(), passenger.getPassword(),
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_PASSENGER")));
         }
 
