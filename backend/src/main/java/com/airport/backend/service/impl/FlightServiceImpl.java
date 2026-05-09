@@ -53,11 +53,8 @@ public class FlightServiceImpl implements FlightService {
     public FlightResponse getFlightById(Long id) {
 
         Flight flight = flightRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Flight not found with ID: " + id
-                        )
-                );
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Flight not found with ID: " + id));
 
         return mapToResponse(flight);
     }
@@ -77,34 +74,29 @@ public class FlightServiceImpl implements FlightService {
         if (dto.getDeparture_time().isAfter(dto.getArrival_time())) {
 
             throw new RuntimeException(
-                    "Scheduling Error: Departure time must be before arrival time!"
-            );
+                    "Scheduling Error: Departure time must be before arrival time!");
         }
 
         if (dto.getDeparture_airport_id()
                 .equals(dto.getArrival_airport_id())) {
 
             throw new RuntimeException(
-                    "Scheduling Error: Departure and arrival airports cannot be the same!"
-            );
+                    "Scheduling Error: Departure and arrival airports cannot be the same!");
         }
 
         // =====================================================
         // 2. AIRCRAFT OVERLAP CHECK
         // =====================================================
 
-        List<Flight> aircraftConflicts =
-                flightRepository.findOverlappingAircraft(
-                        dto.getAircraft_id(),
-                        dto.getDeparture_time(),
-                        dto.getArrival_time()
-                );
+        List<Flight> aircraftConflicts = flightRepository.findOverlappingAircraft(
+                dto.getAircraft_id(),
+                dto.getDeparture_time(),
+                dto.getArrival_time());
 
         if (!aircraftConflicts.isEmpty()) {
 
             throw new RuntimeException(
-                    "Scheduling Error: Aircraft is already assigned to another flight during this time!"
-            );
+                    "Scheduling Error: Aircraft is already assigned to another flight during this time!");
         }
 
         // =====================================================
@@ -113,18 +105,15 @@ public class FlightServiceImpl implements FlightService {
 
         if (dto.getDeparture_gate_id() != null) {
 
-            List<Flight> departureGateConflicts =
-                    flightRepository.findOverlappingDepartureGate(
-                            dto.getDeparture_gate_id(),
-                            dto.getDeparture_time(),
-                            dto.getArrival_time()
-                    );
+            List<Flight> departureGateConflicts = flightRepository.findOverlappingDepartureGate(
+                    dto.getDeparture_gate_id(),
+                    dto.getDeparture_time(),
+                    dto.getArrival_time());
 
             if (!departureGateConflicts.isEmpty()) {
 
                 throw new RuntimeException(
-                        "Scheduling Error: Departure gate is occupied during this time!"
-                );
+                        "Scheduling Error: Departure gate is occupied during this time!");
             }
         }
 
@@ -134,18 +123,15 @@ public class FlightServiceImpl implements FlightService {
 
         if (dto.getArrival_gate_id() != null) {
 
-            List<Flight> arrivalGateConflicts =
-                    flightRepository.findOverlappingArrivalGate(
-                            dto.getArrival_gate_id(),
-                            dto.getDeparture_time(),
-                            dto.getArrival_time()
-                    );
+            List<Flight> arrivalGateConflicts = flightRepository.findOverlappingArrivalGate(
+                    dto.getArrival_gate_id(),
+                    dto.getDeparture_time(),
+                    dto.getArrival_time());
 
             if (!arrivalGateConflicts.isEmpty()) {
 
                 throw new RuntimeException(
-                        "Scheduling Error: Arrival gate is occupied during this time!"
-                );
+                        "Scheduling Error: Arrival gate is occupied during this time!");
             }
         }
 
@@ -153,51 +139,31 @@ public class FlightServiceImpl implements FlightService {
         // 5. OBJECT LOOKUPS
         // =====================================================
 
-        Airport depAirport =
-                airportRepository.findById(dto.getDeparture_airport_id())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Departure Airport not found"
-                                )
-                        );
+        Airport depAirport = airportRepository.findById(dto.getDeparture_airport_id())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Departure Airport not found"));
 
-        Airport arrAirport =
-                airportRepository.findById(dto.getArrival_airport_id())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Arrival Airport not found"
-                                )
-                        );
+        Airport arrAirport = airportRepository.findById(dto.getArrival_airport_id())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Arrival Airport not found"));
 
-        Aircraft aircraft =
-                aircraftRepository.findById(dto.getAircraft_id())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Aircraft not found"
-                                )
-                        );
+        Aircraft aircraft = aircraftRepository.findById(dto.getAircraft_id())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Aircraft not found"));
 
-        Airline airline =
-                airlineRepository.findById(dto.getAirline_id())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Airline not found"
-                                )
-                        );
+        Airline airline = airlineRepository.findById(dto.getAirline_id())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Airline not found"));
 
-        Gate depGate =
-                dto.getDeparture_gate_id() != null
-                        ? gateRepository.findById(
-                                dto.getDeparture_gate_id()
-                        ).orElse(null)
-                        : null;
+        Gate depGate = dto.getDeparture_gate_id() != null
+                ? gateRepository.findById(
+                        dto.getDeparture_gate_id()).orElse(null)
+                : null;
 
-        Gate arrGate =
-                dto.getArrival_gate_id() != null
-                        ? gateRepository.findById(
-                                dto.getArrival_gate_id()
-                        ).orElse(null)
-                        : null;
+        Gate arrGate = dto.getArrival_gate_id() != null
+                ? gateRepository.findById(
+                        dto.getArrival_gate_id()).orElse(null)
+                : null;
 
         // =====================================================
         // 6. ENTITY MAPPING
@@ -242,10 +208,9 @@ public class FlightServiceImpl implements FlightService {
     @Override
     public List<FlightResponse> findFlights(
             String origin,
-            String destination
-    ) {
+            String destination) {
 
-        return flightRepository.findAll()
+        return flightRepository.findFlightsByRoute(origin, destination)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -293,7 +258,6 @@ public class FlightServiceImpl implements FlightService {
 
                 flight.getArrivalAirport() != null
                         ? flight.getArrivalAirport().getAirport_id()
-                        : null
-        );
+                        : null);
     }
 }
