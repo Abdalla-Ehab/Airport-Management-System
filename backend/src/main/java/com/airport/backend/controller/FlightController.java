@@ -1,6 +1,7 @@
 package com.airport.backend.controller;
 
 import com.airport.backend.dto.FlightRequest;
+import com.airport.backend.response.ApiResponse;
 import com.airport.backend.response.FlightResponse;
 import com.airport.backend.service.FlightService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +18,19 @@ public class FlightController {
     private FlightService flightService;
 
     @GetMapping
-    public List<FlightResponse> getAllFlights() {
-        return flightService.getAllFlights();
+    public ResponseEntity<ApiResponse<List<FlightResponse>>> getAllFlights() {
+        List<FlightResponse> flights = flightService.getAllFlights();
+        return ResponseEntity.ok(ApiResponse.success("Flights retrieved successfully", flights));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> scheduleFlight(@RequestBody FlightRequest request) {
+    public ResponseEntity<ApiResponse<FlightResponse>> scheduleFlight(@RequestBody FlightRequest request) {
         try {
             FlightResponse savedFlight = flightService.scheduleFlight(request);
-            return ResponseEntity.ok(savedFlight); 
+            return ResponseEntity.ok(ApiResponse.success("Flight scheduled successfully", savedFlight));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
 }
