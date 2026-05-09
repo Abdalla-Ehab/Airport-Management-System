@@ -1,92 +1,62 @@
-import { bootstrapApp }
-from './shared/appBootstrap.js';
+import { bootstrapApp } from './shared/appBootstrap.js';
 
-import { initLogin }
-from './auth/login.js';
+import { initLogin } from './auth/login.js';
 
-import { initRegister }
-from './auth/register.js';
+import { initRegister } from './auth/register.js';
 
-import { initLogout }
-from './auth/logout.js';
+import { initLogout } from './auth/logout.js';
 
-import {
-    initBookingView
-}
-from './booking/bookingView.js';
+import { initBookingView } from './booking/bookingView.js';
 
-import {
-    initCheckin
-}
-from './booking/checkin.js';
+import { initCheckin } from './booking/checkin.js';
 
-import {
-    initFlightStatus
-}
-from './booking/flightStatus.js';
+import { initFlightStatus } from './booking/flightStatus.js';
 
-import {
-    initAirportView
-}
-from './airports/airportView.js';
+import { initAirportView } from './airports/airportView.js';
 
-import {
-    initBaggageDrop
-}
-from './baggage/baggageDrop.js';
+import { initBaggageDrop } from './baggage/baggageDrop.js';
 
-import {
-    initScanner
-}
-from './baggage/scanner.js';
+import { initScanner } from './baggage/scanner.js';
 
-import {
-    initFleet
-}
-from './admin/fleet.js';
+import { initFleet } from './admin/fleet.js';
 
-import {
-    initMaintenance
-}
-from './admin/maintenance.js';
+import { initMaintenance } from './admin/maintenance.js';
 
-import {
-    initScheduler
-}
-from './admin/scheduler.js';
+import { initScheduler } from './admin/scheduler.js';
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
+import { initUI } from './shared/ui.js';
 
-        bootstrapApp();
+document.addEventListener('DOMContentLoaded', () => {
 
-        initLogin();
+    bootstrapApp();
 
-        initRegister();
+    initUI();
 
-        initLogout();
+    initLogin();
 
-        initBookingView();
+    initRegister();
 
-        initCheckin();
+    initLogout();
 
-        initFlightStatus();
+    initBookingView();
 
-        initAirportView();
+    initCheckin();
 
-        initBaggageDrop();
+    initFlightStatus();
 
-        initScanner();
+    initAirportView();
 
-        initFleet();
+    initBaggageDrop();
 
-        initMaintenance();
+    initScanner();
 
-        initScheduler();
+    initFleet();
 
-        console.log(
-            'Airport Management System Fully Modularized'
-        );
-    }
-);
+    initMaintenance();
+
+    initScheduler();
+
+    console.log(
+        'Airport Management System Fully Modularized'
+    );
+});
