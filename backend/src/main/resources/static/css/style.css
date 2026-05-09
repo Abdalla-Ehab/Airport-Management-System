@@ -1035,3 +1035,78 @@ body {
 .hidden {
     display: none !important;
 }
+
+.seat-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.seat {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 8px;
+    border: none;
+
+    cursor: pointer;
+
+    background: rgba(255,255,255,.08);
+    color: white;
+}
+
+.seat.selected {
+    background: #10b981;
+}
+
+.seat.occupied {
+    background: #ef4444;
+    cursor: not-allowed;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.boarding-pass {
+
+    margin-top: 20px;
+
+    padding: 24px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.03)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.12);
+}
+
+.bp-header {
+
+    font-size: 1.4rem;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+
+    color: var(--sky-light);
+}
+
+.bp-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(160px, 1fr));
+
+    gap: 18px;
+}
