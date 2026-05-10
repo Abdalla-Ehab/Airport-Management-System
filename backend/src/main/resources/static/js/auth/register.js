@@ -195,7 +195,8 @@ async function register() {
         !payload.lastName ||
         !payload.email ||
         !payload.username ||
-        !payload.password
+        !payload.password ||
+        !payload.dob
     ) {
 
         showToast(

@@ -31,3 +31,53 @@
     box-shadow:
         0 0 0 4px rgba(26,115,232,.2);
 }
+
+/* =====================================================
+   SELECT DROPDOWN FIX
+===================================================== */
+
+select {
+
+    -webkit-appearance: none;
+
+    -moz-appearance: none;
+
+    appearance: none;
+}
+
+select.input {
+
+    color: #ffffff;
+
+    background:
+        rgba(20, 28, 48, 0.95);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    appearance: none;
+}
+
+select.input option {
+
+    color: #ffffff;
+
+    background: #172033;
+}
+
+
+/* Selected option */
+select.input:focus {
+
+    border-color: #1A73E8;
+
+    box-shadow:
+        0 0 0 3px rgba(26,115,232,.18);
+}
+
+
+/* Placeholder style */
+select.input option[value=""] {
+
+    color: #94A3B8;
+}
