@@ -39,124 +39,254 @@ function initSidebar() {
 
     if (!sidebar || !toggle) return;
 
-    toggle.addEventListener('click', () => {
+    toggle.addEventListener(
+        'click',
+        () => {
 
-        sidebar.classList.toggle('active');
-    });
+            sidebar.classList.toggle(
+                'active'
+            );
+        }
+    );
+
+    document.addEventListener(
+        'click',
+        e => {
+
+            const insideSidebar =
+                sidebar.contains(
+                    e.target
+                );
+
+            const clickedToggle =
+                toggle.contains(
+                    e.target
+                );
+
+            if (
+                !insideSidebar &&
+                !clickedToggle
+            ) {
+
+                sidebar.classList.remove(
+                    'active'
+                );
+            }
+        }
+    );
 }
 
 
-window.addEventListener('load', () => {
+window.addEventListener(
+    'load',
+    () => {
 
-    document.body.classList.add('loaded');
-});
-
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    bootstrapApp();
-
-    const user =
-        getCurrentUser();
-
-    if (user) {
-
-        const profileName =
-            document.getElementById('profile-name');
-
-        const profileRole =
-            document.getElementById('profile-role');
-
-        const navUsername =
-            document.getElementById('nav-username');
-
-        const navRole =
-            document.getElementById('nav-role');
-
-        const avatar =
-            document.getElementById('nav-avatar');
-
-        if (profileName)
-            profileName.textContent =
-                user.username || user.email || 'User';
-
-        if (profileRole)
-            profileRole.textContent =
-                user.role;
-
-        if (navUsername)
-            navUsername.textContent =
-                user.username || user.email || 'User';
-
-        if (navRole)
-            navRole.textContent =
-                user.role;
-
-        if (avatar)
-            avatar.textContent =
-                user.username || user.email || 'User'
-                    .charAt(0)
-                    .toUpperCase();
+        document.body.classList.add(
+            'loaded'
+        );
     }
+);
 
-    try {
 
-        getFlights()
-            .then(flights => {
+document.addEventListener(
+    'DOMContentLoaded',
+    async () => {
 
-                const kpi =
-                    document.getElementById(
-                        'dashboard-flight-count'
-                    );
+        bootstrapApp();
 
-                if (kpi && flights) {
+        const user =
+            getCurrentUser();
 
-                    kpi.textContent =
-                        flights.length;
-                }
-            })
-            .catch(console.error);
+        // =====================================
+        // USER PROFILE UI
+        // =====================================
 
-    } catch (err) {
+        if (user) {
 
-        console.error(err);
+            const displayName =
+                user.username ||
+                user.email ||
+                'User';
+
+            const displayRole =
+                user.role ||
+                'passenger';
+
+            const profileName =
+                document.getElementById(
+                    'profile-name'
+                );
+
+            const profileRole =
+                document.getElementById(
+                    'profile-role'
+                );
+
+            const navUsername =
+                document.getElementById(
+                    'nav-username'
+                );
+
+            const navRole =
+                document.getElementById(
+                    'nav-role'
+                );
+
+            const avatar =
+                document.getElementById(
+                    'nav-avatar'
+                );
+
+            const profileAvatar =
+                document.getElementById(
+                    'profile-avatar'
+                );
+
+            const profileRoleInfo =
+                document.getElementById(
+                    'profile-role-info'
+                );
+
+            const profileUsername =
+                document.getElementById(
+                    'profile-username'
+                );
+
+            if (profileName) {
+
+                profileName.textContent =
+                    displayName;
+            }
+
+            if (profileRole) {
+
+                profileRole.textContent =
+                    displayRole;
+            }
+
+            if (navUsername) {
+
+                navUsername.textContent =
+                    displayName;
+            }
+
+            if (navRole) {
+
+                navRole.textContent =
+                    displayRole;
+            }
+
+            if (profileUsername) {
+
+                profileUsername.textContent =
+                    displayName;
+            }
+
+            if (profileRoleInfo) {
+
+                profileRoleInfo.textContent =
+                    displayRole;
+            }
+
+            if (avatar) {
+
+                avatar.textContent =
+                    displayName
+                        .charAt(0)
+                        .toUpperCase();
+            }
+
+            if (profileAvatar) {
+
+                profileAvatar.textContent =
+                    displayName
+                        .charAt(0)
+                        .toUpperCase();
+            }
+        }
+
+        // =====================================
+        // DASHBOARD KPI
+        // =====================================
+
+        try {
+
+            const flights =
+                await getFlights();
+
+            const kpi =
+                document.getElementById(
+                    'dashboard-flight-count'
+                );
+
+            if (kpi && flights) {
+
+                kpi.textContent =
+                    flights.length;
+            }
+
+        } catch (err) {
+
+            console.error(err);
+        }
+
+        // =====================================
+        // CORE UI
+        // =====================================
+
+        initUI();
+
+        initSidebar();
+
+        initLogin();
+
+        initRegister();
+
+        initLogout();
+
+        // =====================================
+        // PASSENGER FEATURES
+        // =====================================
+
+        initBookingView();
+
+        initCheckin();
+
+        initFlightStatus();
+
+        initAirportView();
+
+        initBaggageDrop();
+
+        initScanner();
+
+        // =====================================
+        // ADMIN / STAFF FEATURES
+        // =====================================
+
+        if (
+            user &&
+            (
+                user.role === 'admin' ||
+                user.role === 'staff'
+            )
+        ) {
+
+            initFleet();
+
+            initMaintenance();
+
+            initScheduler();
+
+            initFlightsPage();
+
+            initAirportsPage();
+
+            initAirlinesPage();
+        }
+
+        console.log(
+            'twixNexus AMS Initialized Successfully'
+        );
     }
-
-    initUI();
-
-    initSidebar();
-
-    initLogin();
-
-    initRegister();
-
-    initLogout();
-
-    initBookingView();
-
-    initCheckin();
-
-    initFlightStatus();
-
-    initAirportView();
-
-    initBaggageDrop();
-
-    initScanner();
-
-    initFleet();
-
-    initMaintenance();
-
-    initScheduler();
-
-    initFlightsPage();
-
-    initAirportsPage();
-
-    initAirlinesPage();
-
-    console.log(
-        'twixNexus AMS Initialized Successfully'
-    );
-});
+);

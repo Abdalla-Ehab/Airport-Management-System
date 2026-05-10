@@ -200,3 +200,25 @@
         grid-template-columns: 1fr;
     }
 }
+
+.auth-panel {
+
+    width: 100%;
+
+    max-width: 620px;
+}
+
+.auth-form {
+
+    width: 100%;
+}
+
+.auth-form .grid.grid-2 {
+
+    width: 100%;
+}
+
+.auth-form .input {
+
+    width: 100%;
+}

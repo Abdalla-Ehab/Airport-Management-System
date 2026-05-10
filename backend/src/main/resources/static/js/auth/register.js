@@ -1,96 +1,261 @@
-import { registerPassenger }
-from '../api/authApi.js';
+import {
+    registerPassenger
+}
+    from '../api/authApi.js';
 
-import { showToast }
-from '../shared/toast.js';
+import {
+    showToast
+}
+    from '../shared/toast.js';
 
 import {
     show,
     hide
-} from '../shared/dom.js';
+}
+    from '../shared/dom.js';
+
 
 export function initRegister() {
 
     const btn =
-        document.getElementById('register-btn');
+        document.getElementById(
+            'register-btn'
+        );
 
-    btn.addEventListener(
-        'click',
-        register
-    );
+    const dob =
+        document.getElementById(
+            'reg-dob'
+        );
+
+    // =====================================
+    // Prevent future DOB
+    // =====================================
+
+    if (dob) {
+
+        dob.max =
+            new Date()
+                .toISOString()
+                .split('T')[0];
+    }
+
+    // =====================================
+    // Register Button
+    // =====================================
+
+    if (btn) {
+
+        btn.addEventListener(
+            'click',
+            register
+        );
+    }
 
     initAuthTabs();
 }
 
+
 function initAuthTabs() {
 
     const loginTab =
-        document.getElementById('tab-login');
+        document.getElementById(
+            'tab-login'
+        );
 
     const registerTab =
-        document.getElementById('tab-register');
+        document.getElementById(
+            'tab-register'
+        );
 
-    loginTab.addEventListener('click', () => {
+    const loginForm =
+        document.getElementById(
+            'login-form'
+        );
 
-        show(document.getElementById('login-form'));
+    const registerForm =
+        document.getElementById(
+            'register-form'
+        );
 
-        hide(document.getElementById('register-form'));
-    });
+    // =====================================
+    // LOGIN TAB
+    // =====================================
 
-    registerTab.addEventListener('click', () => {
+    if (loginTab) {
 
-        show(document.getElementById('register-form'));
+        loginTab.addEventListener(
+            'click',
+            () => {
 
-        hide(document.getElementById('login-form'));
-    });
+                show(loginForm);
+
+                hide(registerForm);
+
+                loginTab.classList.add(
+                    'active'
+                );
+
+                registerTab.classList.remove(
+                    'active'
+                );
+            }
+        );
+    }
+
+    // =====================================
+    // REGISTER TAB
+    // =====================================
+
+    if (registerTab) {
+
+        registerTab.addEventListener(
+            'click',
+            () => {
+
+                show(registerForm);
+
+                hide(loginForm);
+
+                registerTab.classList.add(
+                    'active'
+                );
+
+                loginTab.classList.remove(
+                    'active'
+                );
+            }
+        );
+    }
 }
 
+
 async function register() {
+
+    const errEl =
+        document.getElementById(
+            'auth-error'
+        );
+
+    if (errEl) {
+
+        errEl.textContent = '';
+
+        hide(errEl);
+    }
 
     const payload = {
 
         firstName:
-            document.getElementById('reg-firstname').value,
+            document.getElementById(
+                'reg-firstname'
+            )?.value?.trim(),
 
         lastName:
-            document.getElementById('reg-lastname').value,
+            document.getElementById(
+                'reg-lastname'
+            )?.value?.trim(),
 
         email:
-            document.getElementById('reg-email').value,
+            document.getElementById(
+                'reg-email'
+            )?.value?.trim(),
 
         phoneNumber:
-            document.getElementById('reg-phone').value,
+            document.getElementById(
+                'reg-phone'
+            )?.value?.trim(),
 
         dob:
-            document.getElementById('reg-dob').value,
+            document.getElementById(
+                'reg-dob'
+            )?.value,
 
         passportNo:
-            document.getElementById('reg-passport').value,
+            document.getElementById(
+                'reg-passport'
+            )?.value?.trim(),
 
         username:
-            document.getElementById('reg-username').value,
+            document.getElementById(
+                'reg-username'
+            )?.value?.trim(),
 
         password:
-            document.getElementById('reg-password').value
+            document.getElementById(
+                'reg-password'
+            )?.value
     };
+
+    // =====================================
+    // VALIDATION
+    // =====================================
+
+    if (
+        !payload.firstName ||
+        !payload.lastName ||
+        !payload.email ||
+        !payload.username ||
+        !payload.password
+    ) {
+
+        showToast(
+            'Please fill all required fields',
+            'error'
+        );
+
+        return;
+    }
 
     try {
 
-        await registerPassenger(payload);
+        await registerPassenger(
+            payload
+        );
 
         showToast(
             'Account created successfully',
             'success'
         );
 
+        // =================================
+        // RESET FORM
+        // =================================
+
+        document.getElementById(
+            'register-form'
+        )?.reset();
+
+        // =================================
+        // SWITCH TO LOGIN
+        // =================================
+
+        const loginTab =
+            document.getElementById(
+                'tab-login'
+            );
+
+        if (loginTab) {
+
+            loginTab.click();
+        }
+
     } catch (err) {
 
-        const errEl =
-            document.getElementById('auth-error');
+        console.error(err);
 
-        errEl.textContent =
-            err.message;
+        if (errEl) {
 
-        show(errEl);
+            errEl.textContent =
+                err.message ||
+                'Registration failed';
+
+            show(errEl);
+        }
+
+        showToast(
+            err.message ||
+            'Registration failed',
+            'error'
+        );
     }
 }

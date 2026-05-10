@@ -8,6 +8,7 @@
     <title>twixNexus — Airport Management System</title>
 
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="data:,">
 </head>
 
 <body class="loading">
@@ -610,9 +611,21 @@
 
                     <div class="booking-search">
 
-                        <select id="flight-origin" class="input"></select>
+                        <select id="flight-origin" class="input">
 
-                        <select id="flight-destination" class="input"></select>
+                            <option value="">
+                                Select Departure
+                            </option>
+
+                        </select>
+
+                        <select id="flight-destination" class="input">
+
+                            <option value="">
+                                Select Destination
+                            </option>
+
+                        </select>
 
                         <input id="flight-date" class="input" type="date">
 
@@ -692,6 +705,29 @@
                 </section>
 
                 <!-- PROFILE -->
+                <section id="view-status" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Flight Status
+                            </h1>
+
+                            <p>
+                                Monitor live airport flight activity.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div id="flight-status-results" class="grid grid-2" style="margin-top:32px;">
+
+                    </div>
+
+                </section>
 
                 <section id="view-profile" class="view hidden dashboard">
 
@@ -702,9 +738,9 @@
                                 profile-sidebar
                             ">
 
-                            <div class="profile-avatar">
+                            <div id="profile-avatar" class="profile-avatar">
 
-                                S
+                                A
 
                             </div>
 
@@ -725,6 +761,32 @@
                             <h2>
                                 Account Information
                             </h2>
+
+                            <div class="profile-info">
+
+                                <div class="profile-row">
+
+                                    <strong>
+                                        Username
+                                    </strong>
+
+                                    <span id="profile-username">
+                                    </span>
+
+                                </div>
+
+                                <div class="profile-row">
+
+                                    <strong>
+                                        Role
+                                    </strong>
+
+                                    <span id="profile-role-info">
+                                    </span>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
@@ -1488,6 +1550,56 @@
 
                 </div>
 
+                <div class="input-group">
+
+                    <label>
+                        Departure Airport ID
+                    </label>
+
+                    <input id="schedule-departure-airport" class="input">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Arrival Airport ID
+                    </label>
+
+                    <input id="schedule-arrival-airport" class="input">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Departure Gate ID
+                    </label>
+
+                    <input id="schedule-departure-gate" class="input">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Departure Time
+                    </label>
+
+                    <input id="schedule-departure-time" type="datetime-local" class="input">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+                        Arrival Time
+                    </label>
+
+                    <input id="schedule-arrival-time" type="datetime-local" class="input">
+
+                </div>
+
             </div>
 
             <div style="
@@ -1507,7 +1619,7 @@
         </div>
 
     </div>
-
+    <div id="toast-container"></div>
     <script type="module" src="/js/main.js"></script>
 
 </body>

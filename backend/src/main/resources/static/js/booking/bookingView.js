@@ -1,34 +1,37 @@
 import {
     searchFlights
 }
-    from '../api/flightApi.js';
+from '../api/flightApi.js';
 
 import {
     createBooking
 }
-    from '../api/bookingApi.js';
+from '../api/bookingApi.js';
 
 import {
     renderSeatMap
 }
-    from './seatMap.js';
+from './seatMap.js';
 
 import { state }
-    from '../shared/state.js';
+from '../shared/state.js';
 
 import {
     escHtml,
     formatTime
 }
-    from '../shared/helpers.js';
+from '../shared/helpers.js';
 
 import {
     showToast
 }
-    from '../shared/toast.js';
+from '../shared/toast.js';
 
-import { getAirports }
-    from '../api/airportApi.js';
+import {
+    getAirports
+}
+from '../api/airportApi.js';
+
 
 export async function initBookingView() {
 
@@ -75,43 +78,122 @@ export async function initBookingView() {
         );
     }
 
-    const airports =
-        await getAirports();
+    const originSelect =
+        document.getElementById(
+            'flight-origin'
+        );
 
-    originSelect.innerHTML =
-        airports.map(a =>
-            `<option value="${a.city}">
-            ${a.city}
-        </option>`
-        ).join('');
+    const destinationSelect =
+        document.getElementById(
+            'flight-destination'
+        );
 
-    destinationSelect.innerHTML =
-        airports.map(a =>
-            `<option value="${a.city}">
-            ${a.city}
-        </option>`
-        ).join('');
+    const dateInput =
+        document.getElementById(
+            'flight-date'
+        );
 
-    dateInput.min =
-        new Date().toISOString().split('T')[0];
+    if (!originSelect ||
+        !destinationSelect) {
+
+        return;
+    }
+
+    try {
+
+        const airports =
+            await getAirports();
+
+        originSelect.innerHTML = `
+            <option value="">
+                Select Departure
+            </option>
+        `;
+
+        destinationSelect.innerHTML = `
+            <option value="">
+                Select Destination
+            </option>
+        `;
+
+        airports.forEach(a => {
+
+            originSelect.innerHTML += `
+                <option value="${a.airport_id}">
+                    ${a.name} (${a.city})
+                </option>
+            `;
+
+            destinationSelect.innerHTML += `
+                <option value="${a.airport_id}">
+                    ${a.name} (${a.city})
+                </option>
+            `;
+        });
+
+        if (dateInput) {
+
+            dateInput.min =
+                new Date()
+                    .toISOString()
+                    .split('T')[0];
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        showToast(
+            'Failed to load airports',
+            'error'
+        );
+    }
 }
+
 
 async function search() {
 
     const origin =
         document.getElementById(
             'flight-origin'
-        ).value;
+        )?.value;
 
     const destination =
         document.getElementById(
             'flight-destination'
-        ).value;
+        )?.value;
+
+    const date =
+        document.getElementById(
+            'flight-date'
+        )?.value;
 
     const resultsEl =
         document.getElementById(
             'flight-results'
         );
+
+    if (!origin || !destination) {
+
+        showToast(
+            'Please select airports',
+            'error'
+        );
+
+        return;
+    }
+
+    if (origin === destination) {
+
+        showToast(
+            'Departure and destination cannot be the same',
+            'error'
+        );
+
+        return;
+    }
+
+    if (!resultsEl) return;
 
     resultsEl.innerHTML =
         'Searching flights...';
@@ -121,21 +203,26 @@ async function search() {
         const flights =
             await searchFlights(
                 origin,
-                destination
+                destination,
+                date
             );
 
         renderFlights(flights);
 
     } catch (err) {
 
+        console.error(err);
+
         resultsEl.innerHTML = '';
 
         showToast(
-            err.message,
+            err.message ||
+            'Failed to load flights',
             'error'
         );
     }
 }
+
 
 function renderFlights(flights) {
 
@@ -144,12 +231,26 @@ function renderFlights(flights) {
             'flight-results'
         );
 
+    if (!listEl) return;
+
     listEl.innerHTML = '';
 
-    if (!flights.length) {
+    if (!flights ||
+        !flights.length) {
 
-        listEl.innerHTML =
-            '<p>No flights found</p>';
+        listEl.innerHTML = `
+            <div class="empty-state">
+
+                <h3>
+                    No Flights Found
+                </h3>
+
+                <p>
+                    Try another route or date.
+                </p>
+
+            </div>
+        `;
 
         return;
     }
@@ -184,6 +285,7 @@ function renderFlights(flights) {
             );
 
         card.innerHTML = `
+
             <div class="flight-header">
                 ✈ ${fn}
             </div>
@@ -212,10 +314,12 @@ function renderFlights(flights) {
         `;
 
         const btn =
-            document.createElement('button');
+            document.createElement(
+                'button'
+            );
 
         btn.className =
-            'btn-primary';
+            'btn btn-primary';
 
         btn.textContent =
             'Select Flight';
@@ -231,14 +335,21 @@ function renderFlights(flights) {
     });
 }
 
+
 function selectFlight(flight) {
 
     state.currentFlight = flight;
 
-    document.getElementById(
-        'selected-flight'
-    ).textContent =
-        flight.flight_number;
+    const selected =
+        document.getElementById(
+            'selected-flight'
+        );
+
+    if (selected) {
+
+        selected.textContent =
+            flight.flight_number;
+    }
 
     renderSeatMap('ECONOMY');
 
@@ -247,6 +358,7 @@ function selectFlight(flight) {
         'success'
     );
 }
+
 
 async function confirmBooking() {
 
@@ -261,6 +373,7 @@ async function confirmBooking() {
     }
 
     if (
+        !state.selectedSeats ||
         !state.selectedSeats.length
     ) {
 
@@ -288,7 +401,9 @@ async function confirmBooking() {
             class_name:
                 document.getElementById(
                     'class-filter'
-                ).value,
+                )?.value ||
+
+                'ECONOMY',
 
             is_transit: false
         };
@@ -302,8 +417,11 @@ async function confirmBooking() {
 
     } catch (err) {
 
+        console.error(err);
+
         showToast(
-            err.message,
+            err.message ||
+            'Booking failed',
             'error'
         );
     }
