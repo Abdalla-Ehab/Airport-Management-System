@@ -124,6 +124,11 @@
 
         padding: 20px;
     }
+
+    .auth-form .grid.grid-2 {
+
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {

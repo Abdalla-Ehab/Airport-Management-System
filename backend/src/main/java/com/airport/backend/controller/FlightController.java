@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/flights")
 public class FlightController {
-    
+
     @Autowired
     private FlightService flightService;
 
@@ -32,5 +32,16 @@ public class FlightController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<ApiResponse<List<FlightResponse>>> getFlightStatus() {
+
+        List<FlightResponse> flights = flightService.getAllFlights();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Flight status loaded",
+                        flights));
     }
 }

@@ -18,4 +18,11 @@ public class MaintenanceController {
     public List<MaintenanceRecord> getAllMaintenanceRecords() {
         return maintenanceRepository.findAll();
     }
+
+    @PostMapping
+    public MaintenanceRecord createMaintenance(
+            @RequestBody MaintenanceRecord record) {
+
+        return maintenanceRepository.save(record);
+    }
 }

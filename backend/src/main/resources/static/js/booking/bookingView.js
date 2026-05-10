@@ -1,33 +1,36 @@
 import {
     searchFlights
 }
-from '../api/flightApi.js';
+    from '../api/flightApi.js';
 
 import {
     createBooking
 }
-from '../api/bookingApi.js';
+    from '../api/bookingApi.js';
 
 import {
     renderSeatMap
 }
-from './seatMap.js';
+    from './seatMap.js';
 
 import { state }
-from '../shared/state.js';
+    from '../shared/state.js';
 
 import {
     escHtml,
     formatTime
 }
-from '../shared/helpers.js';
+    from '../shared/helpers.js';
 
 import {
     showToast
 }
-from '../shared/toast.js';
+    from '../shared/toast.js';
 
-export function initBookingView() {
+import { getAirports }
+    from '../api/airportApi.js';
+
+export async function initBookingView() {
 
     const btn =
         document.getElementById(
@@ -71,6 +74,26 @@ export function initBookingView() {
             confirmBooking
         );
     }
+
+    const airports =
+        await getAirports();
+
+    originSelect.innerHTML =
+        airports.map(a =>
+            `<option value="${a.city}">
+            ${a.city}
+        </option>`
+        ).join('');
+
+    destinationSelect.innerHTML =
+        airports.map(a =>
+            `<option value="${a.city}">
+            ${a.city}
+        </option>`
+        ).join('');
+
+    dateInput.min =
+        new Date().toISOString().split('T')[0];
 }
 
 async function search() {

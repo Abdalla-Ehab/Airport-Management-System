@@ -217,3 +217,30 @@ function initModal() {
         }
     });
 }
+document.addEventListener(
+    'click',
+    (e) => {
+
+        const viewBtn =
+            e.target.closest('.view-flight');
+
+        const editBtn =
+            e.target.closest('.edit-flight');
+
+        if (viewBtn) {
+
+            const id =
+                viewBtn.dataset.id;
+
+            alert(`Viewing Flight ${id}`);
+        }
+
+        if (editBtn) {
+
+            const id =
+                editBtn.dataset.id;
+
+            alert(`Editing Flight ${id}`);
+        }
+    }
+);

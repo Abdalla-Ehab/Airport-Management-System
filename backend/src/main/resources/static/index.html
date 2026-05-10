@@ -11,12 +11,12 @@
 </head>
 
 <body class="loading">
-    
+
     <!-- ========================= -->
     <!-- AUTH SCREEN -->
     <!-- ========================= -->
 
-    <div class="auth-screen">
+    <div id="login-screen" class="auth-screen">
 
         <div class="auth-left">
 
@@ -377,7 +377,7 @@
 
                         </div>
 
-                        <button class="btn btn-primary">
+                        <button id="open-flight-modal" class="btn btn-primary">
 
                             + New Flight
 
@@ -395,7 +395,7 @@
                                 Active Flights
                             </div>
 
-                            <div class="kpi-value">
+                            <div id="dashboard-flight-count" class="kpi-value">
                                 128
                             </div>
 
@@ -610,11 +610,11 @@
 
                     <div class="booking-search">
 
-                        <input id="flight-origin" class="input" placeholder="Departure">
+                        <select id="flight-origin" class="input"></select>
 
-                        <input id="flight-destination" class="input" placeholder="Destination">
+                        <select id="flight-destination" class="input"></select>
 
-                        <input class="input" type="date">
+                        <input id="flight-date" class="input" type="date">
 
                         <button id="search-flight-btn" class="btn btn-primary">
 
@@ -710,12 +710,10 @@
 
                             <div style="text-align:center;">
 
-                                <h2>
-                                    Seif Taha
+                                <h2 id="profile-name">
                                 </h2>
 
-                                <p>
-                                    Premium Passenger
+                                <p id="profile-role">
                                 </p>
 
                             </div>
