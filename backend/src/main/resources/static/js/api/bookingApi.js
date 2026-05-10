@@ -6,7 +6,7 @@ export async function createBooking(
 ) {
 
     return await apiRequest(
-        '/bookings/create',
+        '/bookings',
         {
             method: 'POST',
             body: JSON.stringify(payload)

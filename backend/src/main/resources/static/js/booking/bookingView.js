@@ -1,36 +1,36 @@
 import {
     searchFlights
 }
-from '../api/flightApi.js';
+    from '../api/flightApi.js';
 
 import {
     createBooking
 }
-from '../api/bookingApi.js';
+    from '../api/bookingApi.js';
 
 import {
     renderSeatMap
 }
-from './seatMap.js';
+    from './seatMap.js';
 
 import { state }
-from '../shared/state.js';
+    from '../shared/state.js';
 
 import {
     escHtml,
     formatTime
 }
-from '../shared/helpers.js';
+    from '../shared/helpers.js';
 
 import {
     showToast
 }
-from '../shared/toast.js';
+    from '../shared/toast.js';
 
 import {
     getAirports
 }
-from '../api/airportApi.js';
+    from '../api/airportApi.js';
 
 
 export async function initBookingView() {
@@ -148,6 +148,37 @@ export async function initBookingView() {
             'error'
         );
     }
+    const changeBtn =
+    document.getElementById(
+        'change-flight-btn'
+    );
+
+if (changeBtn) {
+
+    changeBtn.addEventListener(
+        'click',
+        () => {
+
+            document.getElementById(
+                'flight-results'
+            ).style.display =
+                'grid';
+
+            document.getElementById(
+                'seat-map'
+            ).innerHTML = '';
+
+            document.getElementById(
+                'selected-flight'
+            ).textContent =
+                'None Selected';
+
+            changeBtn.classList.add(
+                'hidden'
+            );
+        }
+    );
+}
 }
 
 
@@ -338,7 +369,23 @@ function renderFlights(flights) {
 
 function selectFlight(flight) {
 
+    console.log(
+        'Selected Flight:',
+        flight
+    );
+
     state.currentFlight = flight;
+
+    const results =
+        document.getElementById(
+            'flight-results'
+        );
+
+    if (results) {
+
+        results.style.display =
+            'none';
+    }
 
     const selected =
         document.getElementById(
@@ -348,10 +395,35 @@ function selectFlight(flight) {
     if (selected) {
 
         selected.textContent =
-            flight.flight_number;
+            flight.flight_number ||
+            'Flight Selected';
     }
 
-    renderSeatMap('ECONOMY');
+    try {
+
+        renderSeatMap(
+            'ECONOMY'
+        );
+
+    } catch (err) {
+
+        console.error(
+            'Seat map error:',
+            err
+        );
+    }
+
+    const backBtn =
+        document.getElementById(
+            'change-flight-btn'
+        );
+
+    if (backBtn) {
+
+        backBtn.classList.remove(
+            'hidden'
+        );
+    }
 
     showToast(
         `Selected flight ${flight.flight_number}`,
@@ -425,4 +497,22 @@ async function confirmBooking() {
             'error'
         );
     }
+    document.getElementById(
+    'seat-map'
+).innerHTML = '';
+
+document.getElementById(
+    'selected-flight'
+).textContent =
+    'None Selected';
+
+document.getElementById(
+    'flight-results'
+).style.display =
+    'grid';
+
+showToast(
+    'Booking created successfully',
+    'success'
+);
 }

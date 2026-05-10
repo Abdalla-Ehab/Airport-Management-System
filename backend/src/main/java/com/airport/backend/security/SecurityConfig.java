@@ -35,29 +35,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable()) // Disable CSRF as we use JWT
-            .authorizeHttpRequests(auth -> auth
-                // 1. PUBLIC ENDPOINTS (Anyone can access)
-                .requestMatchers("/api/auth/**", "/api/airports/**", "/api/flights").permitAll()
-                .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.ico", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                
-                // 2. PASSENGER & ADMIN ENDPOINTS
-                .requestMatchers("/api/checkin/**", "/api/bookings/**").hasAnyRole(Role.PASSENGER.name(), Role.ADMIN.name())
-                
-                // 3. STAFF & ADMIN ENDPOINTS
-                .requestMatchers("/api/baggage/**", "/api/gate/**", "/api/shifts/**").hasAnyRole(Role.STAFF.name(), Role.ADMIN.name())
-                
-                // 4. ADMIN ONLY ENDPOINTS
-                .requestMatchers("/api/flights/schedule", "/api/staff/**").hasRole(Role.ADMIN.name())
-                
-                // 5. DEFAULT FALLBACK (Anything else requires login)
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable()) // Disable CSRF as we use JWT
+                .authorizeHttpRequests(auth -> auth
+                        // 1. PUBLIC ENDPOINTS (Anyone can access)
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/airports/**",
+                                "/api/flights/**")
+                        .permitAll()
+                        .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.ico", "/css/**", "/js/**",
+                                "/images/**")
+                        .permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+
+                        // 2. PASSENGER & ADMIN ENDPOINTS
+                        .requestMatchers("/api/checkin/**", "/api/bookings/**")
+                        .hasAnyRole(Role.PASSENGER.name(), Role.ADMIN.name())
+
+                        // 3. STAFF & ADMIN ENDPOINTS
+                        .requestMatchers("/api/baggage/**", "/api/gate/**", "/api/shifts/**")
+                        .hasAnyRole(Role.STAFF.name(), Role.ADMIN.name())
+
+                        // 4. ADMIN ONLY ENDPOINTS
+                        .requestMatchers("/api/flights/schedule", "/api/staff/**").hasRole(Role.ADMIN.name())
+
+                        // 5. DEFAULT FALLBACK (Anything else requires login)
+                        .anyRequest().authenticated())
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -81,14 +88,35 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
-        
+
+        configuration.setAllowedOriginPatterns(
+                Arrays.asList("*"));
+
+        configuration.setAllowedMethods(
+                Arrays.asList(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "OPTIONS"));
+
+        configuration.setAllowedHeaders(
+                Arrays.asList("*"));
+
+        configuration.setExposedHeaders(
+                Arrays.asList("Authorization"));
+
+        configuration.setAllowCredentials(
+                true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration);
+
         return source;
     }
 }

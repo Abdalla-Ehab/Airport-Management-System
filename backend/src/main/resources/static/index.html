@@ -637,7 +637,116 @@
 
                     </div>
 
-                    <div id="flight-results" class="grid grid-2" style="margin-top:32px;">
+                    <div id="flight-results" class="flight-results" style="margin-top:32px;">
+
+                    </div>
+
+                    <!-- SELECTED FLIGHT -->
+
+                    <div class="card" style="margin-top:32px;">
+
+                        <div class="section-header">
+
+                            <h2>
+                                Selected Flight
+                            </h2>
+
+                        </div>
+
+                        <div style="
+            margin-top:20px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:20px;
+            flex-wrap:wrap;
+        ">
+
+                            <div>
+
+                                <strong>
+                                    Flight:
+                                </strong>
+
+                                <span id="selected-flight">
+
+                                    None Selected
+
+                                </span>
+                                <button id="change-flight-btn" class="btn btn-secondary hidden"
+                                    style="margin-left:16px;">
+
+                                    Change Flight
+
+                                </button>
+
+                            </div>
+
+                            <div>
+
+                                <label class="text-muted">
+
+                                    Cabin Class
+
+                                </label>
+
+                                <select id="class-filter" class="input" style="min-width:180px;">
+
+                                    <option value="ECONOMY">
+
+                                        Economy
+
+                                    </option>
+
+                                    <option value="BUSINESS">
+
+                                        Business
+
+                                    </option>
+
+                                    <option value="FIRST">
+
+                                        First Class
+
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- SEAT MAP -->
+
+                    <div class="card" style="margin-top:24px;">
+
+                        <div class="section-header">
+
+                            <h2>
+                                Seat Selection
+                            </h2>
+
+                        </div>
+
+                        <div id="seat-map" style="margin-top:24px;">
+
+                        </div>
+
+                        <div style="
+            margin-top:32px;
+            display:flex;
+            justify-content:flex-end;
+        ">
+
+                            <button id="confirm-booking-btn" class="btn btn-primary">
+
+                                Confirm Booking
+
+                            </button>
+
+                        </div>
 
                     </div>
 
