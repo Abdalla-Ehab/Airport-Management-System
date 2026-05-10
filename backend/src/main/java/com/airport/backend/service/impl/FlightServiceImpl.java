@@ -207,8 +207,8 @@ public class FlightServiceImpl implements FlightService {
 
     @Override
     public List<FlightResponse> findFlights(
-            String origin,
-            String destination) {
+            Long  origin,
+            Long  destination) {
 
         return flightRepository.findFlightsByRoute(origin, destination)
                 .stream()

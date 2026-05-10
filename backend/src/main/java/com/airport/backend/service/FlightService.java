@@ -8,5 +8,8 @@ public interface FlightService {
     List<FlightResponse> getAllFlights();
     FlightResponse getFlightById(Long id);
     FlightResponse scheduleFlight(FlightRequest request); 
-    List<FlightResponse> findFlights(String origin, String destination);
+    List<FlightResponse> findFlights(
+    Long origin,
+    Long destination
+);
 }

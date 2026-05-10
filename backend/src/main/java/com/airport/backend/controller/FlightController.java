@@ -76,8 +76,8 @@ public class FlightController {
 
         List<FlightResponse> flights =
                 flightService.findFlights(
-                        origin.toString(),
-                        destination.toString()
+                        origin,
+                        destination
                 );
 
         return ResponseEntity.ok(

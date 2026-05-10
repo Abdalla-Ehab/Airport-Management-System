@@ -19,72 +19,68 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     // =====================================================
 
     @Query("""
-    SELECT f FROM Flight f
-    WHERE f.aircraft.aircraft_id = :aircraftId
-    AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
-    AND (
-        f.departure_time < :arrivalTime
-        AND
-        f.arrival_time > :departureTime
-    )
-    """)
+            SELECT f FROM Flight f
+            WHERE f.aircraft.aircraft_id = :aircraftId
+            AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
+            AND (
+                f.departure_time < :arrivalTime
+                AND
+                f.arrival_time > :departureTime
+            )
+            """)
     List<Flight> findOverlappingAircraft(
             @Param("aircraftId") Long aircraftId,
             @Param("departureTime") LocalDateTime departureTime,
-            @Param("arrivalTime") LocalDateTime arrivalTime
-    );
+            @Param("arrivalTime") LocalDateTime arrivalTime);
 
     // =====================================================
     // DEPARTURE GATE OVERLAP CHECK
     // =====================================================
 
     @Query("""
-    SELECT f FROM Flight f
-    WHERE f.departureGate.gate_id = :gateId
-    AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
-    AND (
-        f.departure_time < :arrivalTime
-        AND
-        f.arrival_time > :departureTime
-    )
-    """)
+            SELECT f FROM Flight f
+            WHERE f.departureGate.gate_id = :gateId
+            AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
+            AND (
+                f.departure_time < :arrivalTime
+                AND
+                f.arrival_time > :departureTime
+            )
+            """)
     List<Flight> findOverlappingDepartureGate(
             @Param("gateId") Long gateId,
             @Param("departureTime") LocalDateTime departureTime,
-            @Param("arrivalTime") LocalDateTime arrivalTime
-    );
+            @Param("arrivalTime") LocalDateTime arrivalTime);
 
     // =====================================================
     // ARRIVAL GATE OVERLAP CHECK
     // =====================================================
 
     @Query("""
-    SELECT f FROM Flight f
-    WHERE f.arrivalGate.gate_id = :gateId
-    AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
-    AND (
-        f.departure_time < :arrivalTime
-        AND
-        f.arrival_time > :departureTime
-    )
-    """)
+            SELECT f FROM Flight f
+            WHERE f.arrivalGate.gate_id = :gateId
+            AND f.status <> com.airport.backend.enums.FlightStatus.CANCELLED
+            AND (
+                f.departure_time < :arrivalTime
+                AND
+                f.arrival_time > :departureTime
+            )
+            """)
     List<Flight> findOverlappingArrivalGate(
             @Param("gateId") Long gateId,
             @Param("departureTime") LocalDateTime departureTime,
-            @Param("arrivalTime") LocalDateTime arrivalTime
-    );
+            @Param("arrivalTime") LocalDateTime arrivalTime);
 
     // =====================================================
     // FIND FLIGHTS BY ORIGIN + DESTINATION
     // =====================================================
 
     @Query("""
-    SELECT f FROM Flight f
-    WHERE LOWER(f.departureAirport.city) = LOWER(:origin)
-    AND LOWER(f.arrivalAirport.city) = LOWER(:destination)
-    """)
+            SELECT f FROM Flight f
+            WHERE f.departureAirport.airport_id = :origin
+            AND f.arrivalAirport.airport_id = :destination
+            """)
     List<Flight> findFlightsByRoute(
-            @Param("origin") String origin,
-            @Param("destination") String destination
-    );
+            @Param("origin") Long origin,
+            @Param("destination") Long destination);
 }
