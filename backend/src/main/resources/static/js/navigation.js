@@ -1,42 +1,104 @@
 import { navigate }
 from './router.js';
 
-const NAV_CONFIG = {
+const NAVIGATION = {
+
+    admin: [
+
+        {
+            id: 'dashboard',
+            label: 'Dashboard',
+            icon: '📊'
+        },
+
+        {
+            id: 'flights',
+            label: 'Flights',
+            icon: '✈'
+        },
+
+        {
+            id: 'airports',
+            label: 'Airports',
+            icon: '🏢'
+        },
+
+        {
+            id: 'airlines',
+            label: 'Airlines',
+            icon: '🛩'
+        },
+
+        {
+            id: 'fleet',
+            label: 'Fleet',
+            icon: '🛫'
+        },
+
+        {
+            id: 'maintenance',
+            label: 'Maintenance',
+            icon: '🔧'
+        },
+
+        {
+            id: 'analytics',
+            label: 'Analytics',
+            icon: '📈'
+        }
+    ],
 
     passenger: [
+
         {
-            view: 'home',
-            label: 'Airports'
+            id: 'book',
+            label: 'Book Flight',
+            icon: '🎫'
         },
+
         {
-            view: 'book',
-            label: 'Book Flight'
+            id: 'bookings',
+            label: 'My Bookings',
+            icon: '🎟'
         },
+
         {
-            view: 'status',
-            label: 'Flight Status'
+            id: 'boarding',
+            label: 'Boarding Pass',
+            icon: '🛂'
+        },
+
+        {
+            id: 'status',
+            label: 'Flight Status',
+            icon: '✈'
+        },
+
+        {
+            id: 'profile',
+            label: 'Profile',
+            icon: '👤'
         }
     ],
 
     staff: [
-        {
-            view: 'baggage',
-            label: 'Baggage'
-        },
-        {
-            view: 'scanner',
-            label: 'Scanner'
-        }
-    ],
 
-    admin: [
         {
-            view: 'schedule',
-            label: 'Scheduler'
+            id: 'checkin',
+            label: 'Check-In',
+            icon: '🛂'
         },
+
         {
-            view: 'fleet',
-            label: 'Fleet'
+            id: 'baggage',
+            label: 'Baggage',
+            icon: '🧳'
+        },
+
+        {
+            id: 'scanner',
+            label: 'Scanner',
+            icon: '📡'
         }
     ]
 };
@@ -44,37 +106,59 @@ const NAV_CONFIG = {
 export function buildNavigation(role) {
 
     const container =
-        document.getElementById('nav-links');
+        document.getElementById(
+            'nav-links'
+        );
+
+    if (!container) return;
 
     container.innerHTML = '';
 
     const items =
-        NAV_CONFIG[role] || [];
+        NAVIGATION[role] || [];
 
-    items.forEach(item => {
-
-        const li =
-            document.createElement('li');
+    items.forEach((item, index) => {
 
         const a =
             document.createElement('a');
 
-        a.textContent =
-            item.label;
-
         a.href = '#';
+
+        a.className =
+            'sidebar-link';
+
+        if (index === 0) {
+
+            a.classList.add('active');
+        }
+
+        a.innerHTML = `
+            <span>${item.icon}</span>
+            <span>${item.label}</span>
+        `;
 
         a.addEventListener('click', () => {
 
-            navigate(item.view);
+            document
+                .querySelectorAll('.sidebar-link')
+                .forEach(link =>
+                    link.classList.remove('active')
+                );
+
+            a.classList.add('active');
+
+            navigate(item.id);
+
+            document
+                .getElementById('sidebar')
+                ?.classList.remove('active');
         });
 
-        li.appendChild(a);
-
-        container.appendChild(li);
+        container.appendChild(a);
     });
 
     if (items.length) {
-        navigate(items[0].view);
+
+        navigate(items[0].id);
     }
 }

@@ -4,485 +4,1514 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>twixNexus — Airport Management System</title>
-    <link rel="stylesheet" href="/css/style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet" />
+
+    <link rel="stylesheet" href="/css/main.css">
 </head>
 
-<body>
+<body class="loading">
+    
+    <!-- ========================= -->
+    <!-- AUTH SCREEN -->
+    <!-- ========================= -->
 
-    <section id="login-screen" class="active fullscreen">
-        <div class="login-bg">
-            <div class="login-overlay"></div>
+    <div class="auth-screen">
+
+        <div class="auth-left">
+
+            <div class="auth-panel fade-in">
+
+                <div class="auth-logo">
+                    ✈ twixNexus AMS
+                </div>
+
+                <div class="auth-tabs">
+
+                    <button id="tab-login" class="auth-tab active">
+
+                        Sign In
+                    </button>
+
+                    <button id="tab-register" class="auth-tab">
+
+                        Register
+                    </button>
+
+                </div>
+
+                <div id="auth-error" class="auth-error">
+                </div>
+
+                <!-- LOGIN -->
+
+                <form id="login-form" class="auth-form">
+
+                    <div>
+
+                        <h2 class="auth-title">
+                            Welcome Back
+                        </h2>
+
+                        <p class="auth-subtitle">
+                            Access airport operations,
+                            bookings, analytics,
+                            and passenger services.
+                        </p>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <input id="login-username" class="input" type="text" placeholder="Enter username">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input id="login-password" class="input" type="password" placeholder="Enter password">
+
+                    </div>
+
+                    <button type="button" id="login-btn" class="btn btn-primary">
+
+                        Sign In
+
+                    </button>
+
+                </form>
+
+                <!-- REGISTER -->
+
+                <form id="register-form" class="auth-form hidden">
+
+                    <div>
+
+                        <h2 class="auth-title">
+                            Create Account
+                        </h2>
+
+                        <p class="auth-subtitle">
+                            Join the airport management platform.
+                        </p>
+
+                    </div>
+
+                    <div class="grid grid-2">
+
+                        <div class="input-group">
+
+                            <label>
+                                First Name
+                            </label>
+
+                            <input id="reg-firstname" class="input" type="text">
+
+                        </div>
+
+                        <div class="input-group">
+
+                            <label>
+                                Last Name
+                            </label>
+
+                            <input id="reg-lastname" class="input" type="text">
+
+                        </div>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input id="reg-email" class="input" type="email">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Phone
+                        </label>
+
+                        <input id="reg-phone" class="input" type="text">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Date of Birth
+                        </label>
+
+                        <input id="reg-dob" class="input" type="date">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Passport Number
+                        </label>
+
+                        <input id="reg-passport" class="input" type="text">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Username
+                        </label>
+
+                        <input id="reg-username" class="input" type="text">
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>
+                            Password
+                        </label>
+
+                        <input id="reg-password" class="input" type="password">
+
+                    </div>
+
+                    <button type="button" id="register-btn" class="btn btn-primary">
+
+                        Create Account
+
+                    </button>
+
+                </form>
+
+            </div>
+
         </div>
-        <div class="login-card glass">
-            <div class="brand">
-                <div class="brand-icon">✈</div>
-                <h1>twixNexus</h1>
-                <p class="brand-sub">Airport Management Platform</p>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="auth-right">
+
+            <img class="auth-image"
+                src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600&auto=format&fit=crop">
+
+            <div class="auth-overlay"></div>
+
+            <div class="auth-right-content fade-in">
+
+                <div class="hero-badge">
+                    ✈ Enterprise Aviation Platform
+                </div>
+
+                <h1>
+                    Smart Airport Management
+                    For Modern Aviation Operations
+                </h1>
+
+                <p>
+                    Manage flights, passengers,
+                    airports, airlines, maintenance,
+                    fleet operations, and analytics
+                    from one integrated platform.
+                </p>
+
+                <div class="stats-row">
+
+                    <div class="stat-card">
+
+                        <h3>120+</h3>
+
+                        <p>
+                            Daily Flights
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <h3>45K+</h3>
+
+                        <p>
+                            Passengers
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <h3>99.9%</h3>
+
+                        <p>
+                            Uptime
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="auth-tabs">
-                <button id="tab-login" class="btn-primary flex-1 btn-pad">Login</button>
-                <button id="tab-register" class="btn-primary btn-outline flex-1 btn-pad">Register</button>
-            </div>
-
-            <form id="login-form">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off" />
-                </div>
-                <div class="form-group mt-15">
-                    <label>Password</label>
-                    <input type="password" id="login-password" placeholder="••••••••" />
-                </div>
-                <button class="btn-primary mt-20" id="login-btn">Sign In</button>
-            </form>
-
-            <form id="register-form" class="hidden">
-                <div class="form-row mt-15">
-                    <div class="form-group">
-                        <label>Date of Birth</label>
-                        <input type="date" id="reg-dob" />
-                    </div>
-                    <div class="form-group">
-                        <label>Passport Number</label>
-                        <input type="text" id="reg-passport" placeholder="e.g. A1234567" />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="reg-firstname" placeholder="First" />
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" id="reg-lastname" placeholder="Last" />
-                    </div>
-                </div>
-                <div class="form-row mt-15">
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="reg-email" placeholder="email@example.com" />
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" id="reg-phone" placeholder="e.g. 010..." />
-                    </div>
-                </div>
-                <div class="form-row mt-15">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="reg-username" placeholder="Choose a username" />
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="reg-password" placeholder="••••••••" />
-                    </div>
-                </div>
-                <button class="btn-primary mt-20" id="register-btn">Create Account</button>
-            </form>
-
-            <div id="auth-error" class="msg-error hidden"></div>
         </div>
-    </section>
 
-    <div id="app-shell" class="hidden">
+    </div>
 
-        <nav id="sidebar">
-            <div class="nav-brand">
-                <div class="brand-icon small">✈</div>
-                <span>Twix</span>
+    <!-- ========================= -->
+    <!-- APP SHELL -->
+    <!-- ========================= -->
+
+    <div id="app-shell" class="app-shell hidden">
+
+        <!-- SIDEBAR -->
+
+        <aside id="sidebar" class="sidebar">
+
+            <div class="navbar-brand">
+
+                ✈ twixNexus
+
             </div>
-            <div class="nav-user">
-                <div class="user-avatar" id="nav-avatar">P</div>
-                <div>
-                    <div class="user-name" id="nav-username">Passenger</div>
-                    <div class="user-role" id="nav-role">Passenger Portal</div>
+
+            <nav id="nav-links" class="sidebar-nav">
+
+            </nav>
+
+        </aside>
+
+        <!-- MAIN -->
+
+        <div>
+
+            <!-- NAVBAR -->
+
+            <header class="navbar">
+
+                <div class="navbar-brand">
+
+                    <button aria-label="Open sidebar" id="sidebar-toggle" class="btn btn-secondary">
+
+                        ☰
+
+                    </button>
+
+                    <span>
+                        Airport Management System
+                    </span>
+
                 </div>
+
+                <div class="navbar-actions">
+
+                    <button aria-label="Notifications" class="btn btn-secondary">
+
+                        🔔
+
+                    </button>
+
+                    <div class="profile-chip">
+
+                        <div id="nav-avatar" class="avatar-circle">
+
+                            A
+
+                        </div>
+
+                        <div>
+
+                            <div id="nav-username">
+                                Admin
+                            </div>
+
+                            <small id="nav-role" class="text-muted">
+
+                                Administrator
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <button aria-label="Logout" id="logout-btn" class="btn btn-primary">
+
+                        Logout
+
+                    </button>
+
+                </div>
+
+            </header>
+
+            <!-- MAIN CONTENT -->
+
+            <main class="main-content">
+
+                <!-- DASHBOARD -->
+
+                <section id="view-dashboard" class="view dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Operations Dashboard
+                            </h1>
+
+                            <p>
+                                Monitor airport operations,
+                                analytics, flights, and fleet systems.
+                            </p>
+
+                        </div>
+
+                        <button class="btn btn-primary">
+
+                            + New Flight
+
+                        </button>
+
+                    </div>
+
+                    <!-- KPI -->
+
+                    <div class="kpi-grid">
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Active Flights
+                            </div>
+
+                            <div class="kpi-value">
+                                128
+                            </div>
+
+                            <div class="kpi-change positive">
+                                ▲ 12%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Daily Passengers
+                            </div>
+
+                            <div class="kpi-value">
+                                45,280
+                            </div>
+
+                            <div class="kpi-change positive">
+                                ▲ 8%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Delayed Flights
+                            </div>
+
+                            <div class="kpi-value">
+                                6
+                            </div>
+
+                            <div class="kpi-change negative">
+                                ▼ 3%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Fleet Health
+                            </div>
+
+                            <div class="kpi-value">
+                                98%
+                            </div>
+
+                            <div class="kpi-change positive">
+                                Stable
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- FLIGHTS -->
+
+                <section id="view-flights" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Flights Management
+                            </h1>
+
+                            <p>
+                                Manage airport flight operations.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="table-wrapper">
+
+                            <table class="table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Flight</th>
+                                        <th>Status</th>
+                                        <th>Departure</th>
+                                        <th>Arrival</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="flights-table-body">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- AIRPORTS -->
+
+                <section id="view-airports" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Airports
+                            </h1>
+
+                            <p>
+                                Airport operational management.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div id="airports-grid" class="airport-grid">
+
+                    </div>
+
+                </section>
+
+                <!-- AIRLINES -->
+
+                <section id="view-airlines" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Airlines Management
+                            </h1>
+
+                            <p>
+                                Manage airline operations and partnerships.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="table-wrapper">
+
+                            <table class="table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Airline</th>
+                                        <th>Country</th>
+                                        <th>Fleet</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="airlines-table-body">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- BOOK -->
+
+                <section id="view-book" class="view hidden dashboard">
+
+                    <div class="booking-hero card">
+
+                        <div>
+
+                            <div class="hero-badge">
+                                ✈ Passenger Portal
+                            </div>
+
+                            <h1>
+                                Explore Your Next Journey
+                            </h1>
+
+                            <p>
+                                Book flights and manage your travel experience.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="booking-search">
+
+                        <input id="flight-origin" class="input" placeholder="Departure">
+
+                        <input id="flight-destination" class="input" placeholder="Destination">
+
+                        <input class="input" type="date">
+
+                        <button id="search-flight-btn" class="btn btn-primary">
+
+                            Search Flights
+
+                        </button>
+
+                    </div>
+
+                    <div id="flight-results" class="grid grid-2" style="margin-top:32px;">
+
+                    </div>
+
+                </section>
+
+                <!-- BOOKINGS -->
+
+                <section id="view-bookings" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                My Bookings
+                            </h1>
+
+                            <p>
+                                View upcoming flights and tickets.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div id="booking-history" class="booking-history">
+
+                    </div>
+
+                </section>
+
+                <!-- BOARDING -->
+
+                <section id="view-boarding" class="view hidden dashboard">
+
+                    <div class="
+                            card
+                            boarding-pass-premium
+                        ">
+
+                        <div class="bp-layout">
+
+                            <div>
+
+                                <div class="hero-badge">
+                                    ✈ twixNexus Airlines
+                                </div>
+
+                                <h2>
+                                    Boarding Pass
+                                </h2>
+
+                            </div>
+
+                            <div class="bp-qr">
+
+                                <div class="fake-qr"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- PROFILE -->
+
+                <section id="view-profile" class="view hidden dashboard">
+
+                    <div class="profile-grid">
+
+                        <div class="
+                                card
+                                profile-sidebar
+                            ">
+
+                            <div class="profile-avatar">
+
+                                S
+
+                            </div>
+
+                            <div style="text-align:center;">
+
+                                <h2>
+                                    Seif Taha
+                                </h2>
+
+                                <p>
+                                    Premium Passenger
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card">
+
+                            <h2>
+                                Account Information
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section id="view-checkin" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Check-In Operations
+                            </h1>
+
+                            <p>
+                                Process passenger boarding and airport operations.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="ops-grid">
+
+                        <!-- LEFT -->
+
+                        <div class="ops-panel">
+
+                            <!-- CHECKIN -->
+
+                            <div class="card">
+
+                                <h3>
+                                    Passenger Check-In
+                                </h3>
+
+                                <div class="grid" style="
+                        margin-top:24px;
+                        gap:16px;
+                    ">
+
+                                    <input id="checkin-ticket" class="input" placeholder="Ticket Number">
+
+                                    <button id="checkin-btn" class="btn btn-primary">
+
+                                        Process Check-In
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- BOARDING -->
+
+                            <div class="card">
+
+                                <h3>
+                                    Boarding Queue
+                                </h3>
+
+                                <div style="
+                        margin-top:24px;
+                        display:flex;
+                        flex-direction:column;
+                        gap:18px;
+                    ">
+
+                                    <div class="passenger-ticket">
+
+                                        <div class="ticket-meta">
+
+                                            <strong>
+                                                Ahmed Hassan
+                                            </strong>
+
+                                            <p>
+                                                Flight EK202 • Seat 12A
+                                            </p>
+
+                                        </div>
+
+                                        <span class="badge badge-success">
+
+                                            READY
+
+                                        </span>
+
+                                    </div>
+
+                                    <div class="passenger-ticket">
+
+                                        <div class="ticket-meta">
+
+                                            <strong>
+                                                Sarah Ali
+                                            </strong>
+
+                                            <p>
+                                                Flight QR410 • Seat 7C
+                                            </p>
+
+                                        </div>
+
+                                        <span class="badge badge-warning">
+
+                                            WAITING
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+
+                        <div class="ops-panel">
+
+                            <!-- LIVE OPS -->
+
+                            <div class="card">
+
+                                <h3>
+                                    Live Operations Feed
+                                </h3>
+
+                                <div class="operation-feed" style="margin-top:24px;">
+
+                                    <div class="feed-item">
+
+                                        <div class="feed-icon">
+                                            ✈
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                Flight EK202 Boarded
+                                            </strong>
+
+                                            <p>
+                                                Gate G7 • 2 mins ago
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="feed-item">
+
+                                        <div class="feed-icon">
+                                            🧳
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                Baggage Loaded
+                                            </strong>
+
+                                            <p>
+                                                Flight BA110
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="feed-item">
+
+                                        <div class="feed-icon">
+                                            🛂
+                                        </div>
+
+                                        <div>
+
+                                            <strong>
+                                                Passenger Checked-In
+                                            </strong>
+
+                                            <p>
+                                                Terminal A
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section id="view-baggage" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Baggage Operations
+                            </h1>
+
+                            <p>
+                                Process and monitor baggage logistics.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="ops-grid">
+
+                        <!-- LEFT -->
+
+                        <div class="ops-panel">
+
+                            <div class="card">
+
+                                <h3>
+                                    Baggage Drop
+                                </h3>
+
+                                <div class="grid" style="
+                        margin-top:24px;
+                        gap:16px;
+                    ">
+
+                                    <input id="bag-ticket" class="input" placeholder="Ticket Number">
+
+                                    <input id="bag-weight" class="input" type="number" placeholder="Weight (kg)">
+
+                                    <button id="bag-btn" class="btn btn-primary">
+
+                                        Process Baggage
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <div class="card">
+
+                                <h3>
+                                    Scanner
+                                </h3>
+
+                                <div class="scanner-box" style="margin-top:24px;">
+
+                                    <h2>
+                                        📡
+                                    </h2>
+
+                                    <p>
+                                        Ready to scan baggage barcode
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+
+                        <div class="ops-panel">
+
+                            <div class="card">
+
+                                <h3>
+                                    Gate Operations
+                                </h3>
+
+                                <div class="gate-board" style="margin-top:24px;">
+
+                                    <div class="gate-row">
+
+                                        <strong>
+                                            Gate G7
+                                        </strong>
+
+                                        <span class="badge badge-success">
+
+                                            BOARDING
+
+                                        </span>
+
+                                    </div>
+
+                                    <div class="gate-row">
+
+                                        <strong>
+                                            Gate A2
+                                        </strong>
+
+                                        <span class="badge badge-warning">
+
+                                            DELAYED
+
+                                        </span>
+
+                                    </div>
+
+                                    <div class="gate-row">
+
+                                        <strong>
+                                            Gate F1
+                                        </strong>
+
+                                        <span class="badge badge-error">
+
+                                            CLOSED
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section id="view-scanner" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Logistics Scanner
+                            </h1>
+
+                            <p>
+                                Track baggage movement across the airport.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="
+            card
+            scanner-box
+        ">
+
+                        <h1>
+                            📡
+                        </h1>
+
+                        <p style="margin:20px 0;">
+
+                            Ready for baggage barcode scan
+
+                        </p>
+
+                        <input id="scan-barcode" class="input" placeholder="Scan Barcode" style="
+                max-width:420px;
+                margin:auto;
+            ">
+
+                        <button id="scan-btn" class="btn btn-primary" style="margin-top:20px;">
+
+                            Record Scan
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+                <section id="view-analytics" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                Analytics & Reports
+                            </h1>
+
+                            <p>
+                                Executive operational insights
+                                and airport performance analytics.
+                            </p>
+
+                        </div>
+
+                        <button class="btn btn-primary">
+
+                            Export Report
+
+                        </button>
+
+                    </div>
+
+                    <!-- KPI ROW -->
+
+                    <div class="kpi-grid">
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Revenue
+                            </div>
+
+                            <div class="kpi-value">
+                                $12.8M
+                            </div>
+
+                            <div class="kpi-change positive">
+                                ▲ 18%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Flights Today
+                            </div>
+
+                            <div class="kpi-value">
+                                482
+                            </div>
+
+                            <div class="kpi-change positive">
+                                ▲ 9%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Delays
+                            </div>
+
+                            <div class="kpi-value">
+                                14
+                            </div>
+
+                            <div class="kpi-change negative">
+                                ▼ 4%
+                            </div>
+
+                        </div>
+
+                        <div class="card kpi-card">
+
+                            <div class="kpi-label">
+                                Satisfaction
+                            </div>
+
+                            <div class="kpi-value">
+                                96%
+                            </div>
+
+                            <div class="kpi-change positive">
+                                Excellent
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ANALYTICS GRID -->
+
+                    <div class="analytics-grid">
+
+                        <!-- FLIGHT ANALYTICS -->
+
+                        <div class="
+                card
+                analytics-card
+                large
+            ">
+
+                            <div class="section-header">
+
+                                <h3>
+                                    Flight Activity
+                                </h3>
+
+                                <button class="btn btn-secondary">
+
+                                    Monthly
+
+                                </button>
+
+                            </div>
+
+                            <div class="analytics-chart">
+
+                                ✈ Advanced Flight Analytics Chart
+
+                            </div>
+
+                        </div>
+
+                        <!-- PASSENGERS -->
+
+                        <div class="
+                card
+                analytics-card
+                small
+            ">
+
+                            <div class="section-header">
+
+                                <h3>
+                                    Passenger Metrics
+                                </h3>
+
+                            </div>
+
+                            <div style="margin-top:24px;">
+
+                                <div class="metric-row">
+
+                                    <div>
+
+                                        <strong>
+                                            Daily Passengers
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="metric-value">
+                                            45K
+                                        </div>
+
+                                        <div class="metric-growth up">
+                                            ▲ 12%
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="metric-row">
+
+                                    <div>
+
+                                        <strong>
+                                            Boarding Success
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="metric-value">
+                                            98%
+                                        </div>
+
+                                        <div class="metric-growth up">
+                                            Stable
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="metric-row">
+
+                                    <div>
+
+                                        <strong>
+                                            Missed Flights
+                                        </strong>
+
+                                    </div>
+
+                                    <div>
+
+                                        <div class="metric-value">
+                                            1.2%
+                                        </div>
+
+                                        <div class="metric-growth down">
+                                            ▼ 0.4%
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- HEATMAP -->
+
+                        <div class="
+                card
+                analytics-card
+                medium
+            ">
+
+                            <div class="section-header">
+
+                                <h3>
+                                    Flight Heatmap
+                                </h3>
+
+                            </div>
+
+                            <div class="flight-heatmap">
+
+                                <div class="heat-cell heat-high">92</div>
+                                <div class="heat-cell heat-high">88</div>
+                                <div class="heat-cell heat-medium">71</div>
+                                <div class="heat-cell heat-low">42</div>
+                                <div class="heat-cell heat-high">95</div>
+                                <div class="heat-cell heat-medium">68</div>
+                                <div class="heat-cell heat-high">90</div>
+
+                                <div class="heat-cell heat-medium">66</div>
+                                <div class="heat-cell heat-low">40</div>
+                                <div class="heat-cell heat-high">93</div>
+                                <div class="heat-cell heat-medium">70</div>
+                                <div class="heat-cell heat-high">87</div>
+                                <div class="heat-cell heat-low">35</div>
+                                <div class="heat-cell heat-high">91</div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- REVENUE -->
+
+                        <div class="
+                card
+                analytics-card
+                medium
+            ">
+
+                            <div class="section-header">
+
+                                <h3>
+                                    Revenue Streams
+                                </h3>
+
+                            </div>
+
+                            <div class="analytics-chart">
+
+                                💰 Revenue Distribution Chart
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section id="view-404" class="view hidden">
+
+                    <div class="error-state">
+
+                        <div class="error-state-icon">
+                            ✈
+                        </div>
+
+                        <h2>
+                            Page Not Found
+                        </h2>
+
+                        <p>
+                            The requested page could not
+                            be located inside the airport system.
+                        </p>
+
+                        <button class="btn btn-primary">
+
+                            Return Dashboard
+
+                        </button>
+
+                    </div>
+
+                </section>
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- FLIGHT MODAL -->
+    <!-- ========================= -->
+
+    <div id="flight-modal" class="flight-modal">
+
+        <div class="flight-modal-content card">
+
+            <div class="section-header">
+
+                <h2>
+                    Schedule Flight
+                </h2>
+
+                <button id="close-flight-modal" class="btn btn-secondary">
+
+                    ✕
+
+                </button>
+
             </div>
 
-            <ul class="nav-links" id="nav-links"></ul>
+            <div class="grid grid-2" style="margin-top:24px;">
 
-            <button class="btn-logout" id="logout-btn">⬅ Sign Out</button>
-        </nav>
+                <div class="input-group">
 
-        <main id="main-content">
+                    <label>
+                        Flight Number
+                    </label>
 
-            <div id="toast-container"></div>
+                    <input id="schedule-flight-number" class="input">
 
-            <section id="view-home" class="view hidden">
-                <div class="view-header">
-                    <h2>Available Airports</h2>
-                    <p>Live data from our network</p>
                 </div>
-                <div class="card-grid" id="airports-grid"></div>
-            </section>
 
-            <section id="view-book" class="view hidden">
-                <div class="view-header">
-                    <h2>Book a Flight</h2>
-                    <p>Search schedule, select your class, and choose your seat</p>
-                </div>
-                <div class="form-card glass-dark" style="max-width: 900px;">
+                <div class="input-group">
 
-                    <div class="form-row flex-row-15" style="align-items: flex-end;">
-                        <div class="form-group flex-1">
-                            <label>Origin</label>
-                            <select id="book-origin" class="input-glass">
-                                <option value="">Loading...</option>
-                            </select>
-                        </div>
-                        <div class="form-group flex-1">
-                            <label>Destination</label>
-                            <select id="book-dest" class="input-glass">
-                                <option value="">Loading...</option>
-                            </select>
-                        </div>
-                        <div class="form-group flex-1">
-                            <label>Date</label>
-                            <input type="date" id="book-date" class="input-glass" />
-                        </div>
-                        <div class="form-group flex-1">
-                            <label>Passengers</label>
-                            <select id="book-passengers" class="input-glass">
-                                <option value="1">1 Adult</option>
-                                <option value="2">2 Adults</option>
-                                <option value="3">3 Adults</option>
-                                <option value="4">4 Adults</option>
-                                <option value="5">5 Adults</option>
-                            </select>
-                        </div>
-                        <button class="btn-primary" id="search-flights-btn"
-                            style="flex: 0.5; padding: 14px;">Search</button>
-                    </div>
+                    <label>
+                        Airline ID
+                    </label>
 
-                    <div id="flight-results-container" class="mt-20 hidden">
-                        <h3 style="color: var(--sky-light); margin-bottom: 15px;">Available Flights</h3>
-                        <div id="flight-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
-                    </div>
+                    <input id="schedule-airline" class="input">
 
-                    <div id="seat-selection-container" class="hidden mt-20"
-                        style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                </div>
 
-                        <div class="form-group">
-                            <label style="text-align: center; font-size: 1rem; color: white;">1. Select Travel
-                                Class</label>
-                            <div class="class-selector" id="seat-class-selector"
-                                style="max-width: 500px; margin: 0 auto;">
-                                <label class="class-option"><input type="radio" name="travel-class"
-                                        value="First" /><span>⭐ First</span></label>
-                                <label class="class-option"><input type="radio" name="travel-class"
-                                        value="Business" /><span>💼 Business</span></label>
-                                <label class="class-option"><input type="radio" name="travel-class" value="Economy"
-                                        checked /><span>🪑 Economy</span></label>
-                            </div>
-                            <div id="class-inventory-count"
-                                style="text-align: center; margin-top: 12px; font-size: 0.95rem; font-weight: bold;">
-                            </div>
-                        </div>
+                <div class="input-group">
 
-                        <div class="seat-legend" style="margin-top: 25px;">
-                            <div class="legend-item">
-                                <div class="legend-box" style="background: var(--sky);"></div> Available
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-box" style="background: var(--success);"></div> Selected
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-box" style="background: #334155;"></div> Wrong Class
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-box" style="background: var(--error);"></div> Occupied
-                            </div>
-                        </div>
+                    <label>
+                        Aircraft ID
+                    </label>
 
-                        <div class="plane-fuselage" id="plane-seats">
-                        </div>
-                        <input type="hidden" id="selected-seat-no" />
+                    <input id="schedule-aircraft" class="input">
 
-                        <button class="btn-primary mt-20" id="book-btn" disabled>Confirm Booking</button>
-                        <div id="book-result" class="result-area hidden mt-20"></div>
-                    </div>
                 </div>
-            </section>
 
-            <section id="view-checkin" class="view hidden">
-                <div class="view-header">
-                    <h2>Check-In Kiosk</h2>
-                    <p>Fast-track your boarding experience</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Ticket Number</label>
-                        <input type="text" id="checkin-ticket" placeholder="e.g. TKT-20241" />
-                    </div>
-                    <button class="btn-primary" id="checkin-btn">Check In Now</button>
-                    <div id="boarding-pass" class="hidden"></div>
-                </div>
-            </section>
+            </div>
 
-            <section id="view-status" class="view hidden">
-                <div class="view-header">
-                    <h2>Flight Status</h2>
-                    <p>Real-time departure information</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-row flex-row-15">
-                        <div class="form-group flex-1">
-                            <label>From (Origin)</label>
-                            <select id="status-origin" class="input-glass">
-                                <option value="">Loading airports...</option>
-                            </select>
-                        </div>
-                        <div class="form-group flex-1">
-                            <label>To (Destination)</label>
-                            <select id="status-dest" class="input-glass">
-                                <option value="">Loading airports...</option>
-                            </select>
-                        </div>
-                    </div>
+            <div style="
+                    margin-top:32px;
+                    display:flex;
+                    justify-content:flex-end;
+                ">
 
-                    <div class="form-group mt-20">
-                        <label>Select Flight</label>
-                        <select id="status-flight-select" class="input-glass" disabled>
-                            <option value="">Please select Origin and Destination first</option>
-                        </select>
-                    </div>
-                    <button class="btn-primary" id="status-btn">Track Flight</button>
-                    <div id="flight-status-result" class="result-area hidden mt-20"></div>
-                </div>
-            </section>
+                <button id="schedule-btn" class="btn btn-primary">
 
-            <section id="view-baggage" class="view hidden">
-                <div class="view-header">
-                    <h2>Baggage Drop</h2>
-                    <p>Process passenger baggage check-in</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Ticket Number</label>
-                        <input type="text" id="bag-ticket" placeholder="e.g. TKT-20241" />
-                    </div>
-                    <div class="form-group">
-                        <label>Baggage Weight (kg)</label>
-                        <input type="number" id="bag-weight" placeholder="e.g. 23" step="0.1" />
-                    </div>
-                    <button class="btn-primary" id="bag-btn">Process Baggage</button>
-                    <div id="bag-result" class="result-area hidden"></div>
-                </div>
-            </section>
+                    Create Flight
 
-            <section id="view-scanner" class="view hidden">
-                <div class="view-header">
-                    <h2>Logistics Scanner</h2>
-                    <p>Track baggage movement across the network</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Scan Barcode</label>
-                        <input type="text" id="scan-barcode" class="input-glass" placeholder="e.g. BG-A1B2C3D4"
-                            style="font-family: monospace; font-size: 1.2rem; letter-spacing: 2px;"
-                            autocomplete="off" />
-                    </div>
-                    <div class="form-row mt-15">
-                        <div class="form-group">
-                            <label>Scan Location</label>
-                            <input type="text" id="scan-location" class="input-glass"
-                                placeholder="e.g. Cairo T3 Sorting, Gate F4..." />
-                        </div>
-                        <div class="form-group">
-                            <label>Status Override (Optional)</label>
-                            <select id="scan-override" class="input-glass">
-                                <option value="">Auto-Advance Status</option>
-                                <option value="LOST">Flag as LOST</option>
-                                <option value="TRANSIT">Mark as in TRANSIT</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-primary mt-20" id="scan-btn">Record Scan</button>
-                    <div id="scan-result" class="result-area hidden mt-20"></div>
-                </div>
-            </section>
-            <section id="view-security" class="view hidden">
-                <div class="view-header">
-                    <h2>Security Log</h2>
-                    <p>File terminal incident reports</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-group">
-                        <label>Terminal</label>
-                        <select id="sec-terminal" class="input-glass">
-                            <option value="">Select Terminal</option>
-                            <option value="Terminal A">Terminal A</option>
-                            <option value="Terminal B">Terminal B</option>
-                            <option value="Terminal C">Terminal C</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Incident Report</label>
-                        <textarea id="sec-report" class="input-glass" rows="5"
-                            placeholder="Describe the incident..."></textarea>
-                    </div>
-                    <button class="btn-primary" id="sec-btn">Submit Report</button>
-                    <div id="sec-result" class="result-area hidden"></div>
-                </div>
-            </section>
+                </button>
 
-            <section id="view-schedule" class="view hidden">
-                <div class="view-header">
-                    <h2>Master Flight Scheduler</h2>
-                    <p>Create and manage flight operations</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-row flex-row-15">
-                        <div class="form-group flex-1">
-                            <label>Flight Identifier (IATA + Route)</label>
-                            <div style="display: flex; gap: 8px;">
-                                <select id="sched-airline-code" class="input-glass" style="flex: 1.2;">
-                                    <option value="">Airline...</option>
-                                </select>
-                                <input type="number" id="sched-route-no" class="input-glass" style="flex: 1;"
-                                    placeholder="e.g. 201" min="1" max="9999" />
-                            </div>
-                        </div>
-                        <div class="form-group flex-1">
-                            <label>Aircraft ID</label>
-                            <input type="number" id="sched-aircraft-id" class="input-glass" placeholder="e.g. 5" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Origin Airport</label>
-                            <input type="text" id="sched-origin" placeholder="e.g. JFK" />
-                        </div>
-                        <div class="form-group">
-                            <label>Destination Airport</label>
-                            <input type="text" id="sched-dest" placeholder="e.g. LHR" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Departure Time</label>
-                            <input type="datetime-local" id="sched-depart" class="input-glass" />
-                        </div>
-                        <div class="form-group">
-                            <label>Arrival Time</label>
-                            <input type="datetime-local" id="sched-arrive" class="input-glass" />
-                        </div>
-                    </div>
-                    <button class="btn-primary" id="sched-btn">Schedule Flight</button>
-                    <div id="sched-result" class="result-area hidden"></div>
-                </div>
-            </section>
+            </div>
 
-            <section id="view-fleet" class="view hidden">
-                <div class="view-header">
-                    <h2>Fleet Management</h2>
-                    <p>All registered aircraft in the network</p>
-                </div>
-                <div class="card-grid" id="fleet-grid"></div>
-            </section>
+        </div>
 
-            <section id="view-add-staff" class="view hidden">
-                <div class="view-header">
-                    <h2>Hire New Staff</h2>
-                    <p>Create credentials for new airport employees</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>First Name</label>
-                            <input type="text" id="staff-fn" placeholder="First Name" />
-                        </div>
-                        <div class="form-group">
-                            <label>Last Name</label>
-                            <input type="text" id="staff-ln" placeholder="Last Name" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="staff-email" placeholder="work@airport.com" />
-                        </div>
-                        <div class="form-group">
-                            <label>Phone</label>
-                            <input type="text" id="staff-phone" placeholder="Phone Number" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Assigned Role</label>
-                            <select id="staff-role" class="input-glass">
-                                <option value="Gate Agent">Gate Agent</option>
-                                <option value="Security">Security</option>
-                                <option value="Baggage Handler">Baggage Handler</option>
-                                <option value="Maintenance">Maintenance</option>
-                            </select>
-                        </div>
-                    </div>
-                    <hr class="divider">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>System Username</label>
-                            <input type="text" id="staff-username" placeholder="e.g. jsmith_sec" />
-                        </div>
-                        <div class="form-group">
-                            <label>Temporary Password</label>
-                            <input type="password" id="staff-password" placeholder="••••••••" />
-                        </div>
-                    </div>
-                    <button class="btn-primary" id="add-staff-btn">Create Staff Account</button>
-                    <div id="add-staff-result" class="result-area hidden"></div>
-                </div>
-            </section>
-            <section id="view-maintenance" class="view hidden">
-                <div class="view-header">
-                    <h2>Fleet Grounding & Maintenance</h2>
-                    <p>Monitor aircraft health and authorize flight status</p>
-                </div>
-                <div class="card-grid" id="maintenance-grid">
-                </div>
-            </section>
-            <section id="view-roster" class="view hidden">
-                <div class="view-header">
-                    <h2>Staff Roster & Scheduling</h2>
-                    <p>Assign shifts and manage employee hours</p>
-                </div>
-                <div class="form-card glass-dark">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Staff Member ID</label>
-                            <input type="number" id="shift-staff-id" placeholder="e.g., 12" class="input-glass" />
-                        </div>
-                        <div class="form-group">
-                            <label>Role for Shift</label>
-                            <input type="text" id="shift-role" placeholder="e.g., Gate Agent Terminal A"
-                                class="input-glass" />
-                        </div>
-                    </div>
-                    <div class="form-row mt-15">
-                        <div class="form-group">
-                            <label>Shift Start</label>
-                            <input type="datetime-local" id="shift-start" class="input-glass" />
-                        </div>
-                        <div class="form-group">
-                            <label>Shift End</label>
-                            <input type="datetime-local" id="shift-end" class="input-glass" />
-                        </div>
-                    </div>
-                    <button class="btn-primary mt-20" id="assign-shift-btn">Assign Shift</button>
-                    <div id="shift-result" class="result-area hidden mt-20"></div>
-                </div>
-            </section>
-        </main>
     </div>
 
     <script type="module" src="/js/main.js"></script>
-    <!-- <script src="legacy-script.js" defer></script> -->
+
 </body>
 
 </html>

@@ -1,0 +1,46 @@
+@media (max-width: 1024px) {
+
+    .grid-4 {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .app-shell {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .sidebar {
+
+        position: fixed;
+
+        left: -100%;
+
+        transition: var(--transition);
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .grid-3,
+    .grid-2,
+    .grid-4 {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .main-content {
+
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}

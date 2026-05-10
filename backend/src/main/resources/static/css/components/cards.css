@@ -1,0 +1,65 @@
+.card {
+
+    background:
+        rgba(255,255,255,.05);
+
+    backdrop-filter: blur(20px);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    padding: var(--space-6);
+
+    box-shadow: var(--shadow-md);
+
+    transition: var(--transition);
+}
+
+.card:hover {
+
+    transform: translateY(-4px);
+
+    background:
+        rgba(255,255,255,.07);
+}
+
+.profile-chip {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 10px 16px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,.05);
+
+    border:
+        1px solid var(--border);
+}
+
+.avatar-circle {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: var(--primary);
+
+    color: white;
+
+    font-weight: 700;
+}

@@ -1,0 +1,155 @@
+@media (max-width: 1200px) {
+
+    .dashboard-panels,
+    .ops-grid,
+    .profile-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-card.large,
+    .analytics-card.medium,
+    .analytics-card.small {
+
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 992px) {
+
+    .sidebar {
+
+        position: fixed;
+
+        left: -280px;
+
+        top: 0;
+
+        height: 100vh;
+
+        z-index: 9999;
+
+        transition: var(--transition);
+    }
+
+    .sidebar.active {
+
+        left: 0;
+    }
+
+    .main-content {
+
+        padding: 24px;
+    }
+
+    .kpi-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .booking-search {
+
+        grid-template-columns: 1fr;
+    }
+
+    .bp-layout {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .navbar {
+
+        padding: 0 18px;
+    }
+
+    .navbar-actions {
+
+        gap: 10px;
+    }
+
+    .dashboard-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .kpi-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .grid-2 {
+
+        grid-template-columns: 1fr;
+    }
+
+    .flight-toolbar {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .table-wrapper {
+
+        overflow-x: auto;
+    }
+
+    .flight-modal-content {
+
+        padding: 24px;
+    }
+
+    .auth-right {
+
+        display: none;
+    }
+
+    .auth-left {
+
+        width: 100%;
+    }
+
+    .main-content {
+
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .navbar-brand span {
+
+        display: none;
+    }
+
+    .profile-chip {
+
+        display: none;
+    }
+
+    .card {
+
+        padding: 20px;
+    }
+
+    .dashboard-title h1 {
+
+        font-size: 1.8rem;
+    }
+
+    .booking-hero {
+
+        padding: 28px;
+    }
+}

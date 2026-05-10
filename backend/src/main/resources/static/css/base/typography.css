@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+
+    font-family: 'Inter', 'Cairo', sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0F172A 0%,
+            #111827 100%
+        );
+
+    color: var(--text-main);
+
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+p {
+    color: var(--text-secondary);
+}
+
+.text-muted {
+    color: var(--text-muted);
+}

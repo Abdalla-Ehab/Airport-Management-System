@@ -1,0 +1,16 @@
+.app-shell {
+
+    display: grid;
+
+    grid-template-columns:
+        var(--sidebar-width) 1fr;
+
+    min-height: 100vh;
+}
+
+.main-content {
+
+    padding: var(--space-7);
+
+    overflow-x: hidden;
+}

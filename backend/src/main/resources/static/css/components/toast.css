@@ -1,0 +1,50 @@
+.toast-container {
+
+    position: fixed;
+
+    top: 24px;
+    right: 24px;
+
+    z-index: 9999;
+}
+
+.toast {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 16px 20px;
+
+    border-radius: var(--radius-md);
+
+    margin-bottom: 14px;
+
+    backdrop-filter: blur(20px);
+
+    border:
+        1px solid var(--border);
+
+    animation:
+        slideIn .4s ease forwards;
+}
+
+.toast-success {
+
+    background:
+        rgba(16,185,129,.15);
+}
+
+.toast-error {
+
+    background:
+        rgba(239,68,68,.15);
+}
+
+.toast-info {
+
+    background:
+        rgba(26,115,232,.15);
+}

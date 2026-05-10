@@ -1,19 +1,30 @@
-export function $(id) {
-    return document.getElementById(id);
+export function show(element) {
+
+    if (!element) return;
+
+    element.classList.remove('hidden');
 }
 
-export function show(el) {
-    el.classList.remove('hidden');
+export function hide(element) {
+
+    if (!element) return;
+
+    element.classList.add('hidden');
 }
 
-export function hide(el) {
-    el.classList.add('hidden');
+export function toggle(element) {
+
+    if (!element) return;
+
+    element.classList.toggle('hidden');
 }
 
-export function activate(el) {
-    el.classList.add('active');
+export function qs(selector) {
+
+    return document.querySelector(selector);
 }
 
-export function deactivate(el) {
-    el.classList.remove('active');
+export function qsa(selector) {
+
+    return document.querySelectorAll(selector);
 }

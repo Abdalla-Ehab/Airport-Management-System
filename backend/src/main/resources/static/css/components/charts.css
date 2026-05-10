@@ -1,0 +1,48 @@
+.chart-card {
+
+    min-height: 360px;
+}
+
+.chart-placeholder {
+
+    height: 280px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(26,115,232,.15),
+            rgba(255,255,255,.03)
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-top: 24px;
+
+    color: var(--text-secondary);
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.chart-placeholder::before {
+
+    content: '';
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.08),
+            transparent 70%
+        );
+}

@@ -1,0 +1,121 @@
+.airport-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(320px, 1fr));
+
+    gap: 24px;
+}
+
+.airport-card {
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.airport-card::before {
+
+    content: '';
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(26,115,232,.08);
+
+    top: -60px;
+    right: -60px;
+}
+
+.airport-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.airport-icon {
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(26,115,232,.15);
+
+    font-size: 1.5rem;
+}
+
+.airport-meta {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-top: 24px;
+}
+
+.airport-meta-item {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+.airline-table-logo {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(255,255,255,.06);
+
+    font-size: 1.2rem;
+}
+
+.airline-cell {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+.management-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
