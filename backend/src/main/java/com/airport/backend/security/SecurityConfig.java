@@ -1,7 +1,5 @@
 package com.airport.backend.security;
 
-// import com.airport.backend.enums.Role;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.context.annotation.Bean;
@@ -78,13 +76,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // =============================================
-                        // PUBLIC API ENDPOINTS
+                        // PUBLIC AUTH ENDPOINTS
                         // =============================================
 
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/**")
+                        .permitAll()
+
+                        // =============================================
+                        // PUBLIC READ-ONLY ENDPOINTS
+                        // =============================================
+
+                        .requestMatchers(
                                 "/api/airports/**",
-                                "/api/flights/**")
+                                "/api/flights",
+                                "/api/flights/search",
+                                "/api/flights/status")
                         .permitAll()
 
                         // =============================================
@@ -118,7 +125,9 @@ public class SecurityConfig {
                                 "/api/bookings",
                                 "/api/bookings/**",
                                 "/api/checkin/**")
-                        .permitAll()
+                        .hasAnyAuthority(
+                                "ROLE_PASSENGER",
+                                "ROLE_ADMIN")
 
                         // =============================================
                         // STAFF + ADMIN
@@ -182,8 +191,9 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
 
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(
-                userDetailsService);
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider(
+                        userDetailsService);
 
         authProvider.setPasswordEncoder(
                 passwordEncoder());
@@ -197,7 +207,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
+            AuthenticationConfiguration config)
+            throws Exception {
 
         return config.getAuthenticationManager();
     }
@@ -219,7 +230,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration =
+                new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(
                 Arrays.asList("*"));
@@ -241,7 +253,8 @@ public class SecurityConfig {
         configuration.setAllowCredentials(
                 true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
         source.registerCorsConfiguration(
                 "/**",
