@@ -10,14 +10,12 @@ export async function getFlights() {
 
 export async function searchFlights(
     origin,
-    destination
+    destination,
+    date
 ) {
 
-    const query =
-        `?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`;
-
-    return await apiRequest(
-        `/flights/search${query}`
+    return apiRequest(
+        `/flights/search?origin=${origin}&destination=${destination}&date=${date}`
     );
 }
 

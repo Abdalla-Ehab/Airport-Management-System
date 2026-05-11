@@ -70,14 +70,17 @@ public class FlightController {
 
             @RequestParam Long origin,
 
-            @RequestParam Long destination
+            @RequestParam Long destination,
+
+            @RequestParam String date
 
     ) {
 
         List<FlightResponse> flights =
                 flightService.findFlights(
                         origin,
-                        destination
+                        destination,
+                        date
                 );
 
         return ResponseEntity.ok(

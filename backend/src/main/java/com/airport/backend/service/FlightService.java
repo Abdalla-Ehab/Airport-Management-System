@@ -10,6 +10,7 @@ public interface FlightService {
     FlightResponse scheduleFlight(FlightRequest request); 
     List<FlightResponse> findFlights(
     Long origin,
-    Long destination
+    Long destination,
+    String date
 );
 }

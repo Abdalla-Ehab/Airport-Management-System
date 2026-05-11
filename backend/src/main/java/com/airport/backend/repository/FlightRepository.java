@@ -79,8 +79,10 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             SELECT f FROM Flight f
             WHERE f.departureAirport.airport_id = :origin
             AND f.arrivalAirport.airport_id = :destination
+            AND FUNCTION('DATE', f.departure_time) = :date
             """)
     List<Flight> findFlightsByRoute(
             @Param("origin") Long origin,
-            @Param("destination") Long destination);
+            @Param("destination") Long destination,
+            @Param("date") java.time.LocalDate date);
 }
