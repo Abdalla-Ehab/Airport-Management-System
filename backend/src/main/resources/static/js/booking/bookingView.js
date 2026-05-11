@@ -149,36 +149,48 @@ export async function initBookingView() {
         );
     }
     const changeBtn =
-    document.getElementById(
-        'change-flight-btn'
-    );
+        document.getElementById(
+            'change-flight-btn'
+        );
 
-if (changeBtn) {
+    if (changeBtn) {
 
-    changeBtn.addEventListener(
-        'click',
-        () => {
+        changeBtn.addEventListener(
+            'click',
+            () => {
 
-            document.getElementById(
-                'flight-results'
-            ).style.display =
-                'grid';
+                document.getElementById(
+                    'flight-results'
+                ).style.display =
+                    'grid';
 
-            document.getElementById(
-                'seat-map'
-            ).innerHTML = '';
+                document.getElementById(
+                    'seat-map'
+                ).innerHTML = '';
 
-            document.getElementById(
-                'selected-flight'
-            ).textContent =
-                'None Selected';
+                document.getElementById(
+                    'selected-flight'
+                ).textContent =
+                    'None Selected';
 
-            changeBtn.classList.add(
-                'hidden'
-            );
-        }
-    );
-}
+                document.getElementById(
+                    'selected-flight-section'
+                ).classList.add(
+                    'hidden'
+                );
+
+                document.getElementById(
+                    'seat-selection-section'
+                ).classList.add(
+                    'hidden'
+                );
+
+                changeBtn.classList.add(
+                    'hidden'
+                );
+            }
+        );
+    }
 }
 
 
@@ -429,6 +441,14 @@ function selectFlight(flight) {
         `Selected flight ${flight.flight_number}`,
         'success'
     );
+
+    document.getElementById(
+        'selected-flight-section'
+    ).classList.remove('hidden');
+
+    document.getElementById(
+        'seat-selection-section'
+    ).classList.remove('hidden');
 }
 
 
@@ -498,21 +518,21 @@ async function confirmBooking() {
         );
     }
     document.getElementById(
-    'seat-map'
-).innerHTML = '';
+        'seat-map'
+    ).innerHTML = '';
 
-document.getElementById(
-    'selected-flight'
-).textContent =
-    'None Selected';
+    document.getElementById(
+        'selected-flight'
+    ).textContent =
+        'None Selected';
 
-document.getElementById(
-    'flight-results'
-).style.display =
-    'grid';
+    document.getElementById(
+        'flight-results'
+    ).style.display =
+        'grid';
 
-showToast(
-    'Booking created successfully',
-    'success'
-);
+    showToast(
+        'Booking created successfully',
+        'success'
+    );
 }

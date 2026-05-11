@@ -222,42 +222,48 @@ public class FlightServiceImpl implements FlightService {
 
     private FlightResponse mapToResponse(Flight flight) {
 
-        return new FlightResponse(
+return new FlightResponse(
 
-                flight.getFlight_id(),
+        flight.getFlight_id(),
 
-                flight.getFlight_number(),
+        flight.getFlight_number(),
 
-                flight.getStatus() != null
-                        ? flight.getStatus().name()
-                        : null,
+        flight.getStatus() != null
+                ? flight.getStatus().name()
+                : null,
 
-                flight.getDeparture_time(),
+        flight.getDeparture_time(),
 
-                flight.getArrival_time(),
+        flight.getArrival_time(),
 
-                flight.getAirline() != null
-                        ? flight.getAirline().getAirline_id()
-                        : null,
+        flight.getAirline() != null
+                ? flight.getAirline().getAirline_id()
+                : null,
 
-                flight.getAircraft() != null
-                        ? flight.getAircraft().getAircraft_id()
-                        : null,
+        flight.getAircraft() != null
+                ? flight.getAircraft().getAircraft_id()
+                : null,
 
-                flight.getDepartureGate() != null
-                        ? flight.getDepartureGate().getGate_id()
-                        : null,
+        flight.getDepartureGate() != null
+                ? flight.getDepartureGate().getGate_id()
+                : null,
 
-                flight.getArrivalGate() != null
-                        ? flight.getArrivalGate().getGate_id()
-                        : null,
+        flight.getArrivalGate() != null
+                ? flight.getArrivalGate().getGate_id()
+                : null,
 
-                flight.getDepartureAirport() != null
-                        ? flight.getDepartureAirport().getAirport_id()
-                        : null,
+        flight.getDepartureAirport() != null
+                ? flight.getDepartureAirport().getAirport_id()
+                : null,
 
-                flight.getArrivalAirport() != null
-                        ? flight.getArrivalAirport().getAirport_id()
-                        : null);
+        flight.getArrivalAirport() != null
+                ? flight.getArrivalAirport().getAirport_id()
+                : null,
+
+        flight.getAircraft() != null
+                ? flight.getAircraft().getNumber_of_seats()
+                : 60
+);
+                        
     }
 }

@@ -589,6 +589,8 @@
 
                 <section id="view-book" class="view hidden dashboard">
 
+                    <!-- HERO -->
+
                     <div class="booking-hero card">
 
                         <div>
@@ -608,6 +610,9 @@
                         </div>
 
                     </div>
+
+
+                    <!-- SEARCH -->
 
                     <div class="booking-search">
 
@@ -637,13 +642,17 @@
 
                     </div>
 
+
+                    <!-- RESULTS -->
+
                     <div id="flight-results" class="flight-results" style="margin-top:32px;">
 
                     </div>
 
+
                     <!-- SELECTED FLIGHT -->
 
-                    <div class="card" style="margin-top:32px;">
+                    <div id="selected-flight-section" class="card hidden" style="margin-top:32px;">
 
                         <div class="section-header">
 
@@ -673,6 +682,7 @@
                                     None Selected
 
                                 </span>
+
                                 <button id="change-flight-btn" class="btn btn-secondary hidden"
                                     style="margin-left:16px;">
 
@@ -718,9 +728,10 @@
 
                     </div>
 
+
                     <!-- SEAT MAP -->
 
-                    <div class="card" style="margin-top:24px;">
+                    <div id="seat-selection-section" class="card hidden" style="margin-top:24px;">
 
                         <div class="section-header">
 
@@ -730,7 +741,19 @@
 
                         </div>
 
-                        <div id="seat-map" style="margin-top:24px;">
+                        <!-- AIRCRAFT VISUAL -->
+
+                        <div class="aircraft-wrapper">
+
+                            <div class="aircraft-head">
+
+                                ✈
+
+                            </div>
+
+                            <div id="seat-map" class="seat-map">
+
+                            </div>
 
                         </div>
 

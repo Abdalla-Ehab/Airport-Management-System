@@ -355,35 +355,37 @@
     color: var(--text-muted);
 }
 /* =====================================================
-   SEAT MAP
+   AIRCRAFT SEAT MAP
 ===================================================== */
 
-#seat-map {
+.aircraft-wrapper {
+
+    margin-top: 32px;
 
     display: flex;
 
     flex-direction: column;
 
-    gap: 14px;
-}
-
-
-.seat-row {
-
-    display: flex;
-
     align-items: center;
 
-    gap: 12px;
+    gap: 24px;
 }
 
 
-.seat {
+.aircraft-head {
 
-    width: 42px;
-    height: 42px;
+    width: 140px;
 
-    border-radius: 12px;
+    height: 70px;
+
+    border-radius: 70px 70px 24px 24px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.08),
+            rgba(26,115,232,.18)
+        );
 
     display: flex;
 
@@ -391,45 +393,108 @@
 
     justify-content: center;
 
-    background:
-        rgba(255,255,255,.06);
+    font-size: 1.8rem;
 
     border:
         1px solid rgba(255,255,255,.08);
+}
+
+
+.seat-map {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding: 32px;
+
+    border-radius: 32px;
+
+    background:
+        rgba(255,255,255,.02);
+
+    border:
+        1px solid rgba(255,255,255,.05);
+
+    overflow-x: auto;
+
+    max-width: 100%;
+}
+
+
+.aircraft-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+}
+
+
+.aircraft-aisle {
+
+    width: 34px;
+}
+
+
+.aircraft-seat {
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 16px;
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    background:
+        rgba(255,255,255,.06);
+
+    color: white;
+
+    font-weight: 700;
 
     cursor: pointer;
 
     transition:
         .2s ease;
 
-    font-size: .9rem;
+    display: flex;
 
-    font-weight: 600;
+    align-items: center;
+
+    justify-content: center;
 }
 
 
-.seat:hover {
+.aircraft-seat:hover {
 
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 
     border-color: #1A73E8;
 
     background:
-        rgba(26,115,232,.18);
+        rgba(26,115,232,.22);
 }
 
 
-.seat.selected {
+.aircraft-seat.selected {
 
     background: #1A73E8;
 
-    color: white;
-
     border-color: #1A73E8;
+
+    box-shadow:
+        0 0 20px rgba(26,115,232,.35);
 }
 
 
-.seat.occupied {
+.aircraft-seat.occupied {
 
     opacity: .35;
 
@@ -440,7 +505,11 @@
 }
 
 
-.seat-gap {
+.legend-item {
 
-    width: 24px;
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
 }

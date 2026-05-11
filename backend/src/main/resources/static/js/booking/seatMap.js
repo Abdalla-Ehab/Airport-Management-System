@@ -5,10 +5,14 @@ import { showToast }
 from '../shared/toast.js';
 
 const seatMapEl =
-    document.getElementById('seat-map');
+    document.getElementById(
+        'seat-map'
+    );
 
 const seatLegendEl =
-    document.getElementById('seat-legend');
+    document.getElementById(
+        'seat-legend'
+    );
 
 export function renderSeatMap(
     seatClass = 'ECONOMY'
@@ -16,34 +20,71 @@ export function renderSeatMap(
 
     if (!seatMapEl) return;
 
+    if (!state.currentFlight) return;
+
     state.selectedSeats = [];
 
     seatMapEl.innerHTML = '';
 
     renderLegend();
 
-    let rows = 20;
+    // =====================================================
+    // AIRCRAFT CONFIG
+    // =====================================================
+
+    const totalSeats =
+        state.currentFlight
+            .number_of_seats || 60;
+
     let seatsPerRow = 6;
 
+    let letters =
+        ['A', 'B', 'C', 'D', 'E', 'F'];
+
+    // =====================================================
+    // CABIN CONFIG
+    // =====================================================
+
     if (seatClass === 'BUSINESS') {
-        rows = 8;
+
         seatsPerRow = 4;
+
+        letters =
+            ['A', 'B', 'D', 'F'];
     }
 
     if (seatClass === 'FIRST') {
-        rows = 4;
+
         seatsPerRow = 4;
+
+        letters =
+            ['A', 'C', 'D', 'F'];
     }
 
-    const letters =
-        ['A', 'B', 'C', 'D', 'E', 'F'];
+    const rows =
+        Math.ceil(
+            totalSeats / seatsPerRow
+        );
 
-    for (let row = 1; row <= rows; row++) {
+    let seatCounter = 0;
+
+    // =====================================================
+    // GENERATE ROWS
+    // =====================================================
+
+    for (
+        let row = 1;
+        row <= rows;
+        row++
+    ) {
 
         const rowEl =
-            document.createElement('div');
+            document.createElement(
+                'div'
+            );
 
-        rowEl.className = 'seat-row';
+        rowEl.className =
+            'aircraft-row';
 
         for (
             let seat = 0;
@@ -51,21 +92,36 @@ export function renderSeatMap(
             seat++
         ) {
 
+            if (
+                seatCounter >= totalSeats
+            ) break;
+
             const seatNo =
                 `${row}${letters[seat]}`;
 
             const btn =
-                document.createElement('button');
+                document.createElement(
+                    'button'
+                );
 
-            btn.className = 'seat';
+            btn.className =
+                'aircraft-seat';
 
-            btn.textContent = seatNo;
+            btn.textContent =
+                seatNo;
 
-            btn.dataset.seat = seatNo;
+            btn.dataset.seat =
+                seatNo;
 
-            if (Math.random() < 0.15) {
+            // =================================================
+            // RANDOM OCCUPANCY
+            // =================================================
 
-                btn.classList.add('occupied');
+            if (Math.random() < 0.12) {
+
+                btn.classList.add(
+                    'occupied'
+                );
 
                 btn.disabled = true;
 
@@ -78,11 +134,59 @@ export function renderSeatMap(
             }
 
             rowEl.appendChild(btn);
+
+            // =================================================
+            // AIRCRAFT AISLE
+            // =================================================
+
+            if (
+                seatClass === 'ECONOMY' &&
+                seat === 2
+            ) {
+
+                const aisle =
+                    document.createElement(
+                        'div'
+                    );
+
+                aisle.className =
+                    'aircraft-aisle';
+
+                rowEl.appendChild(
+                    aisle
+                );
+            }
+
+            if (
+                seatClass !== 'ECONOMY' &&
+                seat === 1
+            ) {
+
+                const aisle =
+                    document.createElement(
+                        'div'
+                    );
+
+                aisle.className =
+                    'aircraft-aisle';
+
+                rowEl.appendChild(
+                    aisle
+                );
+            }
+
+            seatCounter++;
         }
 
-        seatMapEl.appendChild(rowEl);
+        seatMapEl.appendChild(
+            rowEl
+        );
     }
 }
+
+// =====================================================
+// TOGGLE SEAT
+// =====================================================
 
 function toggleSeat(btn) {
 
@@ -90,10 +194,14 @@ function toggleSeat(btn) {
         btn.dataset.seat;
 
     if (
-        btn.classList.contains('selected')
+        btn.classList.contains(
+            'selected'
+        )
     ) {
 
-        btn.classList.remove('selected');
+        btn.classList.remove(
+            'selected'
+        );
 
         state.selectedSeats =
             state.selectedSeats.filter(
@@ -114,13 +222,21 @@ function toggleSeat(btn) {
             return;
         }
 
-        btn.classList.add('selected');
+        btn.classList.add(
+            'selected'
+        );
 
-        state.selectedSeats.push(seatNo);
+        state.selectedSeats.push(
+            seatNo
+        );
     }
 
     updateSeatSummary();
 }
+
+// =====================================================
+// UPDATE SUMMARY
+// =====================================================
 
 function updateSeatSummary() {
 
@@ -136,24 +252,38 @@ function updateSeatSummary() {
         'None';
 }
 
+// =====================================================
+// LEGEND
+// =====================================================
+
 function renderLegend() {
 
     if (!seatLegendEl) return;
 
     seatLegendEl.innerHTML = `
+
         <div class="legend-item">
-            <div class="seat"></div>
+
+            <div class="aircraft-seat"></div>
+
             Available
+
         </div>
 
         <div class="legend-item">
-            <div class="seat selected"></div>
+
+            <div class="aircraft-seat selected"></div>
+
             Selected
+
         </div>
 
         <div class="legend-item">
-            <div class="seat occupied"></div>
+
+            <div class="aircraft-seat occupied"></div>
+
             Occupied
+
         </div>
     `;
 }
