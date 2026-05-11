@@ -9,6 +9,11 @@ import {
     from '../api/bookingApi.js';
 
 import {
+    initMyBookings
+}
+    from './myBookings.js';
+
+import {
     renderSeatMap
 }
     from './seatMap.js';
@@ -502,6 +507,8 @@ async function confirmBooking() {
 
         await createBooking(payload);
 
+        await initMyBookings();
+
         showToast(
             'Booking confirmed successfully',
             'success'
@@ -531,8 +538,5 @@ async function confirmBooking() {
     ).style.display =
         'grid';
 
-    showToast(
-        'Booking created successfully',
-        'success'
-    );
+
 }

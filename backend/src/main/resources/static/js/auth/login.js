@@ -1,35 +1,39 @@
 import {
     loginRequest
 }
-from '../api/authApi.js';
+    from '../api/authApi.js';
 
 import {
     setToken,
     setCurrentUser
 }
-from '../shared/storage.js';
+    from '../shared/storage.js';
 
 import {
     state
 }
-from '../shared/state.js';
+    from '../shared/state.js';
 
 import {
     showToast
 }
-from '../shared/toast.js';
+    from '../shared/toast.js';
 
 import {
     hide,
     show
 }
-from '../shared/dom.js';
+    from '../shared/dom.js';
 
 import {
     buildNavigation
 }
-from '../navigation.js';
+    from '../navigation.js';
 
+import {
+    initMyBookings
+}
+    from '../booking/myBookings.js';
 
 export function initLogin() {
 
@@ -168,7 +172,7 @@ async function login() {
                 username,
                 password
             );
-            console.log(user);
+        console.log(user);
 
         // =================================
         // SAVE USER STATE
@@ -319,6 +323,12 @@ async function login() {
         buildNavigation(
             displayRole.toLowerCase()
         );
+
+        // =================================
+        // LOAD BOOKINGS
+        // =================================
+
+        await initMyBookings();
 
         // =================================
         // SUCCESS TOAST

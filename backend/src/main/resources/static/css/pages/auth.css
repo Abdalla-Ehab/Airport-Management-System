@@ -4,18 +4,22 @@
     display: grid;
 
     grid-template-columns: 1fr 480px;
+
+    align-items: stretch;
 }
 
 .auth-left {
     display: flex;
 
-    align-items: center;
+    align-items: flex-start;
 
     justify-content: center;
 
     padding: 60px;
 
     position: relative;
+
+    overflow-y: auto;
 }
 
 .auth-left::before {
@@ -28,6 +32,13 @@
     background: radial-gradient(circle at top left,
             rgba(26, 115, 232, 0.25),
             transparent 60%);
+}
+.auth-right {
+    position: relative;
+
+    overflow: hidden;
+
+    height: 100vh;
 }
 
 .auth-panel {

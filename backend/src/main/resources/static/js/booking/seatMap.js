@@ -4,6 +4,11 @@ from '../shared/state.js';
 import { showToast }
 from '../shared/toast.js';
 
+import {
+    getBookedSeats
+}
+from '../api/bookingApi.js';
+
 const seatMapEl =
     document.getElementById(
         'seat-map'
@@ -14,7 +19,11 @@ const seatLegendEl =
         'seat-legend'
     );
 
-export function renderSeatMap(
+// =====================================================
+// RENDER SEAT MAP
+// =====================================================
+
+export async function renderSeatMap(
     seatClass = 'ECONOMY'
 ) {
 
@@ -27,6 +36,27 @@ export function renderSeatMap(
     seatMapEl.innerHTML = '';
 
     renderLegend();
+
+    // =====================================================
+    // FETCH REAL BOOKED SEATS
+    // =====================================================
+
+    let bookedSeats = [];
+
+    try {
+
+        bookedSeats =
+            await getBookedSeats(
+                state.currentFlight.flight_id
+            );
+
+    } catch (err) {
+
+        console.error(
+            'Failed to load booked seats',
+            err
+        );
+    }
 
     // =====================================================
     // AIRCRAFT CONFIG
@@ -114,10 +144,14 @@ export function renderSeatMap(
                 seatNo;
 
             // =================================================
-            // RANDOM OCCUPANCY
+            // REAL OCCUPIED SEATS
             // =================================================
 
-            if (Math.random() < 0.12) {
+            if (
+                bookedSeats.includes(
+                    seatNo
+                )
+            ) {
 
                 btn.classList.add(
                     'occupied'
@@ -182,6 +216,8 @@ export function renderSeatMap(
             rowEl
         );
     }
+
+    updateSeatSummary();
 }
 
 // =====================================================

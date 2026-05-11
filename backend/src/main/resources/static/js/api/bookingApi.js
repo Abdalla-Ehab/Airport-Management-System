@@ -56,3 +56,16 @@ export async function getBoardingPass(
         `/boarding-pass/${ticketNo}`
     );
 }
+
+// =====================================================
+// GET BOOKED SEATS
+// =====================================================
+
+export async function getBookedSeats(
+    flightId
+) {
+
+    return await apiRequest(
+        `/bookings/flight/${flightId}/seats`
+    );
+}
