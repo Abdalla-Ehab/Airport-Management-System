@@ -1,273 +1,106 @@
-import {
-    apiRequest
-}
-from '../api/apiClient.js';
-
-import {
-    escHtml
-}
-from '../shared/helpers.js';
-
-import {
-    showToast
-}
-from '../shared/toast.js';
-
+import { getAirlines, updateAirline } from '../api/airlineApi.js';
+import { escHtml } from '../shared/helpers.js';
+import { showToast } from '../shared/toast.js';
 
 let airlinesCache = [];
 
-
 export async function initAirlinesPage() {
-
     try {
-
-        const airlines =
-            await apiRequest(
-                '/airlines'
-            );
-
-        airlinesCache =
-            airlines || [];
-
-        renderAirlines(
-            airlinesCache
-        );
-
-        initTableActions();
-
+        const airlines = await getAirlines();
+        airlinesCache = airlines || [];
+        renderAirlines(airlinesCache);
+        setupAirlineModal();
     } catch (err) {
-
         console.error(err);
-
-        showToast(
-            'Failed to load airlines',
-            'error'
-        );
+        showToast('Failed to load airlines', 'error');
     }
 }
 
-
-// =====================================================
-// RENDER AIRLINES
-// =====================================================
-
 function renderAirlines(airlines) {
-
-    const tbody =
-        document.getElementById(
-            'airlines-table-body'
-        );
-
+    const tbody = document.getElementById('airlines-table-body');
     if (!tbody) return;
 
     tbody.innerHTML = '';
 
-    // =========================================
-    // EMPTY STATE
-    // =========================================
-
-    if (!airlines ||
-        !airlines.length) {
-
-        tbody.innerHTML = `
-
-            <tr>
-
-                <td colspan="5">
-
-                    <div class="empty-state">
-
-                        No Airlines Found
-
-                    </div>
-
-                </td>
-
-            </tr>
-        `;
-
+    if (!airlines || !airlines.length) {
+        tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state">No Airlines Found</div></td></tr>`;
         return;
     }
 
-    airlines.forEach((a, index) => {
-
-        const tr =
-            document.createElement('tr');
-
-        // =====================================
-        // SAFE FLEET VALUE
-        // =====================================
-
-        const pseudoFleet =
-            12 + (index * 3);
-
+    airlines.forEach(a => {
+        const tr = document.createElement('tr');
         tr.innerHTML = `
-
             <td>
-
                 <div class="airline-cell">
-
-                    <div class="airline-table-logo">
-                        ✈
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            ${escHtml(
-                                a.name || 'Unknown Airline'
-                            )}
-                        </strong>
-
-                    </div>
-
+                    <div class="airline-table-logo">✈</div>
+                    <div><strong>${escHtml(a.name || 'Unknown Airline')}</strong></div>
                 </div>
-
             </td>
-
+            <td>${escHtml(a.country || '-')}</td>
+            <td><span class="badge badge-success">ACTIVE</span></td>
             <td>
-                ${escHtml(
-                    a.country || '-'
-                )}
-            </td>
-
-            <td>
-
-                ${pseudoFleet}
-                Aircraft
-
-            </td>
-
-            <td>
-
-                <span
-                    class="
-                        badge
-                        badge-success
-                    ">
-
-                    ACTIVE
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <div
-                    class="
-                        management-actions
-                    ">
-
-                    <button
-                        class="
-                            btn
-                            btn-secondary
-                            edit-airline
-                        "
-                        data-id="${a.airline_id}">
-
-                        Edit
-
-                    </button>
-
-                    <button
-                        class="
-                            btn
-                            btn-primary
-                            view-airline
-                        "
-                        data-id="${a.airline_id}">
-
-                        View
-
-                    </button>
-
+                <div class="management-actions">
+                    <button class="btn btn-secondary btn-sm edit-airline" data-id="${a.airline_id}">Edit</button>
+                    <button class="btn btn-primary btn-sm view-airline" data-id="${a.airline_id}">View</button>
                 </div>
-
             </td>
         `;
+
+        tr.querySelector('.edit-airline').onclick = () => openAirlineModal(a, false);
+        tr.querySelector('.view-airline').onclick = () => openAirlineModal(a, true);
 
         tbody.appendChild(tr);
     });
 }
 
+function setupAirlineModal() {
+    const modal = document.getElementById('airline-modal');
+    const closeBtn = document.getElementById('close-airline-modal');
+    const saveBtn = document.getElementById('save-airline-btn');
 
-// =====================================================
-// TABLE ACTIONS
-// =====================================================
+    if (closeBtn) {
+        closeBtn.onclick = () => modal.classList.remove('active');
+    }
 
-function initTableActions() {
+    if (saveBtn) {
+        saveBtn.onclick = async () => {
+            const id = document.getElementById('airline-id').value;
+            const payload = {
+                name: document.getElementById('airline-name').value,
+                country: document.getElementById('airline-country').value
+            };
 
-    document.addEventListener(
-        'click',
-        e => {
-
-            const viewBtn =
-                e.target.closest(
-                    '.view-airline'
-                );
-
-            const editBtn =
-                e.target.closest(
-                    '.edit-airline'
-                );
-
-            // =================================
-            // VIEW
-            // =================================
-
-            if (viewBtn) {
-
-                const id =
-                    viewBtn.dataset.id;
-
-                const airline =
-                    airlinesCache.find(
-                        a =>
-                            a.airline_id == id
-                    );
-
-                if (!airline) return;
-
-                showToast(
-                    `Viewing ${airline.name}`,
-                    'success'
-                );
-
-                console.log(
-                    'VIEW AIRLINE:',
-                    airline
-                );
+            try {
+                await updateAirline(id, payload);
+                showToast('Airline updated successfully', 'success');
+                modal.classList.remove('active');
+                initAirlinesPage();
+            } catch (err) {
+                showToast(err.message || 'Failed to update airline', 'error');
             }
+        };
+    }
+}
 
-            // =================================
-            // EDIT
-            // =================================
+function openAirlineModal(airline, readOnly) {
+    const modal = document.getElementById('airline-modal');
+    const title = document.getElementById('airline-modal-title');
+    const saveBtn = document.getElementById('save-airline-btn');
 
-            if (editBtn) {
+    document.getElementById('airline-id').value = airline.airline_id;
+    document.getElementById('airline-name').value = airline.name || '';
+    document.getElementById('airline-country').value = airline.country || '';
 
-                const id =
-                    editBtn.dataset.id;
+    document.getElementById('airline-name').disabled = readOnly;
+    document.getElementById('airline-country').disabled = readOnly;
 
-                const airline =
-                    airlinesCache.find(
-                        a =>
-                            a.airline_id == id
-                    );
+    if (readOnly) {
+        title.textContent = 'View Airline';
+        saveBtn.style.display = 'none';
+    } else {
+        title.textContent = 'Edit Airline';
+        saveBtn.style.display = 'block';
+    }
 
-                if (!airline) return;
-
-                showToast(
-                    `Editing ${airline.name}`,
-                    'success'
-                );
-
-                console.log(
-                    'EDIT AIRLINE:',
-                    airline
-                );
-            }
-        }
-    );
+    modal.classList.add('active');
 }

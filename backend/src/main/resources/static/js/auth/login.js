@@ -35,6 +35,13 @@ import {
 }
     from '../booking/myBookings.js';
 
+import { initScheduler } from '../admin/scheduler.js';
+import { initFlightsPage } from '../admin/flightsPage.js';
+import { initAirportsPage } from '../admin/airportsPage.js';
+import { initAirlinesPage } from '../admin/airlinesPage.js';
+import { initUsersPage } from '../admin/usersPage.js';
+import { initReportsPage } from '../admin/reportsPage.js';
+
 export function initLogin() {
 
     const btn =
@@ -325,10 +332,19 @@ async function login() {
         );
 
         // =================================
-        // LOAD BOOKINGS
+        // LOAD DASHBOARD DATA
         // =================================
 
-        await initMyBookings();
+        if (displayRole.toLowerCase() === 'passenger') {
+            await initMyBookings();
+        } else if (displayRole.toLowerCase() === 'admin' || displayRole.toLowerCase() === 'staff') {
+            initScheduler();
+            initFlightsPage();
+            initAirportsPage();
+            initAirlinesPage();
+            initUsersPage();
+            initReportsPage();
+        }
 
         // =================================
         // SUCCESS TOAST

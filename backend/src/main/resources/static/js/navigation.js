@@ -29,22 +29,24 @@ const NAVIGATION = {
             icon: '🛩'
         },
 
-        {
-            id: 'fleet',
-            label: 'Fleet',
-            icon: '🛫'
-        },
 
-        {
-            id: 'maintenance',
-            label: 'Maintenance',
-            icon: '🔧'
-        },
 
         {
             id: 'analytics',
             label: 'Analytics',
             icon: '📈'
+        },
+
+        {
+            id: 'users',
+            label: 'Users',
+            icon: '👥'
+        },
+
+        {
+            id: 'reports',
+            label: 'Reports',
+            icon: '📄'
         }
     ],
 

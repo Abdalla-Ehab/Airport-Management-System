@@ -7,8 +7,6 @@ import com.airport.backend.dto.StaffRegisterRequest;
 import com.airport.backend.entity.Passenger;
 import com.airport.backend.entity.Staff;
 
-import com.airport.backend.enums.Role;
-
 import com.airport.backend.repository.PassengerRepository;
 import com.airport.backend.repository.StaffRepository;
 
@@ -113,24 +111,22 @@ public class AuthService {
                     )
             ) {
 
-                String roleStr =
-                        "ROLE_" +
-                        staff.getRole()
-                                .name();
+                String roleName = staff.getRole().toUpperCase().replace(" ", "_");
+                if (!roleName.startsWith("ROLE_")) {
+                    roleName = "ROLE_" + roleName;
+                }
 
                 String token =
                         createSpringSecurityToken(
                                 staff.getUsername(),
                                 staff.getPassword(),
-                                roleStr
+                                roleName
                         );
 
                 return buildAuthResponse(
                         token,
                         staff.getUsername(),
-                        staff.getRole()
-                                .name()
-                                .toLowerCase(),
+                        staff.getRole().toLowerCase(),
                         staff.getStaff_id()
                 );
             }
@@ -379,11 +375,7 @@ public class AuthService {
         );
 
         newStaff.setRole(
-                Role.valueOf(
-                        dto.getRole()
-                                .toUpperCase()
-                                .replace(" ", "_")
-                )
+                dto.getRole()
         );
 
         newStaff.setDept_id(

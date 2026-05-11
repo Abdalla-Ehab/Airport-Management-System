@@ -32,9 +32,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (staffOpt.isPresent()) {
             Staff staff = staffOpt.get();
             // Prefix role with "ROLE_" for Spring Security RBAC conventions
-            String role = "ROLE_" + staff.getRole().name();
+            String roleName = staff.getRole().toUpperCase().replace(" ", "_");
+            if (!roleName.startsWith("ROLE_")) {
+                roleName = "ROLE_" + roleName;
+            }
             return new User(staff.getUsername(), staff.getPassword(),
-                    Collections.singletonList(new SimpleGrantedAuthority(role)));
+                    Collections.singletonList(new SimpleGrantedAuthority(roleName)));
         }
 
         // 2. Try to find a Passenger

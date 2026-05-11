@@ -76,6 +76,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // =============================================
+                        // ADMIN ONLY (High Priority)
+                        // =============================================
+
+                        .requestMatchers(
+                                "/api/flights/schedule",
+                                "/api/staff",
+                                "/api/staff/**")
+                        .hasAuthority("ROLE_ADMIN")
+
+                        // =============================================
                         // PUBLIC AUTH ENDPOINTS
                         // =============================================
 
@@ -88,6 +98,7 @@ public class SecurityConfig {
                         // =============================================
 
                         .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
                                 "/api/airports/**",
                                 "/api/flights",
                                 "/api/flights/search",
@@ -124,7 +135,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/bookings",
                                 "/api/bookings/**",
-                                "/api/checkin/**")
+                                "/api/checkin/**",
+                                "/api/passengers",
+                                "/api/passengers/**")
                         .hasAnyAuthority(
                                 "ROLE_PASSENGER",
                                 "ROLE_ADMIN")
@@ -141,20 +154,6 @@ public class SecurityConfig {
                         .hasAnyAuthority(
                                 "ROLE_STAFF",
                                 "ROLE_ADMIN")
-
-                        // =============================================
-                        // ADMIN ONLY
-                        // =============================================
-
-                        .requestMatchers(
-                                "/api/flights/schedule",
-                                "/api/staff/**")
-                        .hasAuthority(
-                                "ROLE_ADMIN")
-
-                        // =============================================
-                        // EVERYTHING ELSE
-                        // =============================================
 
                         .anyRequest()
                         .authenticated())

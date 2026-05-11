@@ -1,92 +1,93 @@
 import {
     scheduleFlight
 }
-from '../api/flightApi.js';
+    from '../api/flightApi.js';
 
 import {
     showToast
 }
-from '../shared/toast.js';
+    from '../shared/toast.js';
+
+import {
+    initFlightsPage
+}
+    from './flightsPage.js';
+
 
 export function initScheduler() {
 
-    const btn =
+    const form =
+        document.getElementById(
+            'schedule-form'
+        );
+
+    const submitBtn =
         document.getElementById(
             'schedule-btn'
         );
 
-    if (!btn) return;
+    if (submitBtn) {
 
-    btn.addEventListener(
-        'click',
-        submitSchedule
-    );
+        submitBtn.addEventListener(
+            'click',
+            submitSchedule
+        );
+    }
 }
 
-async function submitSchedule() {
+
+async function submitSchedule(e) {
+    // If button text is Update Flight, let flightsPage.js handle it
+    if (e.target.textContent.includes('Update')) return;
+
+    e.preventDefault();
 
     const payload = {
-
-        flight_number:
-            document.getElementById(
-                'schedule-flight-number'
-            ).value,
-
-        aircraft_id:
-            document.getElementById(
-                'schedule-aircraft'
-            ).value,
-
-        airline_id:
-            document.getElementById(
-                'schedule-airline'
-            ).value,
-
-        departure_airport_id:
-            document.getElementById(
-                'schedule-departure-airport'
-            ).value,
-
-        arrival_airport_id:
-            document.getElementById(
-                'schedule-arrival-airport'
-            ).value,
-
-        departure_gate_id:
-            document.getElementById(
-                'schedule-departure-gate'
-            ).value,
-
-        arrival_gate_id:
-            document.getElementById(
-                'schedule-arrival-gate'
-            ).value,
-
-        departure_time:
-            document.getElementById(
-                'schedule-departure-time'
-            ).value,
-
-        arrival_time:
-            document.getElementById(
-                'schedule-arrival-time'
-            ).value
+        flight_number: getVal('schedule-flight-number'),
+        airline_id: getVal('schedule-airline'),
+        aircraft_id: getVal('schedule-aircraft'),
+        departure_airport_id: getVal('schedule-departure-airport'),
+        arrival_airport_id: getVal('schedule-arrival-airport'),
+        departure_gate_id: getVal('schedule-departure-gate'),
+        arrival_gate_id: getVal('schedule-arrival-gate'),
+        departure_time: getVal('schedule-departure-time'),
+        arrival_time: getVal('schedule-arrival-time')
     };
 
     try {
-
         await scheduleFlight(payload);
+        showToast('Flight scheduled successfully', 'success');
+        
+        // Clear form
+        clearForm();
+        
+        // Close modal if open
+        const modal = document.getElementById('flight-modal');
+        if (modal) modal.classList.remove('active');
 
-        showToast(
-            'Flight scheduled successfully',
-            'success'
-        );
+        // Refresh flights page if we are on it
+        initFlightsPage();
 
     } catch (err) {
-
-        showToast(
-            err.message,
-            'error'
-        );
+        console.error(err);
+        showToast(err.message || 'Failed to schedule flight', 'error');
     }
+}
+
+function getVal(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : null;
+}
+
+function clearForm() {
+    const ids = [
+        'schedule-flight-number', 'schedule-airline', 'schedule-aircraft',
+        'schedule-departure-airport', 'schedule-arrival-airport',
+        'schedule-departure-gate', 'schedule-arrival-gate',
+        'schedule-departure-time', 'schedule-arrival-time'
+    ];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
 }

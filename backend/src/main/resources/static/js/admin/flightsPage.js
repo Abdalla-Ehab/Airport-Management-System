@@ -1,5 +1,7 @@
 import {
-    getFlights
+    getFlights,
+    updateFlight,
+    deleteFlight
 }
     from '../api/flightApi.js';
 
@@ -20,22 +22,6 @@ let flightsCache = [];
 
 export async function initFlightsPage() {
 
-    await loadFlights();
-
-    initSearch();
-
-    initModal();
-
-    initTableActions();
-}
-
-
-// =====================================================
-// LOAD FLIGHTS
-// =====================================================
-
-async function loadFlights() {
-
     try {
 
         const flights =
@@ -47,6 +33,9 @@ async function loadFlights() {
         renderFlights(
             flightsCache
         );
+
+        initSearch();
+        initNewFlightButton();
 
     } catch (err) {
 
@@ -60,9 +49,25 @@ async function loadFlights() {
 }
 
 
-// =====================================================
-// RENDER TABLE
-// =====================================================
+function initSearch() {
+    const searchInput = document.getElementById('flight-search');
+    if (!searchInput) return;
+
+    searchInput.oninput = (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+            renderFlights(flightsCache);
+            return;
+        }
+
+        const filtered = flightsCache.filter(f => 
+            (f.flight_number && f.flight_number.toLowerCase().includes(query)) ||
+            (f.airline_id && String(f.airline_id).includes(query))
+        );
+        renderFlights(filtered);
+    };
+}
+
 
 function renderFlights(flights) {
 
@@ -75,34 +80,26 @@ function renderFlights(flights) {
 
     tbody.innerHTML = '';
 
-    // =========================================
-    // EMPTY STATE
-    // =========================================
-
     if (!flights ||
         !flights.length) {
 
         tbody.innerHTML = `
-
             <tr>
-
                 <td colspan="7">
-
                     <div class="empty-state">
-
                         No Flights Found
-
                     </div>
-
                 </td>
-
             </tr>
         `;
 
         return;
     }
 
-    flights.forEach(flight => {
+    // Limit to 50 for search results, 10 for initial load if no search
+    const displayFlights = flights.slice(0, 50);
+
+    displayFlights.forEach(flight => {
 
         const tr =
             document.createElement('tr');
@@ -116,10 +113,7 @@ function renderFlights(flights) {
         tr.innerHTML = `
 
             <td>
-                ${escHtml(
-            flight.flight_number ||
-            'UNKNOWN'
-        )}
+                <strong>${escHtml(flight.flight_number || 'UNKNOWN')}</strong>
             </td>
 
             <td>
@@ -127,298 +121,154 @@ function renderFlights(flights) {
             </td>
 
             <td>
-                ${formatTime(
-            flight.departure_time
-        )}
+                ${flight.aircraft_id || '-'}
             </td>
 
             <td>
-                ${formatTime(
-            flight.arrival_time
-        )}
+                ${formatTime(flight.departure_time)}
             </td>
 
             <td>
+                ${formatTime(flight.arrival_time)}
+            </td>
 
-                <span
-                    class="
-                        status-badge
-                        status-${status.toLowerCase()}
-                    ">
-
+            <td>
+                <span class="status-badge status-${status.toLowerCase()}">
                     ${status}
-
                 </span>
-
             </td>
 
             <td>
-                ${flight.departure_gate_id || '-'}
-            </td>
-
-            <td>
-
                 <div class="table-actions">
-
-                    <button
-                        class="
-                            btn
-                            btn-secondary
-                            edit-flight
-                        "
-                        data-id="${flight.flight_id}">
-
+                    <button class="btn btn-secondary btn-sm edit-flight" data-id="${flight.flight_id}">
                         Edit
-
                     </button>
-
-                    <button
-                        class="
-                            btn
-                            btn-primary
-                            view-flight
-                        "
-                        data-id="${flight.flight_id}">
-
-                        View
-
+                    <button class="btn btn-danger btn-sm delete-flight" data-id="${flight.flight_id}">
+                        Delete
                     </button>
-
                 </div>
-
             </td>
         `;
+
+        // =====================================
+        // ACTIONS
+        // =====================================
+
+        const editBtn = tr.querySelector('.edit-flight');
+        const deleteBtn = tr.querySelector('.delete-flight');
+
+        editBtn.onclick = () => openEditModal(flight);
+        deleteBtn.onclick = () => handleDeleteFlight(flight.flight_id);
 
         tbody.appendChild(tr);
     });
 }
 
 
-// =====================================================
-// SEARCH/FILTER
-// =====================================================
+async function handleDeleteFlight(id) {
+    if (!confirm('Are you sure you want to delete this flight?')) return;
 
-function initSearch() {
-
-    const search =
-        document.getElementById(
-            'flight-search'
-        );
-
-    const statusFilter =
-        document.getElementById(
-            'flight-status-filter'
-        );
-
-    if (search) {
-
-        search.addEventListener(
-            'input',
-            applyFilters
-        );
-    }
-
-    if (statusFilter) {
-
-        statusFilter.addEventListener(
-            'change',
-            applyFilters
-        );
+    try {
+        await deleteFlight(id);
+        showToast('Flight deleted', 'success');
+        initFlightsPage();
+    } catch (err) {
+        showToast(err.message || 'Failed to delete flight', 'error');
     }
 }
 
 
-function applyFilters() {
-
-    const searchValue =
-        document.getElementById(
-            'flight-search'
-        )?.value
-            ?.toLowerCase() || '';
-
-    const statusValue =
-        document.getElementById(
-            'flight-status-filter'
-        )?.value || '';
-
-    const filtered =
-        flightsCache.filter(f => {
-
-            const matchesSearch =
-
-                (
-                    f.flight_number || ''
-                )
-                    .toLowerCase()
-                    .includes(searchValue);
-
-            const matchesStatus =
-
-                !statusValue ||
-
-                f.status === statusValue;
-
-            return (
-                matchesSearch &&
-                matchesStatus
-            );
-        });
-
-    renderFlights(filtered);
-}
-
-
-// =====================================================
-// MODAL
-// =====================================================
-
-function initModal() {
-
-    const modal =
-        document.getElementById(
-            'flight-modal'
-        );
-
-    const openBtn =
-        document.getElementById(
-            'open-flight-modal'
-        );
-
-    const closeBtn =
-        document.getElementById(
-            'close-flight-modal'
-        );
-
+function openEditModal(flight) {
+    const modal = document.getElementById('flight-modal');
     if (!modal) return;
 
-    if (openBtn) {
+    // Fill inputs
+    setVal('schedule-flight-id', flight.flight_id);
+    setVal('schedule-flight-number', flight.flight_number);
+    setVal('schedule-airline', flight.airline_id);
+    setVal('schedule-aircraft', flight.aircraft_id);
+    setVal('schedule-departure-airport', flight.departure_airport_id);
+    setVal('schedule-arrival-airport', flight.arrival_airport_id);
+    setVal('schedule-departure-gate', flight.departure_gate_id);
+    setVal('schedule-arrival-gate', flight.arrival_gate_id);
+    setVal('schedule-departure-time', flight.departure_time ? flight.departure_time.substring(0, 16) : '');
+    setVal('schedule-arrival-time', flight.arrival_time ? flight.arrival_time.substring(0, 16) : '');
 
-        openBtn.addEventListener(
-            'click',
-            () => {
+    const saveBtn = document.getElementById('schedule-btn');
+    if (saveBtn) {
+        saveBtn.textContent = 'Update Flight';
+        saveBtn.onclick = async (e) => {
+            e.preventDefault();
+            
+            const payload = {
+                flight_number: getVal('schedule-flight-number'),
+                airline_id: getVal('schedule-airline'),
+                aircraft_id: getVal('schedule-aircraft'),
+                departure_airport_id: getVal('schedule-departure-airport'),
+                arrival_airport_id: getVal('schedule-arrival-airport'),
+                departure_gate_id: getVal('schedule-departure-gate'),
+                arrival_gate_id: getVal('schedule-arrival-gate'),
+                departure_time: getVal('schedule-departure-time'),
+                arrival_time: getVal('schedule-arrival-time')
+            };
 
-                modal.classList.add(
-                    'active'
-                );
+            try {
+                await updateFlight(flight.flight_id, payload);
+                showToast('Flight updated', 'success');
+                modal.classList.remove('active');
+                initFlightsPage();
+            } catch (err) {
+                showToast(err.message || 'Update failed', 'error');
             }
-        );
+        };
+    }
+
+    modal.classList.add('active');
+}
+
+function initNewFlightButton() {
+    const btn = document.getElementById('open-flight-modal');
+    const modal = document.getElementById('flight-modal');
+    const closeBtn = document.getElementById('close-flight-modal');
+
+    if (btn) {
+        btn.onclick = () => {
+            // Reset title and button
+            const title = document.querySelector('#flight-modal h2');
+            if (title) title.textContent = 'Schedule New Flight';
+            
+            const saveBtn = document.getElementById('schedule-btn');
+            if (saveBtn) saveBtn.textContent = 'Schedule Flight';
+            
+            // Clear inputs
+            const ids = [
+                'schedule-flight-id', 'schedule-flight-number', 'schedule-airline', 'schedule-aircraft',
+                'schedule-departure-airport', 'schedule-arrival-airport',
+                'schedule-departure-gate', 'schedule-arrival-gate',
+                'schedule-departure-time', 'schedule-arrival-time'
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+
+            if (modal) modal.classList.add('active');
+        };
     }
 
     if (closeBtn) {
-
-        closeBtn.addEventListener(
-            'click',
-            () => {
-
-                modal.classList.remove(
-                    'active'
-                );
-            }
-        );
+        closeBtn.onclick = () => {
+            if (modal) modal.classList.remove('active');
+        };
     }
-
-    modal.addEventListener(
-        'click',
-        e => {
-
-            if (e.target === modal) {
-
-                modal.classList.remove(
-                    'active'
-                );
-            }
-        }
-    );
 }
 
+function setVal(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+}
 
-// =====================================================
-// TABLE ACTIONS
-// =====================================================
-
-function initTableActions() {
-
-    document.addEventListener(
-        'click',
-        e => {
-
-            const viewBtn =
-                e.target.closest(
-                    '.view-flight'
-                );
-
-            const editBtn =
-                e.target.closest(
-                    '.edit-flight'
-                );
-
-            // =================================
-            // VIEW
-            // =================================
-
-            if (viewBtn) {
-
-                const id =
-                    viewBtn.dataset.id;
-
-                const flight =
-                    flightsCache.find(
-                        f =>
-                            f.flight_id == id
-                    );
-
-                if (!flight) return;
-
-                showToast(
-                    `Viewing flight ${flight.flight_number}`,
-                    'success'
-                );
-
-                console.log(
-                    'VIEW FLIGHT:',
-                    flight
-                );
-            }
-
-            // =================================
-            // EDIT
-            // =================================
-
-            if (editBtn) {
-
-                const id =
-                    editBtn.dataset.id;
-
-                const flight =
-                    flightsCache.find(
-                        f =>
-                            f.flight_id == id
-                    );
-
-                if (!flight) return;
-
-                const modal =
-                    document.getElementById(
-                        'flight-modal'
-                    );
-
-                if (modal) {
-
-                    modal.classList.add(
-                        'active'
-                    );
-                }
-
-                showToast(
-                    `Editing flight ${flight.flight_number}`,
-                    'success'
-                );
-
-                console.log(
-                    'EDIT FLIGHT:',
-                    flight
-                );
-            }
-        }
-    );
+function getVal(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : null;
 }

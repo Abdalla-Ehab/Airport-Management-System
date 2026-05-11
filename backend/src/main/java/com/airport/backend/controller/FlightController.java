@@ -122,4 +122,45 @@ public class FlightController {
             );
         }
     }
+
+    // =====================================================
+    // UPDATE FLIGHT
+    // =====================================================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<FlightResponse>> updateFlight(
+            @PathVariable Long id,
+            @RequestBody FlightRequest request) {
+
+        try {
+            FlightResponse updatedFlight = flightService.updateFlight(id, request);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Flight updated successfully", updatedFlight)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.error(e.getMessage())
+            );
+        }
+    }
+
+    // =====================================================
+    // DELETE FLIGHT
+    // =====================================================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteFlight(@PathVariable Long id) {
+        try {
+            flightService.deleteFlight(id);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Flight deleted successfully", null)
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.error(e.getMessage())
+            );
+        }
+    }
 }

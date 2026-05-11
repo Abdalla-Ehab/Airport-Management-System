@@ -28,4 +28,27 @@ public class AirportController {
     public ResponseEntity<Airport> addAirport(@RequestBody Airport airport) {
         return ResponseEntity.ok(airportRepository.save(airport));
     }
+
+    // 3. ADMIN ONLY: Update Airport
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Airport> updateAirport(@PathVariable Long id, @RequestBody Airport airportDetails) {
+        return airportRepository.findById(id).map(airport -> {
+            airport.setName(airportDetails.getName());
+            airport.setCity(airportDetails.getCity());
+            airport.setCountry(airportDetails.getCountry());
+            airport.setIata_code(airportDetails.getIata_code());
+            return ResponseEntity.ok(airportRepository.save(airport));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // 4. ADMIN ONLY: Delete Airport
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAirport(@PathVariable Long id) {
+        return airportRepository.findById(id).map(airport -> {
+            airportRepository.delete(airport);
+            return ResponseEntity.ok().<Void>build();
+        }).orElse(ResponseEntity.notFound().build());
+    }
 }

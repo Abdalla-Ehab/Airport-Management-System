@@ -47,3 +47,16 @@ export async function getFlightStatus() {
         '/flights/status'
     );
 }
+
+export async function updateFlight(id, payload) {
+    return await apiRequest(`/flights/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+    });
+}
+
+export async function deleteFlight(id) {
+    return await apiRequest(`/flights/${id}`, {
+        method: 'DELETE'
+    });
+}

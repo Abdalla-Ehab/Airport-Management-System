@@ -16,12 +16,12 @@ import { initAirportView } from './airports/airportView.js';
 import { initBaggageDrop } from './baggage/baggageDrop.js';
 import { initScanner } from './baggage/scanner.js';
 
-import { initFleet } from './admin/fleet.js';
-import { initMaintenance } from './admin/maintenance.js';
 import { initScheduler } from './admin/scheduler.js';
 import { initFlightsPage } from './admin/flightsPage.js';
 import { initAirportsPage } from './admin/airportsPage.js';
 import { initAirlinesPage } from './admin/airlinesPage.js';
+import { initUsersPage } from './admin/usersPage.js';
+import { initReportsPage } from './admin/reportsPage.js';
 
 import { getFlights } from './api/flightApi.js';
 
@@ -235,19 +235,17 @@ document.addEventListener(
         // PASSENGER FEATURES
         // =====================================
 
-        initBookingView();
-
-        initMyBookings();
-
-        initCheckin();
-
-        // initFlightStatus();
-
-        initAirportView();
-
-        initBaggageDrop();
-
-        initScanner();
+        if (!user || user.role === 'passenger') {
+            initBookingView();
+            if (user) {
+                initMyBookings();
+            }
+            initCheckin();
+            // initFlightStatus();
+            initAirportView();
+            initBaggageDrop();
+            initScanner();
+        }
 
         // =====================================
         // ADMIN / STAFF FEATURES
@@ -261,10 +259,6 @@ document.addEventListener(
             )
         ) {
 
-            initFleet();
-
-            initMaintenance();
-
             initScheduler();
 
             initFlightsPage();
@@ -272,6 +266,10 @@ document.addEventListener(
             initAirportsPage();
 
             initAirlinesPage();
+
+            initUsersPage();
+
+            initReportsPage();
         }
 
         console.log(

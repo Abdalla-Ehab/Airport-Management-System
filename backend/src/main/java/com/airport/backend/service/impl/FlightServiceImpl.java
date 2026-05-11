@@ -222,6 +222,53 @@ public class FlightServiceImpl implements FlightService {
     }
 
     // =========================================================
+    // UPDATE FLIGHT
+    // =========================================================
+    @Override
+    @Transactional
+    public FlightResponse updateFlight(Long id, FlightRequest dto) {
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Flight not found with ID: " + id));
+
+        Airport depAirport = airportRepository.findById(dto.getDeparture_airport_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Departure Airport not found"));
+        Airport arrAirport = airportRepository.findById(dto.getArrival_airport_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Arrival Airport not found"));
+        Aircraft aircraft = aircraftRepository.findById(dto.getAircraft_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Aircraft not found"));
+        Airline airline = airlineRepository.findById(dto.getAirline_id())
+                .orElseThrow(() -> new ResourceNotFoundException("Airline not found"));
+        Gate depGate = dto.getDeparture_gate_id() != null
+                ? gateRepository.findById(dto.getDeparture_gate_id()).orElse(null) : null;
+        Gate arrGate = dto.getArrival_gate_id() != null
+                ? gateRepository.findById(dto.getArrival_gate_id()).orElse(null) : null;
+
+        flight.setFlight_number(dto.getFlight_number());
+        flight.setDeparture_time(dto.getDeparture_time());
+        flight.setArrival_time(dto.getArrival_time());
+        flight.setDepartureAirport(depAirport);
+        flight.setArrivalAirport(arrAirport);
+        flight.setAircraft(aircraft);
+        flight.setAirline(airline);
+        flight.setDepartureGate(depGate);
+        flight.setArrivalGate(arrGate);
+
+        return mapToResponse(flightRepository.save(flight));
+    }
+
+    // =========================================================
+    // DELETE FLIGHT
+    // =========================================================
+    @Override
+    @Transactional
+    public void deleteFlight(Long id) {
+        if (!flightRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Flight not found with ID: " + id);
+        }
+        flightRepository.deleteById(id);
+    }
+
+    // =========================================================
     // ENTITY -> RESPONSE DTO
     // =========================================================
 

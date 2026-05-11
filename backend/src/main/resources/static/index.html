@@ -224,8 +224,7 @@
 
                 <p>
                     Manage flights, passengers,
-                    airports, airlines, maintenance,
-                    fleet operations, and analytics
+                    airports, airlines, and analytics
                     from one integrated platform.
                 </p>
 
@@ -383,7 +382,6 @@
                             + New Flight
 
                         </button>
-
                     </div>
 
                     <!-- KPI -->
@@ -438,21 +436,7 @@
 
                         </div>
 
-                        <div class="card kpi-card">
 
-                            <div class="kpi-label">
-                                Fleet Health
-                            </div>
-
-                            <div class="kpi-value">
-                                98%
-                            </div>
-
-                            <div class="kpi-change positive">
-                                Stable
-                            </div>
-
-                        </div>
 
                     </div>
 
@@ -489,9 +473,12 @@
                                     <tr>
 
                                         <th>Flight</th>
-                                        <th>Status</th>
+                                        <th>Airline</th>
+                                        <th>Aircraft</th>
                                         <th>Departure</th>
                                         <th>Arrival</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
 
                                     </tr>
 
@@ -567,7 +554,6 @@
 
                                         <th>Airline</th>
                                         <th>Country</th>
-                                        <th>Fleet</th>
 
                                     </tr>
 
@@ -1801,6 +1787,110 @@
                     </div>
 
                 </section>
+                <!-- USERS -->
+
+                <section id="view-users" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">
+                            <h1>User Management</h1>
+                            <p>Manage passengers and staff accounts.</p>
+                        </div>
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <div class="search-box">
+                                <input type="text" id="user-search" placeholder="Search users...">
+                            </div>
+                            <select id="user-role-filter" class="input" style="width:150px;">
+                                <option value="all">All Users</option>
+                                <option value="staff">Staff Only</option>
+                                <option value="passenger">Passengers Only</option>
+                            </select>
+                            <button id="open-user-modal" class="btn btn-primary">
+                                + Add Staff
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+
+                        <div class="table-wrapper">
+
+                            <table class="table">
+
+                                <thead>
+
+                                    <tr>
+
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody id="users-table-body">
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- REPORTS -->
+
+                <section id="view-reports" class="view hidden dashboard">
+
+                    <div class="dashboard-header">
+
+                        <div class="dashboard-title">
+
+                            <h1>
+                                System Reports
+                            </h1>
+
+                            <p>
+                                Aggregate statistics and summaries.
+                            </p>
+
+                        </div>
+
+                        <button id="refresh-reports-btn" class="btn btn-secondary">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+                    <div class="kpi-grid">
+
+                        <div class="card kpi-card">
+                            <div class="kpi-label">Total Flights</div>
+                            <div id="report-total-flights" class="kpi-value">-</div>
+                        </div>
+
+                        <div class="card kpi-card">
+                            <div class="kpi-label">Total Passengers</div>
+                            <div id="report-total-passengers" class="kpi-value">-</div>
+                        </div>
+
+                        <div class="card kpi-card">
+                            <div class="kpi-label">Total Staff</div>
+                            <div id="report-total-staff" class="kpi-value">-</div>
+                        </div>
+
+                        <div class="card kpi-card">
+                            <div class="kpi-label">Total Bookings</div>
+                            <div id="report-total-bookings" class="kpi-value">-</div>
+                        </div>
+
+                    </div>
+
+                </section>
             </main>
 
         </div>
@@ -1830,6 +1920,8 @@
             </div>
 
             <div class="grid grid-2" style="margin-top:24px;">
+
+                <input type="hidden" id="schedule-flight-id">
 
                 <div class="input-group">
 
@@ -1881,15 +1973,15 @@
 
                 </div>
 
-                <div class="input-group">
+                 <div class="input-group">
+                     <label>Departure Gate ID</label>
+                     <input id="schedule-departure-gate" class="input">
+                 </div>
 
-                    <label>
-                        Departure Gate ID
-                    </label>
-
-                    <input id="schedule-departure-gate" class="input">
-
-                </div>
+                 <div class="input-group">
+                     <label>Arrival Gate ID</label>
+                     <input id="schedule-arrival-gate" class="input">
+                 </div>
 
                 <div class="input-group">
 
@@ -1932,6 +2024,115 @@
     </div>
     <div id="toast-container"></div>
     <script type="module" src="/js/main.js"></script>
+
+    <!-- ========================= -->
+    <!-- AIRPORT MODAL -->
+    <!-- ========================= -->
+
+    <div id="airport-modal" class="flight-modal">
+        <div class="flight-modal-content card">
+            <div class="section-header">
+                <h2 id="airport-modal-title">Edit Airport</h2>
+                <button id="close-airport-modal" class="btn btn-secondary">✕</button>
+            </div>
+            <div class="grid grid-2" style="margin-top:24px;">
+                <input type="hidden" id="airport-id">
+                <div class="input-group">
+                    <label>Name</label>
+                    <input id="airport-name" class="input">
+                </div>
+                <div class="input-group">
+                    <label>City</label>
+                    <input id="airport-city" class="input">
+                </div>
+                <div class="input-group">
+                    <label>Country</label>
+                    <input id="airport-country" class="input">
+                </div>
+                <div class="input-group">
+                    <label>IATA Code</label>
+                    <input id="airport-iata" class="input">
+                </div>
+            </div>
+            <div style="margin-top:32px; display:flex; justify-content:flex-end;">
+                <button id="save-airport-btn" class="btn btn-primary">Save Airport</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- USER MODAL -->
+    <!-- ========================= -->
+
+    <div id="user-modal" class="flight-modal">
+        <div class="flight-modal-content card">
+            <div class="section-header">
+                <h2 id="user-modal-title">Edit User</h2>
+                <button id="close-user-modal" class="btn btn-secondary">✕</button>
+            </div>
+            <div class="grid grid-2" style="margin-top:24px;">
+                <input type="hidden" id="user-id">
+                <input type="hidden" id="user-type">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input id="user-first-name" class="input">
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input id="user-last-name" class="input">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input id="user-email" class="input">
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input id="user-phone" class="input">
+                </div>
+                <div class="input-group" id="user-passport-group">
+                    <label>Passport Number</label>
+                    <input id="user-passport" class="input">
+                </div>
+                <div class="input-group" id="user-role-group">
+                    <label>Role</label>
+                    <select id="user-role" class="input">
+                        <option value="STAFF">Staff</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:32px; display:flex; justify-content:flex-end;">
+                <button id="save-user-btn" class="btn btn-primary">Save User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- AIRLINE MODAL -->
+    <!-- ========================= -->
+
+    <div id="airline-modal" class="flight-modal">
+        <div class="flight-modal-content card">
+            <div class="section-header">
+                <h2 id="airline-modal-title">Edit Airline</h2>
+                <button id="close-airline-modal" class="btn btn-secondary">✕</button>
+            </div>
+            <div class="grid grid-2" style="margin-top:24px;">
+                <input type="hidden" id="airline-id">
+                <div class="input-group">
+                    <label>Airline Name</label>
+                    <input id="airline-name" class="input">
+                </div>
+                <div class="input-group">
+                    <label>Country</label>
+                    <input id="airline-country" class="input">
+                </div>
+            </div>
+            <div style="margin-top:32px; display:flex; justify-content:flex-end;">
+                <button id="save-airline-btn" class="btn btn-primary">Save Airline</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 

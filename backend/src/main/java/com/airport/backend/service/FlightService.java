@@ -13,4 +13,6 @@ public interface FlightService {
     Long destination,
     String date
 );
+    FlightResponse updateFlight(Long id, FlightRequest request);
+    void deleteFlight(Long id);
 }
