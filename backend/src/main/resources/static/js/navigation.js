@@ -69,12 +69,6 @@ const NAVIGATION = {
         },
 
         {
-            id: 'status',
-            label: 'Flight Status',
-            icon: '✈'
-        },
-
-        {
             id: 'profile',
             label: 'Profile',
             icon: '👤'

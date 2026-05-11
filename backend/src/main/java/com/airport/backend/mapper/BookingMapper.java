@@ -7,12 +7,54 @@ import org.springframework.stereotype.Component;
 @Component
 public class BookingMapper {
 
-    public BookingResponse toResponse(Booking booking) {
+    public BookingResponse toResponse(
+            Booking booking) {
+
         return new BookingResponse(
-            booking.getTicket_no(),
-            booking.getFlight().getFlight_id(), // REACHING THROUGH THE OBJECT!
-            booking.getSeat_no(),
-            booking.getClass_name()
-        );
+
+                booking.getTicket_no(),
+
+                booking.getFlight()
+                        .getFlight_id(),
+
+                booking.getSeat_no(),
+
+                booking.getClass_name(),
+
+                // =====================================
+                // BOARDING PASS DATA
+                // =====================================
+
+                booking.getPassenger()
+                        .getFirstName()
+                        + " " +
+                        booking.getPassenger()
+                                .getLastName(),
+
+                booking.getFlight()
+                        .getDepartureAirport()
+                        .getCity(),
+
+                booking.getFlight()
+                        .getArrivalAirport()
+                        .getCity(),
+
+                booking.getFlight()
+                        .getDeparture_time()
+                        .toLocalTime()
+                        .toString(),
+
+                booking.getFlight()
+                        .getArrival_time()
+                        .toLocalTime()
+                        .toString(),
+
+                booking.getFlight()
+                        .getDeparture_time()
+                        .toLocalDate()
+                        .toString(),
+
+                booking.getFlight()
+                        .getFlight_number());
     }
 }

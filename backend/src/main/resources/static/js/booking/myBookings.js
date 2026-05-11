@@ -1,12 +1,12 @@
 import {
     apiRequest
 }
-from '../api/apiClient.js';
+    from '../api/apiClient.js';
 
 import {
     escHtml
 }
-from '../shared/helpers.js';
+    from '../shared/helpers.js';
 
 export async function initMyBookings() {
 
@@ -88,65 +88,104 @@ function renderBookings(
 
         card.innerHTML = `
 
-            <div class="section-header">
+        <div class="section-header">
 
-                <h3>
-                    Ticket #${booking.bookingId}
-                </h3>
+            <h3>
+                Ticket #${booking.bookingId}
+            </h3>
 
-                <span class="badge badge-success">
+            <span class="badge badge-success">
 
-                    CONFIRMED
+                CONFIRMED
 
+            </span>
+
+        </div>
+
+        <div class="airport-meta">
+
+            <div class="airport-meta-item">
+
+                <strong>
+                    Flight ID
+                </strong>
+
+                <span>
+                    ${booking.flightId}
                 </span>
 
             </div>
 
-            <div class="airport-meta">
+            <div class="airport-meta-item">
 
-                <div class="airport-meta-item">
+                <strong>
+                    Seat
+                </strong>
 
-                    <strong>
-                        Flight ID
-                    </strong>
-
-                    <span>
-                        ${booking.flightId}
-                    </span>
-
-                </div>
-
-                <div class="airport-meta-item">
-
-                    <strong>
-                        Seat
-                    </strong>
-
-                    <span>
-                        ${escHtml(
-                            booking.seatNo
-                        )}
-                    </span>
-
-                </div>
-
-                <div class="airport-meta-item">
-
-                    <strong>
-                        Class
-                    </strong>
-
-                    <span>
-                        ${escHtml(
-                            booking.className
-                        )}
-                    </span>
-
-                </div>
+                <span>
+                    ${escHtml(
+            booking.seatNo
+        )}
+                </span>
 
             </div>
-        `;
+
+            <div class="airport-meta-item">
+
+                <strong>
+                    Class
+                </strong>
+
+                <span>
+                    ${escHtml(
+            booking.className
+        )}
+                </span>
+
+            </div>
+
+        </div>
+
+        <button
+            class="btn btn-primary view-pass-btn"
+        >
+            View Boarding Pass
+        </button>
+    `;
 
         container.appendChild(card);
+
+        card.querySelector(
+            '.view-pass-btn'
+        ).addEventListener(
+            'click',
+            async () => {
+
+                const module =
+                    await import(
+                        '../boarding/boardingPass.js'
+                    );
+
+                module.renderBoardingPass(
+                    booking
+                );
+
+                document
+                    .querySelectorAll('.view')
+                    .forEach(v =>
+                        v.classList.add(
+                            'hidden'
+                        )
+                    );
+
+                document
+                    .getElementById(
+                        'view-boarding'
+                    )
+                    .classList.remove(
+                        'hidden'
+                    );
+            }
+        );
     });
 }

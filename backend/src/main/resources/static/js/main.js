@@ -8,7 +8,7 @@ import { initLogout } from './auth/logout.js';
 
 import { initBookingView } from './booking/bookingView.js';
 import { initCheckin } from './booking/checkin.js';
-import { initFlightStatus } from './booking/flightStatus.js';
+// import { initFlightStatus } from './booking/flightStatus.js';
 import { initMyBookings } from './booking/myBookings.js';
 
 import { initAirportView } from './airports/airportView.js';
@@ -25,6 +25,7 @@ import { initAirlinesPage } from './admin/airlinesPage.js';
 
 import { getFlights } from './api/flightApi.js';
 
+import { buildNavigation } from './navigation.js';
 
 function initSidebar() {
 
@@ -97,6 +98,16 @@ document.addEventListener(
 
         const user =
             getCurrentUser();
+
+        if (user) {
+
+            buildNavigation(
+                (
+                    user.role ||
+                    'passenger'
+                ).toLowerCase()
+            );
+        }
 
         // =====================================
         // USER PROFILE UI
@@ -204,7 +215,7 @@ document.addEventListener(
                         .charAt(0)
                         .toUpperCase();
             }
-            
+
         }
 
         // =====================================
@@ -256,7 +267,7 @@ document.addEventListener(
 
         initCheckin();
 
-        initFlightStatus();
+        // initFlightStatus();
 
         initAirportView();
 

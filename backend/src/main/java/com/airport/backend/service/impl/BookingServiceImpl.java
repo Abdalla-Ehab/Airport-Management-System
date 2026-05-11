@@ -65,7 +65,8 @@ public class BookingServiceImpl implements BookingService {
                         booking.setClass_name(
                                         request.getClass_name());
 
-                        booking.setIs_transit(false);
+                        booking.setIs_transit(
+                                        request.getIs_transit());
 
                         newBookings.add(booking);
                 }

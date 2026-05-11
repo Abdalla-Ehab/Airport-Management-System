@@ -805,28 +805,207 @@
 
                 <section id="view-boarding" class="view hidden dashboard">
 
-                    <div class="
-                            card
-                            boarding-pass-premium
-                        ">
+                    <div class="boarding-pass-container">
 
-                        <div class="bp-layout">
+                        <!-- LEFT SIDE -->
 
-                            <div>
+                        <div class="boarding-main">
 
-                                <div class="hero-badge">
-                                    ✈ twixNexus Airlines
+                            <div class="boarding-header">
+
+                                <div class="boarding-title">
+
+                                    <div class="boarding-plane">
+                                        ✈
+                                    </div>
+
+                                    <h1>
+                                        BOARDING PASS
+                                    </h1>
+
                                 </div>
 
-                                <h2>
-                                    Boarding Pass
+                                <div class="boarding-brand">
+
+                                    twixNexus Airlines
+
+                                </div>
+
+                            </div>
+
+                            <!-- PASSENGER -->
+
+                            <div class="boarding-section">
+
+                                <span class="boarding-label">
+                                    PASSENGER NAME
+                                </span>
+
+                                <h2 id="bp-passenger-name">
+                                    Ahmed Kamal
                                 </h2>
 
                             </div>
 
-                            <div class="bp-qr">
+                            <!-- ROUTE -->
 
-                                <div class="fake-qr"></div>
+                            <div class="boarding-route">
+
+                                <div>
+
+                                    <span class="boarding-label">
+                                        FROM
+                                    </span>
+
+                                    <h2 class="boarding-city from" id="bp-from">
+                                        Cairo
+                                    </h2>
+
+                                </div>
+
+                                <div class="boarding-airplane">
+                                    ✈
+                                </div>
+
+                                <div>
+
+                                    <span class="boarding-label">
+                                        TO
+                                    </span>
+
+                                    <h2 class="boarding-city to" id="bp-to">
+                                        Dubai
+                                    </h2>
+
+                                </div>
+
+                            </div>
+
+                            <!-- FLIGHT INFO -->
+
+                            <div class="boarding-grid">
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        DATE
+                                    </span>
+
+                                    <h3 id="bp-date">
+                                        28 Apr 2026
+                                    </h3>
+
+                                </div>
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        DEPARTURE
+                                    </span>
+
+                                    <h3 id="bp-departure">
+                                        04:00 PM
+                                    </h3>
+
+                                </div>
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        ARRIVAL
+                                    </span>
+
+                                    <h3 id="bp-arrival">
+                                        06:00 PM
+                                    </h3>
+
+                                </div>
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        FLIGHT
+                                    </span>
+
+                                    <h3 id="bp-flight">
+                                        TNX-220
+                                    </h3>
+
+                                </div>
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        SEAT
+                                    </span>
+
+                                    <h3 id="bp-seat">
+                                        12A
+                                    </h3>
+
+                                </div>
+
+                                <div class="boarding-box">
+
+                                    <span class="boarding-label">
+                                        CLASS
+                                    </span>
+
+                                    <h3 id="bp-class">
+                                        BUSINESS
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT SIDE -->
+
+                        <div class="boarding-side">
+
+                            <div class="boarding-ticket-box">
+
+                                <span class="boarding-label">
+                                    TICKET ID
+                                </span>
+
+                                <h2 id="bp-ticket">
+                                    TKT-2900101
+                                </h2>
+
+                            </div>
+
+                            <div class="boarding-ticket-box">
+
+                                <span class="boarding-label">
+                                    BOARDING TIME
+                                </span>
+
+                                <h2 id="bp-boarding-time">
+                                    03:30 PM
+                                </h2>
+
+                            </div>
+
+                            <div class="boarding-qr">
+
+                                <img id="bp-qr"
+                                    src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=TKT-2900101"
+                                    alt="QR Code">
+
+                            </div>
+
+                            <div class="boarding-scan">
+
+                                SCAN AT GATE
+
+                            </div>
+
+                            <div class="boarding-footer">
+
+                                HAVE A NICE JOURNEY!
 
                             </div>
 
