@@ -9,6 +9,7 @@ import { initLogout } from './auth/logout.js';
 import { initBookingView } from './booking/bookingView.js';
 import { initCheckin } from './booking/checkin.js';
 import { initFlightStatus } from './booking/flightStatus.js';
+import { initMyBookings } from './booking/myBookings.js';
 
 import { initAirportView } from './airports/airportView.js';
 
@@ -203,6 +204,7 @@ document.addEventListener(
                         .charAt(0)
                         .toUpperCase();
             }
+            
         }
 
         // =====================================
@@ -249,6 +251,8 @@ document.addEventListener(
         // =====================================
 
         initBookingView();
+
+        initMyBookings();
 
         initCheckin();
 

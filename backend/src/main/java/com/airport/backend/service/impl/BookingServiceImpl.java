@@ -53,11 +53,19 @@ public class BookingServiceImpl implements BookingService {
                 // 4. Process Business Logic
                 List<Booking> newBookings = new ArrayList<>();
                 for (String seat : request.getSeat_nos()) {
+
                         Booking booking = new Booking();
-                        booking.setFlight(flight); // <--- Now passing the entire Flight object!
-                        booking.setPassenger(passenger); // <--- Now passing the entire Passenger object!
+
+                        booking.setFlight(flight);
+
+                        booking.setPassenger(passenger);
+
                         booking.setSeat_no(seat);
-                        booking.setClass_name(request.getClass_name());
+
+                        booking.setClass_name(
+                                        request.getClass_name());
+
+                        booking.setIs_transit(false);
 
                         newBookings.add(booking);
                 }

@@ -1,29 +1,45 @@
 package com.airport.backend.security;
 
-import com.airport.backend.enums.Role; // NEW IMPORT FOR RBAC
+// import com.airport.backend.enums.Role;
+
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
+
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
+
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import org.springframework.web.cors.CorsConfiguration;
+
 import org.springframework.web.cors.CorsConfigurationSource;
+
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Keeps @PreAuthorize working if you still have any!
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -32,59 +48,173 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    // =====================================================
+    // SECURITY FILTER CHAIN
+    // =====================================================
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
+
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable()) // Disable CSRF as we use JWT
+
+                // =================================================
+                // CORS
+                // =================================================
+
+                .cors(cors -> cors.configurationSource(
+                        corsConfigurationSource()))
+
+                // =================================================
+                // CSRF
+                // =================================================
+
+                .csrf(csrf -> csrf.disable())
+
+                // =================================================
+                // AUTHORIZATION
+                // =================================================
+
                 .authorizeHttpRequests(auth -> auth
-                        // 1. PUBLIC ENDPOINTS (Anyone can access)
+
+                        // =============================================
+                        // PUBLIC API ENDPOINTS
+                        // =============================================
+
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/airports/**",
                                 "/api/flights/**")
                         .permitAll()
-                        .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.ico", "/css/**", "/js/**",
+
+                        // =============================================
+                        // STATIC FILES
+                        // =============================================
+
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/*.css",
+                                "/*.js",
+                                "/*.ico",
+                                "/css/**",
+                                "/js/**",
                                 "/images/**")
                         .permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
 
-                        // 2. PASSENGER & ADMIN ENDPOINTS
-                        .requestMatchers("/api/checkin/**", "/api/bookings/**")
-                        .hasAnyRole(Role.PASSENGER.name(), Role.ADMIN.name())
+                        // =============================================
+                        // ACTUATOR
+                        // =============================================
 
-                        // 3. STAFF & ADMIN ENDPOINTS
-                        .requestMatchers("/api/baggage/**", "/api/gate/**", "/api/shifts/**")
-                        .hasAnyRole(Role.STAFF.name(), Role.ADMIN.name())
+                        .requestMatchers(
+                                "/actuator/health")
+                        .permitAll()
 
-                        // 4. ADMIN ONLY ENDPOINTS
-                        .requestMatchers("/api/flights/schedule", "/api/staff/**").hasRole(Role.ADMIN.name())
+                        // =============================================
+                        // PASSENGER + ADMIN
+                        // =============================================
 
-                        // 5. DEFAULT FALLBACK (Anything else requires login)
-                        .anyRequest().authenticated())
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers(
+                                "/api/bookings",
+                                "/api/bookings/**",
+                                "/api/checkin/**")
+                        .permitAll()
+
+                        // =============================================
+                        // STAFF + ADMIN
+                        // =============================================
+
+                        .requestMatchers(
+                                "/api/baggage/**",
+                                "/api/gate/**",
+                                "/api/shifts/**",
+                                "/api/aircraft/**")
+                        .hasAnyAuthority(
+                                "ROLE_STAFF",
+                                "ROLE_ADMIN")
+
+                        // =============================================
+                        // ADMIN ONLY
+                        // =============================================
+
+                        .requestMatchers(
+                                "/api/flights/schedule",
+                                "/api/staff/**")
+                        .hasAuthority(
+                                "ROLE_ADMIN")
+
+                        // =============================================
+                        // EVERYTHING ELSE
+                        // =============================================
+
+                        .anyRequest()
+                        .authenticated())
+
+                // =================================================
+                // STATELESS JWT
+                // =================================================
+
+                .sessionManagement(sess -> sess.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
+
+                // =================================================
+                // AUTH PROVIDER
+                // =================================================
+
+                .authenticationProvider(
+                        authenticationProvider())
+
+                // =================================================
+                // JWT FILTER
+                // =================================================
+
+                .addFilterBefore(
+                        jwtAuthFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // =====================================================
+    // AUTH PROVIDER
+    // =====================================================
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(
+                userDetailsService);
+
+        authProvider.setPasswordEncoder(
+                passwordEncoder());
+
         return authProvider;
     }
 
+    // =====================================================
+    // AUTH MANAGER
+    // =====================================================
+
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+
         return config.getAuthenticationManager();
     }
 
+    // =====================================================
+    // PASSWORD ENCODER
+    // =====================================================
+
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
+
+    // =====================================================
+    // CORS CONFIG
+    // =====================================================
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
