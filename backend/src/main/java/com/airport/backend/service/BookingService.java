@@ -6,6 +6,30 @@ import com.airport.backend.response.BookingResponse;
 import java.util.List;
 
 public interface BookingService {
-    List<BookingResponse> createBooking(BookFlightRequest request, String username);
-    List<BookingResponse> getMyBookings(String username);
+
+    // =====================================
+    // CREATE BOOKING
+    // =====================================
+
+    List<BookingResponse> createBooking(
+            BookFlightRequest request,
+            String username
+    );
+
+    // =====================================
+    // GET USER BOOKINGS
+    // =====================================
+
+    List<BookingResponse> getMyBookings(
+            String username
+    );
+
+    // =====================================
+    // CANCEL BOOKING
+    // =====================================
+
+    void cancelBooking(
+            Long ticketNo,
+            String username
+    );
 }

@@ -1,0 +1,435 @@
+/* =========================================
+   BOARDING PASS
+========================================= */
+
+#view-boarding {
+    min-height: 100vh;
+    padding: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(circle at top left, #0d2b6b 0%, transparent 30%),
+        radial-gradient(circle at bottom right, #09152e 0%, transparent 30%),
+        linear-gradient(135deg, #020817, #04122d, #020817);
+
+    font-family: "Poppins", sans-serif;
+}
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.boarding-pass-container {
+    width: 100%;
+    max-width: 1450px;
+
+    display: grid;
+    grid-template-columns: 2.2fr 1fr;
+
+    background: rgba(5, 15, 40, 0.95);
+
+    border-radius: 40px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 25px 60px rgba(0,0,0,0.5);
+
+    position: relative;
+}
+
+/* =========================================
+   LEFT SIDE
+========================================= */
+
+.boarding-main {
+    padding: 45px 50px;
+    position: relative;
+}
+
+/* DOTTED LINE */
+
+.boarding-main::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 2px;
+    height: 100%;
+
+    background-image:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.7),
+            rgba(255,255,255,0.7) 10px,
+            transparent 10px,
+            transparent 22px
+        );
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.boarding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 40px;
+}
+
+.boarding-title {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.boarding-plane {
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+
+    background: linear-gradient(135deg, #2b6cff, #1d4ed8);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+    color: white;
+
+    box-shadow:
+        0 8px 20px rgba(37,99,235,0.5);
+}
+
+.boarding-title h1 {
+    color: white;
+
+    font-size: 52px;
+    font-weight: 700;
+
+    letter-spacing: 4px;
+
+    margin: 0;
+}
+
+.boarding-brand {
+    color: white;
+
+    font-size: 32px;
+    font-weight: 600;
+
+    opacity: 0.9;
+}
+
+/* =========================================
+   SECTIONS
+========================================= */
+
+.boarding-section,
+.boarding-route,
+.boarding-grid {
+    border: 1px solid rgba(255,255,255,0.12);
+
+    border-radius: 28px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,0.03),
+            rgba(255,255,255,0.01)
+        );
+
+    backdrop-filter: blur(10px);
+
+    margin-bottom: 28px;
+}
+
+/* =========================================
+   PASSENGER
+========================================= */
+
+.boarding-section {
+    padding: 35px 40px;
+}
+
+.boarding-section h2 {
+    color: white;
+
+    font-size: 50px;
+    font-weight: 700;
+
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+/* =========================================
+   LABELS
+========================================= */
+
+.boarding-label {
+    color: #9bb7ff;
+
+    font-size: 22px;
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+/* =========================================
+   ROUTE
+========================================= */
+
+.boarding-route {
+    padding: 40px 50px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.boarding-city {
+    font-size: 52px;
+    font-weight: 700;
+
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+
+.boarding-city.from {
+    color: #62b1ff;
+}
+
+.boarding-city.to {
+    color: #ff6e95;
+}
+
+.boarding-airplane {
+    font-size: 65px;
+
+    color: #94b9ff;
+
+    transform: rotate(10deg);
+}
+
+/* =========================================
+   GRID
+========================================= */
+
+.boarding-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.boarding-box {
+    padding: 35px;
+
+    border-right: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.boarding-box:nth-child(3n) {
+    border-right: none;
+}
+
+.boarding-box h3 {
+    color: white;
+
+    font-size: 36px;
+    font-weight: 700;
+
+    margin-top: 16px;
+    margin-bottom: 0;
+}
+
+/* =========================================
+   RIGHT SIDE
+========================================= */
+
+.boarding-side {
+    padding: 50px 40px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.02),
+            rgba(255,255,255,0.01)
+        );
+}
+
+/* =========================================
+   TICKET BOXES
+========================================= */
+
+.boarding-ticket-box {
+    padding-bottom: 35px;
+    margin-bottom: 35px;
+
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.boarding-ticket-box h2 {
+    color: #ffc93c;
+
+    font-size: 42px;
+    font-weight: 700;
+
+    margin-top: 14px;
+    margin-bottom: 0;
+}
+
+/* =========================================
+   QR
+========================================= */
+
+.boarding-qr {
+    display: flex;
+    justify-content: center;
+
+    margin: 20px 0;
+}
+
+.boarding-qr img {
+    width: 260px;
+    height: 260px;
+
+    background: white;
+
+    padding: 14px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* =========================================
+   SCAN
+========================================= */
+
+.boarding-scan {
+    text-align: center;
+
+    color: #62b1ff;
+
+    font-size: 34px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    margin-top: 15px;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.boarding-footer {
+    margin-top: 50px;
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 38px;
+    font-weight: 600;
+
+    letter-spacing: 2px;
+
+    opacity: 0.95;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1200px) {
+
+    .boarding-pass-container {
+        grid-template-columns: 1fr;
+    }
+
+    .boarding-main::after {
+        display: none;
+    }
+
+    .boarding-title h1 {
+        font-size: 40px;
+    }
+
+    .boarding-brand {
+        font-size: 24px;
+    }
+
+    .boarding-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+
+    #view-boarding {
+        padding: 20px;
+    }
+
+    .boarding-header {
+        flex-direction: column;
+        gap: 20px;
+
+        align-items: flex-start;
+    }
+
+    .boarding-route {
+        flex-direction: column;
+        gap: 25px;
+
+        text-align: center;
+    }
+
+    .boarding-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .boarding-box {
+        border-right: none;
+    }
+
+    .boarding-title h1 {
+        font-size: 30px;
+    }
+
+    .boarding-city {
+        font-size: 38px;
+    }
+
+    .boarding-section h2 {
+        font-size: 34px;
+    }
+
+    .boarding-box h3 {
+        font-size: 26px;
+    }
+
+    .boarding-scan {
+        font-size: 24px;
+    }
+
+    .boarding-footer {
+        font-size: 28px;
+    }
+}

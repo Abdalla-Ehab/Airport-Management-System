@@ -70,6 +70,10 @@ public class BookingController {
     // GET BOOKED SEATS FOR FLIGHT
     // =====================================================
 
+       // =====================================================
+    // GET BOOKED SEATS FOR FLIGHT
+    // =====================================================
+
     @GetMapping("/flight/{flightId}/seats")
     public ResponseEntity<?> getBookedSeats(
             @PathVariable Long flightId) {
@@ -81,6 +85,29 @@ public class BookingController {
 
         return ResponseEntity.ok(
                 bookedSeats
+        );
+    }
+
+    // =====================================================
+    // CANCEL BOOKING
+    // =====================================================
+
+    @DeleteMapping("/{ticketNo}")
+    public ResponseEntity<?> cancelBooking(
+            @PathVariable Long ticketNo,
+            Authentication authentication
+    ) {
+
+        bookingService.cancelBooking(
+                ticketNo,
+                authentication.getName()
+        );
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message",
+                        "Booking cancelled successfully"
+                )
         );
     }
 }

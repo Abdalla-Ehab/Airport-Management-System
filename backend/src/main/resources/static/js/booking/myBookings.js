@@ -8,6 +8,16 @@ import {
 }
     from '../shared/helpers.js';
 
+import {
+    cancelBooking
+}
+    from '../api/bookingApi.js';
+
+import {
+    showToast
+}
+    from '../shared/toast.js';
+
 export async function initMyBookings() {
 
     const container =
@@ -152,6 +162,74 @@ function renderBookings(
             View Boarding Pass
         </button>
     `;
+
+        const cancelBtn =
+            document.createElement('button');
+
+        cancelBtn.className =
+            'btn btn-danger';
+
+        cancelBtn.style.marginTop =
+            '16px';
+
+        cancelBtn.textContent =
+            'Cancel Ticket';
+
+        cancelBtn.addEventListener(
+            'click',
+            async () => {
+
+                const confirmed =
+                    confirm(
+                        'Cancel this booking?'
+                    );
+
+                if (!confirmed) return;
+
+                try {
+
+                    await cancelBooking(
+                        booking.bookingId
+                    );
+
+                    card.remove();
+
+                    if (!container.children.length) {
+
+                        container.innerHTML = `
+
+        <div class="card">
+
+            <h3>
+                No Bookings Yet
+            </h3>
+
+            <p class="text-muted">
+
+                Your tickets will appear here.
+
+            </p>
+
+        </div>
+    `;
+                    }
+
+                    showToast(
+                        'Booking cancelled',
+                        'success'
+                    );
+
+                } catch (err) {
+
+                    showToast(
+                        err.message,
+                        'error'
+                    );
+                }
+            }
+        );
+
+        card.appendChild(cancelBtn);
 
         container.appendChild(card);
 

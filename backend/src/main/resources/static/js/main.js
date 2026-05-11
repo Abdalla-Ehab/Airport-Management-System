@@ -46,34 +46,8 @@ function initSidebar() {
         () => {
 
             sidebar.classList.toggle(
-                'active'
+                'closed'
             );
-        }
-    );
-
-    document.addEventListener(
-        'click',
-        e => {
-
-            const insideSidebar =
-                sidebar.contains(
-                    e.target
-                );
-
-            const clickedToggle =
-                toggle.contains(
-                    e.target
-                );
-
-            if (
-                !insideSidebar &&
-                !clickedToggle
-            ) {
-
-                sidebar.classList.remove(
-                    'active'
-                );
-            }
         }
     );
 }

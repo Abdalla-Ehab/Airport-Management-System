@@ -18,6 +18,7 @@
 @import url('./components/charts.css');
 @import url('./components/skeleton.css');
 @import url('./components/states.css');
+@import url('./components/BoardingPass.css');
 
 @import url('./pages/landing.css');
 @import url('./pages/auth.css');

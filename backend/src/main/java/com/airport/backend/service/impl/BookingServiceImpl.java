@@ -90,4 +90,56 @@ public class BookingServiceImpl implements BookingService {
                                 .map(bookingMapper::toResponse)
                                 .collect(Collectors.toList());
         }
+
+        @Override
+        @Transactional
+        public void cancelBooking(
+                        Long ticketNo,
+                        String username) {
+
+                Passenger passenger = passengerRepository
+                                .findByUsername(username)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Passenger not found"));
+
+                Booking booking = bookingRepository
+                                .findById(ticketNo)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Booking not found"));
+
+                // =====================================
+                // SECURITY CHECK
+                // =====================================
+
+                if (!booking.getPassenger()
+                                .getPassengerId()
+                                .equals(
+                                                passenger.getPassengerId())) {
+
+                        throw new RuntimeException(
+                                        "Unauthorized");
+                }
+
+                // =====================================
+                // 24 HOUR VALIDATION
+                // =====================================
+
+                java.time.LocalDateTime departure = booking.getFlight()
+                                .getDeparture_time();
+
+                java.time.LocalDateTime now = java.time.LocalDateTime.now();
+
+                if (departure.minusHours(24)
+                                .isBefore(now)) {
+
+                        throw new RuntimeException(
+                                        "Cannot cancel within 24 hours of departure");
+                }
+
+                // =====================================
+                // DELETE BOOKING
+                // =====================================
+
+                bookingRepository.delete(booking);
+        }
 }
